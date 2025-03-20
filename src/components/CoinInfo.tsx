@@ -9,15 +9,14 @@ const CoinInfo: ({ data }: any) => any = ({ data }) => {
   const [change24, setChange] = useState<number | any>();
   const addF = async (coinId: any) => {
     await axios
-      .post("http://localhost:3000/api/addfav", { coinId })
+      .post("http://localhost:3000/api/coins/add-fav", { coinId })
       .then((response) => {
         console.log(response.data);
       })
       .catch((error) => {
         console.error("Error:", error);
       });
-    const { data } = await axios.get("http://localhost:3000/api/user-coin");
-    console.log(data);
+  
   };
   console.log(data);
 
@@ -58,8 +57,11 @@ const CoinInfo: ({ data }: any) => any = ({ data }) => {
         <div className="flex items-center justify-center gap-2">
           {" "}
           <Star
-            onClick={() => addF(data.id)}
-            className="h-8 w-8 p-2 text-slate-500 rounded-md bg-[#EFF2F5] cursor-pointer "
+            onClick={() => {
+              addF(data.id);
+              setColor("text-yellow-400");
+            }}
+            className={`h-8 w-8 p-2 ${color}   rounded-md bg-[#EFF2F5] cursor-pointer`}
           />
           <Share className="h-8 w-8 p-2 text-slate-500 rounded-md bg-[#EFF2F5] cursor-pointer  " />
         </div>

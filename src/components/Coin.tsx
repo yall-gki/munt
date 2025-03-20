@@ -13,7 +13,7 @@ const Coin: FC<CoinProps> = ({ image, name, price, marketCap, symbol }) => {
   return (
     <Link href={`/dashboard/${name.toLowerCase()}`}>
       {" "}
-      <div className="container hover:bg-slate-50 h-16 flex items-center justify-between p-1 px-6 border-b-1 border-t-2 border-zinc-100">
+      <div className="w-screen hover:bg-slate-50 h-16 flex items-center justify-between p-1 px-6 border-2 border-b-1 border-l-4 border-r-4  border-zinc-100">
         <div className="w-[10rem] h-full flex items-center justify-start">
           <span
             className="flex items-center justify-center gap-2 
