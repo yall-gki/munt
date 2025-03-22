@@ -6,12 +6,18 @@ export async function fetchCoins(ids: string[]): Promise<any> {
     throw new Error("❌ No coin IDs provided.");
   }
 
-  const cacheKey = `coinsData:${ids.join(",")}`; // Cache each unique request separately
+  // 🔹 Sort IDs to ensure cache key consistency
+  const sortedIds = [...ids].sort();
+  const cacheKey = `coinsData:${sortedIds.join(",")}`;
 
   try {
     // 1️⃣ Try to get data from Redis cache
     let cachedData = await redisClient.get(cacheKey);
-    if (cachedData) {
+    if (
+      cachedData &&
+      typeof cachedData === "string" &&
+      cachedData.trim() !== ""
+    ) {
       try {
         console.log("✅ Data retrieved from Redis cache");
         return JSON.parse(cachedData);
@@ -25,8 +31,9 @@ export async function fetchCoins(ids: string[]): Promise<any> {
     const batchSize = 20;
     let allCoins: any[] = [];
 
-    for (let i = 0; i < ids.length; i += batchSize) {
-      const batch = ids.slice(i, i + batchSize).join(",");
+    for (let i = 0; i < sortedIds.length; i += batchSize) {
+      const batch = sortedIds.slice(i, i + batchSize).join(",");
+
       try {
         const response = await axios.get(
           `https://api.coingecko.com/api/v3/coins/markets`,
@@ -44,15 +51,19 @@ export async function fetchCoins(ids: string[]): Promise<any> {
           }
         );
 
-        if (response.status !== 200) {
-          throw new Error(`CoinGecko API error: ${response.statusText}`);
+        if (response.status === 200) {
+          allCoins.push(...response.data);
+        } else {
+          console.error("❌ CoinGecko API error:", response.statusText);
         }
-
-        allCoins.push(...response.data);
       } catch (apiError) {
         console.error("❌ API Fetch Error:", apiError);
-        throw new Error("Failed to fetch coin data.");
+        // Don't throw an error here, just log it and continue with other batches
       }
+    }
+
+    if (allCoins.length === 0) {
+      throw new Error("Failed to fetch any coin data.");
     }
 
     // 3️⃣ Cache the data in Redis for 1 hour
