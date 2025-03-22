@@ -14,7 +14,7 @@ interface pageProps {
   };
 }
 
-const page: ({ params }: pageProps) => any = ({ params }) => {
+const Page: ({ params }: pageProps) => any = ({ params }) => {
   const { coinName } = params;
   const { data: coin, isError } = useCoinsData(ids);
   const { data: chartData, isLoading } = useChartData(coinName);
@@ -44,4 +44,4 @@ const page: ({ params }: pageProps) => any = ({ params }) => {
   );
 };
 
-export default page;
+export default Page;
