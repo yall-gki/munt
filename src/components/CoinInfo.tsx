@@ -50,7 +50,7 @@ const CoinInfo = ({ data }: any) => {
     if (data?.price_change_percentage_24h !== undefined) {
       let currData = data.price_change_percentage_24h;
       setColor(currData < 0 ? "text-red-500" : "text-green-500");
-      setChange(Math.abs(currData).toFixed(2));
+      setChange(Number(Math.abs(currData).toFixed(2)));
     }
   }, [data]);
 
