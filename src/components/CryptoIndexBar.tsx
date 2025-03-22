@@ -8,7 +8,7 @@ interface CryptoIndexBarProps {
 
 const CryptoIndexBar: FC<CryptoIndexBarProps> = ({ sort }) => {
   return (
-    <div className=" h-16 w-screen flex items-center justify-between p-1 px-6 border-2  text-zinc-900 border-zinc-800 ">
+    <div className=" h-16 w-screen flex items-center justify-between p-1 px-6   text-zinc-900  ">
       <div className="w-[10rem] h-full flex items-center justify-start">
         <span className="flex items-center justify-center gap-2  text-sm font-semibold">
           Coin

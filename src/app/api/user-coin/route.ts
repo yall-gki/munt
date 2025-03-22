@@ -1,20 +1,34 @@
 import { db } from "@/lib/db";
-import { getSession } from "next-auth/react";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth"; // Import authOptions if using custom auth config
 
-export async function GET(res: Response) {
+export async function GET(req: Request) {
   try {
-    const session = await getSession();
+    const session = await getServerSession(authOptions);
 
-    const userC = await db.userCoin.findMany({
+    if (!session?.user?.id) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+      });
+    }
+
+    const userCoins = await db.userCoin.findMany({
       where: {
-        userId: session?.user.id,
+        userId: session.user.id,
       },
-      include: {
-        user: true,
+      select: {
+        coinId: true, // Only return coin IDs
       },
     });
-    return new Response(JSON.stringify(userC));
+
+    return new Response(JSON.stringify(userCoins), {
+      headers: { "Content-Type": "application/json" },
+      status: 200,
+    });
   } catch (error) {
-    return new Response("Could not fetch coins", { status: 500 });
+    return new Response(JSON.stringify({ error: "Could not fetch coins" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
