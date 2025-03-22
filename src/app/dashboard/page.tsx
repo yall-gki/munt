@@ -33,7 +33,7 @@ function Page() {
   // Fetch Favorite Coins
   const getFav = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/user-coin");
+      const response = await axios.get("/api/user-coin");
       setFavcoin(response.data);
     } catch (error) {
       console.error("Error fetching favorite coins:", error);

@@ -13,7 +13,7 @@ const CoinInfo = ({ data }: any) => {
   // Function to add coin to favorites
   const addF = async (coinId: string) => {
     try {
-      await axios.post("http://localhost:3000/api/coins/add-fav", { coinId });
+      await axios.post("/api/coins/add-fav", { coinId });
     } catch (error) {
       console.error("Error:", error);
     }
@@ -28,7 +28,7 @@ const CoinInfo = ({ data }: any) => {
   // Function to fetch favorite coins for the current user
   const getFav = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/user-coin");
+      const response = await axios.get("/api/user-coin");
       setFav(response.data || []);
     } catch (error) {
       console.error("Error fetching favorite coins:", error);
