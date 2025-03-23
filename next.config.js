@@ -5,7 +5,12 @@ const nextConfig = {
     REDIS_SECRET: process.env.REDIS_SECRET,
   },
   images: {
-    domains: ["uploadthing.com", "lh3.googleusercontent.com" ,"ethereum.org"],
+    domains: [
+      "uploadthing.com",
+      "lh3.googleusercontent.com",
+      "ethereum.org",
+      "images.unsplash.com",
+    ],
   },
   experimental: {
     appDir: true,

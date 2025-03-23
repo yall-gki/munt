@@ -1,3 +1,4 @@
+import FavoriteCoins from "@/components/FavoriteCoins";
 import Navbar from "@/components/Navbar";
 import Providers from "@/components/Providers";
 import { Toaster } from "@/components/ui/Toaster";
@@ -26,12 +27,12 @@ export default function RootLayout({
         inter.className
       )}
     >
-      <body className="min-h-screen   antialiased">
-        {" "}
+      <body className="min-h-screen antialiased">
         <Providers>
           <Navbar />
+          <FavoriteCoins />
           {authModal}
-          <div className=" max-w-7xl pt-12 h-screen "> {children}</div>
+          <main className="w-full  h-[calc(100vh-11rem)]">{children}</main>
         </Providers>
         <Toaster />
       </body>

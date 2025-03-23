@@ -1,6 +1,25 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@keyframes greenGlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-greenGlow {
+  background-size: 200% 200%;
+  animation: greenGlow 6s ease infinite;
+  filter: blur(12px);
+  opacity: 0.9;
+}
+
 
 @layer base {
   :root {

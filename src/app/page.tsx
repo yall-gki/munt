@@ -3,16 +3,24 @@ import Image from "next/image";
 export default function Home() {
   return (
     <>
-      <div className="relative h-full w-[100vw]">
+      <div className="relative h-full w-full overflow-hidden">
+        {/* Background Image */}
         <Image
-          src="https://ethereum.org/_next/image/?url=%2F_next%2Fstatic%2Fmedia%2Fhero.94a1ecc4.png&w=1504&q=75"
+          src="https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           alt="Hero"
           fill
-          className="absolute top-0 left-0 w-full h-full object-fill select-none"
+          className="absolute top-0 left-0 w-full h-full object-cover select-none"
         />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <h1 className="text-white text-4xl"></h1>
-          <p className="text-white mt-2"></p>
+
+        {/* New Radial Glow Overlay */}
+        <span className="absolute inset-0 bg-[radial-gradient(circle_at_50%_80%,_#00ff99_10%,_rgba(0,0,0,0.8)_60%)] opacity-80"></span>
+
+        {/* Centered Content */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+          <h1 className="text-white text-4xl font-bold">Your Hero Title</h1>
+          <p className="text-white mt-2 text-lg">
+            Your subtitle or description here
+          </p>
         </div>
       </div>
     </>
