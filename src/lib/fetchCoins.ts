@@ -14,21 +14,16 @@ export async function fetchCoins(ids: string[]): Promise<any> {
     // 1️⃣ Try to get data from Redis cache
     let cachedData = await redisClient.get(cacheKey);
     if (
-      cachedData &&
-      typeof cachedData === "string" &&
-      cachedData.trim() !== ""
+      cachedData 
     ) {
       try {
         console.log("✅ Data retrieved from Redis cache");
-        return JSON.parse(cachedData);
+        return cachedData;
       } catch (parseError) {
         console.error("❌ JSON Parse Error:", parseError);
         await redisClient.del(cacheKey); // Clear corrupted cache
       }
-    }
-
-    // 2️⃣ Handle CoinGecko's API limit (split into batches of 20)
-    const batchSize = 20;
+    }else{  const batchSize = 20;
     let allCoins: any[] = [];
 
     for (let i = 0; i < sortedIds.length; i += batchSize) {
@@ -71,7 +66,10 @@ export async function fetchCoins(ids: string[]): Promise<any> {
     await redisClient.expire(cacheKey, 3600); // Set cache expiration
 
     return allCoins;
-  } catch (error: any) {
+}
+
+    // 2️⃣ Handle CoinGecko's API limit (split into batches of 20)
+    } catch (error: any) {
     console.error("❌ Server Error:", error.message || error);
     throw new Error("Failed to fetch coin data. Please try again later.");
   }

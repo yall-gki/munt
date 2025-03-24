@@ -2,48 +2,32 @@ import { cn } from "@/lib/utils";
 import { Share, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Icons } from "./Icons";
-import axios from "axios";
+import { useFavoriteCoinsStore } from "@/lib/store";
 
 const CoinInfo = ({ data }: any) => {
-  const [fav, setFav] = useState<string[]>([]);
+  const { favorites, fetchFavorites, addFavorite } = useFavoriteCoinsStore();
   const [color, setColor] = useState("text-slate-500");
-  const [favcolor, setFavColor] = useState(false);
   const [change24, setChange] = useState<number>(0);
-
-  // Function to add coin to favorites
-  const addF = async (coinId: string) => {
-    try {
-      await axios.post("/api/coins/add-fav", { coinId });
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  // Toggle favorite
-  const toggleFavorite = async () => {
-    await addF(data?.id);
-    setFavColor((prev) => !prev);
-  };
-
-  // Function to fetch favorite coins for the current user
-  const getFav = async () => {
-    try {
-      const response = await axios.get("/api/user-coin");
-      setFav(response.data || []);
-    } catch (error) {
-      console.error("Error fetching favorite coins:", error);
-    }
-  };
-
-  // Update favorite color when fav list changes
-  useEffect(() => {
-    setFavColor(fav.some((coin: any) => coin.coinId === data.id));
-  }, [fav, data.id]);
 
   // Fetch user's favorite coins on mount
   useEffect(() => {
-    getFav();
+    fetchFavorites();
   }, []);
+
+  // Check if this coin is in favorites
+  const isFavorite = favorites.includes(data?.id);
+
+  // Toggle favorite and update state instantly
+  const toggleFavorite = async () => {
+    const newFavorites = isFavorite
+      ? favorites.filter((coin) => coin !== data?.id) // Remove from list
+      : [...favorites, data?.id]; // Add to list
+
+    useFavoriteCoinsStore.setState({ favorites: newFavorites }); // Optimistic UI update
+
+    await addFavorite(data?.id);
+    fetchFavorites(); // Sync with API to ensure correctness
+  };
 
   // Format price change percentage
   useEffect(() => {
@@ -70,10 +54,10 @@ const CoinInfo = ({ data }: any) => {
         </div>
         <div className="flex items-center justify-center gap-2">
           <Star
-            fill={favcolor ? "gold" : "none"}
+            fill={isFavorite ? "gold" : "none"}
             onClick={toggleFavorite}
             className={`h-8 w-8 p-2 rounded-md ${
-              favcolor ? "text-[#ffd700]" : "text-slate-500"
+              isFavorite ? "text-[#ffd700]" : "text-slate-500"
             } cursor-pointer`}
           />
           <Share className="h-8 w-8 p-2 text-slate-500 rounded-md bg-[#EFF2F5] cursor-pointer" />

@@ -5,6 +5,7 @@ import { useChartData } from "@/hooks/useChartData";
 import { ids } from "@/lib/ids";
 import { useCoinsData } from "@/hooks/useCoinData";
 import { Loader2 } from "lucide-react";
+import CandlestickChart from "@/components/charty";
 
 // Inside your component
 
@@ -35,9 +36,10 @@ const Page: ({ params }: pageProps) => any = ({ params }) => {
   return (
     <>
       <div className="h-12 max-w-screen border border-slate-300"></div>
-      <div className="max-w-screen h-auto flex items-center justify-center ">
+      <div className="max-w-screen h-auto flex items-center justify-center max-md:flex-wrap ">
         <CoinInfo data={coinData} />
         <CoinLineChart data={chartData} coinName={coinName} />
+
         <CoinInfo data={coinData} />
       </div>
     </>

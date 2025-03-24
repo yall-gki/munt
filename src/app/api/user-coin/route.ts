@@ -1,12 +1,22 @@
 import { db } from "@/lib/db";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth"; // Import authOptions if using custom auth config
+import { authOptions } from "@/lib/auth";
 
 export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user?.id) {
+    // Extract user ID from headers if session is missing
+    let userId = session?.user?.id;
+
+    if (!userId) {
+      const authHeader = req.headers.get("Authorization");
+      if (authHeader) {
+        userId = authHeader.replace("Bearer ", ""); // Extract token
+      }
+    }
+
+    if (!userId) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
       });
@@ -14,7 +24,7 @@ export async function GET(req: Request) {
 
     const userCoins = await db.userCoin.findMany({
       where: {
-        userId: session.user.id,
+        userId: userId,
       },
       select: {
         coinId: true, // Only return coin IDs

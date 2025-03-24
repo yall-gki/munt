@@ -1,3 +1,5 @@
+"use client"
+import CandlestickChart from "@/components/charty";
 import Image from "next/image";
 
 export default function Home() {

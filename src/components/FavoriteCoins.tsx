@@ -1,27 +1,18 @@
 "use client";
-import { useEffect, useState, FC, useCallback, useMemo } from "react";
+import { useEffect, useMemo, FC } from "react";
 import { useCoinsData } from "@/hooks/useCoinData";
 import { ids } from "@/lib/ids";
 import { Plus } from "lucide-react";
+import { useFavoriteCoinsStore } from "@/lib/store"; // ✅ Import Global Store
 
 const FavoriteCoins: FC = () => {
-  const [favcoin, setFavcoin] = useState<{ coinId: string }[]>([]);
+  const { favorites, fetchFavorites } = useFavoriteCoinsStore(); // ✅ Use global favorites state
   const { data: cacheD } = useCoinsData(ids);
 
-  const getFav = useCallback(async () => {
-    try {
-      const response = await fetch("/api/user-coin");
-      const data = await response.json();
-      setFavcoin(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("Error fetching favorite coins:", error);
-      setFavcoin([]);
-    }
-  }, []);
-
+  // Fetch user's favorite coins on mount
   useEffect(() => {
-    getFav();
-  }, [getFav]);
+    fetchFavorites();
+  }, []);
 
   const getCoinData = useMemo(
     () => (coinId: string) => {
@@ -33,17 +24,19 @@ const FavoriteCoins: FC = () => {
 
   return (
     <div className="relative h-32 p-4 px-6 min-w-full flex items-center gap-4 overflow-x-auto scroll-smooth">
-      {/* Plus Button with White BG & Black Text */}
+      {/* Plus Button */}
       <button className="relative w-12 h-12 flex items-center justify-center rounded-full bg-white text-black transition-all hover:scale-110 shadow-lg z-10">
         <Plus className="relative z-20 w-6 h-6" />
       </button>
 
       {/* Background Gradient */}
-      <span className="absolute min-w-screen inset-0 bg-[radial-gradient(circle_at_50%_100%,_#00ff99_10%,_rgba(0,0,0,0.8)_60%)] opacity-80"></span>
+      {/* Background Gradient */}
+      {/* Background Gradient */}
+      <span className="absolute left-0 top-0 h-full w-[300%] min-w-[max-content] bg-[radial-gradient(circle_at_50%_100%,_#00ff99_10%,_rgba(0,0,0,0.8)_60%)] opacity-80 pointer-events-none"></span>
 
       {/* Favorite Coins List */}
-      {favcoin.length > 0 ? (
-        favcoin.map(({ coinId }) => {
+      {favorites.length > 0 ? (
+        favorites.map((coinId) => {
           const coinData = getCoinData(coinId);
           if (!coinData) return null;
 

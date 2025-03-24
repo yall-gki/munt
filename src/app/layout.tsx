@@ -32,7 +32,7 @@ export default function RootLayout({
           <Navbar />
           <FavoriteCoins />
           {authModal}
-          <main className="w-full  h-[calc(100vh-11rem)]">{children}</main>
+          <main className="w-full  h-[calc(100vh-11rem)] ">{children}</main>
         </Providers>
         <Toaster />
       </body>
