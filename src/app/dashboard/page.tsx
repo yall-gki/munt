@@ -71,7 +71,7 @@ function Page() {
     <>
      
 
-      <div className="w-screen">
+      <div className="w-screen ">
         <CryptoIndexBar sort={handleSort} />
         {sortedData?.map((coin) => (
           <Coin

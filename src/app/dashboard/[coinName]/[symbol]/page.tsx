@@ -6,17 +6,21 @@ import { ids } from "@/lib/ids";
 import { useCoinsData } from "@/hooks/useCoinData";
 import { Loader2 } from "lucide-react";
 import CandlestickChart from "@/components/charty";
+import TradeHistory from "@/components/tradeHi";
+import { useRouter } from "next/router";
 
 // Inside your component
 
 interface pageProps {
   params: {
     coinName: string;
+    symbol: string
   };
 }
 
 const Page: ({ params }: pageProps) => any = ({ params }) => {
-  const { coinName } = params;
+  const { coinName,symbol } = params;
+ 
   const { data: coin, isError } = useCoinsData(ids);
   const { data: chartData, isLoading } = useChartData(coinName);
   let coinData;
@@ -35,12 +39,12 @@ const Page: ({ params }: pageProps) => any = ({ params }) => {
   }
   return (
     <>
-      <div className="h-12 max-w-screen border border-slate-300"></div>
-      <div className="max-w-screen h-auto flex items-center justify-center max-md:flex-wrap ">
-        <CoinInfo data={coinData} />
-        <CoinLineChart data={chartData} coinName={coinName} />
-
-        <CoinInfo data={coinData} />
+      <div className="max-w-screen h-full p-10 px-44 bg-black  flex items-center justify-center max-md:flex-col ">
+        <div className="wrapp h-full w-full flex items-center justify-center  ">
+          <CoinInfo data={coinData} />
+          <CoinLineChart data={chartData} symbol={symbol} coinName={coinName} />
+          <TradeHistory symbol={coinData?.symbol} />
+        </div>
       </div>
     </>
   );

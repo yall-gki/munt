@@ -11,7 +11,7 @@ interface CoinProps {
 
 const Coin: FC<CoinProps> = ({ image, name, price, marketCap, symbol }) => {
   return (
-    <Link href={`/dashboard/${name.toLowerCase()}`}>
+    <Link href={`/dashboard/${name.toLowerCase()}/${symbol.toUpperCase()}`}>
       <div className="w-full hover:bg-slate-50 h-16 flex flex-wrap items-center justify-between p-2 sm:p-4 border-2 border-b-1 border-l-4 border-r-4 border-zinc-100">
         <div className="flex items-center gap-2 w-36">
           <img src={image} className="h-6 w-6 object-cover" alt={name} />

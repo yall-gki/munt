@@ -39,38 +39,40 @@ const CoinInfo = ({ data }: any) => {
   }, [data]);
 
   return (
-    <div className="min-h-[90vh] w-full flex flex-col items-start justify-start border border-r-slate-400 text-black gap-2">
-      <div className="w-full h-7 flex items-center justify-between p-4 mt-3">
-        <div className="flex items-center justify-center w-auto gap-2 cursor-pointer">
-          <img
-            src={data?.image}
-            alt={data?.name}
-            className="h-6 w-6 rounded-2xl bg-[#EFF2F5]"
-          />
-          <h1 className="font-bold text-lg">{data?.name}</h1>
-          <h1 className="font-semibold text-slate-500">
-            {data?.symbol.toUpperCase()}
+    <div className="h-full max-md:h-44 w-full flex p-2 pr-0  flex-col items-start justify-start flex-1  text-neutral-100 gap-2">
+      <div className="wrapper  h-full w-full  rounded-md bg-zinc-900 ">
+        <div className="w-full h-7 flex items-center justify-between p-4 mt-3">
+          <div className="flex items-center justify-center w-auto gap-2 cursor-pointer">
+            <img
+              src={data?.image}
+              alt={data?.name}
+              className="h-6 w-6 rounded-2xl bg-[#EFF2F5]"
+            />
+            <h1 className="font-bold text-lg">{data?.name}</h1>
+            <h1 className="font-semibold text-slate-500">
+              {data?.symbol.toUpperCase()}
+            </h1>
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <Star
+              fill={isFavorite ? "gold" : "none"}
+              onClick={toggleFavorite}
+              className={`h-8 w-8 p-2 rounded-md ${
+                isFavorite ? "text-[#ffd700]" : "text-slate-500"
+              } cursor-pointer`}
+            />
+            <Share className="h-8 w-8 p-2 text-slate-500 rounded-md bg-zinc-800 cursor-pointer" />
+          </div>
+        </div>
+        <div className="h-auto p-4">
+          <h1 className="text-4xl font-bold">
+            ${data?.current_price.toLocaleString("en-US")}
           </h1>
+          <h3 className={cn(color, "font-bold text-sm flex items-center mt-2")}>
+            {change24 < 0.0 ? <Icons.chevyDown /> : <Icons.chevyUp />}
+            {change24}% (1d)
+          </h3>
         </div>
-        <div className="flex items-center justify-center gap-2">
-          <Star
-            fill={isFavorite ? "gold" : "none"}
-            onClick={toggleFavorite}
-            className={`h-8 w-8 p-2 rounded-md ${
-              isFavorite ? "text-[#ffd700]" : "text-slate-500"
-            } cursor-pointer`}
-          />
-          <Share className="h-8 w-8 p-2 text-slate-500 rounded-md bg-[#EFF2F5] cursor-pointer" />
-        </div>
-      </div>
-      <div className="h-auto p-4">
-        <h1 className="text-4xl font-bold">
-          ${data?.current_price.toLocaleString("en-US")}
-        </h1>
-        <h3 className={cn(color, "font-bold text-sm flex items-center mt-2")}>
-          {change24 < 0.0 ? <Icons.chevyDown /> : <Icons.chevyUp />}
-          {change24}% (1d)
-        </h3>
       </div>
     </div>
   );

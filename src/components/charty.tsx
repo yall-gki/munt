@@ -2,18 +2,22 @@ import React, { useEffect, useRef, useState } from "react";
 import { CandlestickSeries, createChart } from "lightweight-charts";
 import { Grid } from "lucide-react";
 
-const CandlestickChart = () => {
+const CandlestickChart = ({ symbol }: any) => {
   const chartContainerRef = useRef(null);
   const [data, setData] = useState([]);
 
   useEffect(() => {
+    console.log(symbol );
+    
     const fetchData = async () => {
       try {
         const response = await fetch(
-          "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=2000"
+          "https://api.binance.com/api/v3/klines?symbol=" +
+            symbol +
+            "USDT&interval=1h&limit=2000"
         );
         const rawData = await response.json();
-        const formattedData = rawData.map((item : any) => ({
+        const formattedData = rawData.map((item: any) => ({
           time: item[0] / 1000, // Convert milliseconds to seconds
           open: parseFloat(item[1]),
           high: parseFloat(item[2]),
@@ -34,8 +38,8 @@ const CandlestickChart = () => {
 
     const chartOptions = {
       layout: {
-        textColor: "black",
-        background: { type: "solid", color: "white" },
+        textColor: "gray",
+        background: { type: "solid", color: "#18181b" },
       },
       grid: {
         vertLines: { color: "transparent" },
@@ -53,7 +57,7 @@ const CandlestickChart = () => {
           below: 10,
         },
       }),
-      baseLineWidth : 4
+      baseLineWidth: 4,
     };
     const chart = createChart(chartContainerRef.current, chartOptions as any);
 
@@ -74,8 +78,8 @@ const CandlestickChart = () => {
   return (
     <div
       ref={chartContainerRef}
-      className="overflow-hidden "
-      style={{ width: "100%", height: "400px" }}
+      className="overflow-hidden h-3/4 w-full relative rounded-md p-0 text-neutral-600 "
+      style={{ width: "100%", height: "600px" }}
     />
   );
 };

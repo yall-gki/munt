@@ -4,6 +4,7 @@ import { useCoinsData } from "@/hooks/useCoinData";
 import { ids } from "@/lib/ids";
 import { Plus } from "lucide-react";
 import { useFavoriteCoinsStore } from "@/lib/store"; // ✅ Import Global Store
+import Link from "next/link";
 
 const FavoriteCoins: FC = () => {
   const { favorites, fetchFavorites } = useFavoriteCoinsStore(); // ✅ Use global favorites state
@@ -23,16 +24,12 @@ const FavoriteCoins: FC = () => {
   );
 
   return (
-    <div className="relative h-32 p-4 px-6 min-w-full flex items-center gap-4 overflow-x-auto scroll-smooth">
+    <div className="relative h-32 p-4 px-6 min-w-full flex items-center gap-4 overflow-x-auto scroll-smooth bg-green-600 bg-zinc-950">
       {/* Plus Button */}
-      <button className="relative w-12 h-12 flex items-center justify-center rounded-full bg-white text-black transition-all hover:scale-110 shadow-lg z-10">
-        <Plus className="relative z-20 w-6 h-6" />
-      </button>
 
       {/* Background Gradient */}
       {/* Background Gradient */}
       {/* Background Gradient */}
-      <span className="absolute left-0 top-0 h-full w-[300%] min-w-[max-content] bg-[radial-gradient(circle_at_50%_100%,_#00ff99_10%,_rgba(0,0,0,0.8)_60%)] opacity-80 pointer-events-none"></span>
 
       {/* Favorite Coins List */}
       {favorites.length > 0 ? (
@@ -70,6 +67,14 @@ const FavoriteCoins: FC = () => {
           No favorite coins
         </p>
       )}
+      <Link
+        href="/add-coin"
+        className=" hover:text-zinc-800 text-sm font-bold underline underline-offset-6"
+      >
+        <button className="relative w-12 h-12 flex items-center justify-center rounded-full bg-white text-black transition-all hover:scale-110 shadow-lg z-10">
+          <Plus className="relative z-20 w-6 h-6" />
+        </button>
+      </Link>
     </div>
   );
 };

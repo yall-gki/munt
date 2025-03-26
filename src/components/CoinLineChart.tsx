@@ -33,7 +33,7 @@ export const options = {
   },
 };
 
-const CoinLineChart: React.FC<{ data: any }> = ({ data }) => {
+const CoinLineChart: React.FC<{ data: any; symbol : any }> = ({ data, symbol }) => {
   const labels = data?.prices?.map((entry: any) =>
     new Date(entry[0]).toLocaleDateString()
   );
@@ -49,7 +49,7 @@ const CoinLineChart: React.FC<{ data: any }> = ({ data }) => {
         data: dataValues,
         borderColor: "#3691ff",
         borderWidth: 2,
-        backgroundColor: "rgba(0, 255, 0, 0.3)", // More visible fill
+        backgroundColor: "#27272a", // More visible fill
         pointRadius: 0,
         tension: 0.4, // Smooth curve
         fill: "origin", // Ensures fill is applied correctly
@@ -58,12 +58,14 @@ const CoinLineChart: React.FC<{ data: any }> = ({ data }) => {
   };
 
   return (
-    <div className="h-[90vh] flex items-center justify-between flex-col w-full">
-      <CandlestickChart />
-      <div className="relative h-64 w-full bg-black">
-        {" "}
-        {/* Ensure background contrast */}
-        <Line options={options} data={initialData} />
+    <div className="h-full flex items-center justify-between flex-col w-1/2">
+      <div className="wrap h-full p-2 gap-2  w-full flex flex-col rounded-md">
+        <CandlestickChart symbol={symbol} />
+        <div className="relative h-64 w-full bg-zinc-900  rounded-md ">
+          {" "}
+          {/* Ensure background contrast */}
+          <Line options={options} data={initialData} />
+        </div>
       </div>
     </div>
   );
