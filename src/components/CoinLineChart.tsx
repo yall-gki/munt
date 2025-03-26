@@ -20,7 +20,7 @@ ChartJS.register(
   Legend
 );
 
-export const options = {
+export const options:any = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -31,7 +31,7 @@ export const options = {
     x: { display: false }, // Hide X-axis
     y: { display: false }, // Hide Y-axis
   },
-};
+} ;
 
 const CoinLineChart: React.FC<{ data: any; symbol : any }> = ({ data, symbol }) => {
   const labels = data?.prices?.map((entry: any) =>

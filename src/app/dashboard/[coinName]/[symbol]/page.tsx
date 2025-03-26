@@ -42,7 +42,7 @@ const Page: ({ params }: pageProps) => any = ({ params }) => {
       <div className="max-w-screen h-full p-10 px-44 bg-black  flex items-center justify-center max-md:flex-col ">
         <div className="wrapp h-full w-full flex items-center justify-center  ">
           <CoinInfo data={coinData} />
-          <CoinLineChart data={chartData} symbol={symbol} coinName={coinName} />
+          <CoinLineChart data={chartData} symbol={symbol}  />
           <TradeHistory symbol={coinData?.symbol} />
         </div>
       </div>
