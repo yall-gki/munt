@@ -8,18 +8,16 @@ import { Loader2 } from "lucide-react";
 import CandlestickChart from "@/components/charty";
 import TradeHistory from "@/components/tradeHi";
 import { useRouter } from "next/router";
+import React from "react";
 
 // Inside your component
 
 interface pageProps {
-  params: {
-    coinName: string;
-    symbol: string
-  };
+  params: any
 }
 
 const Page: ({ params }: pageProps) => any = ({ params }) => {
-  const { coinName,symbol } = params;
+  const { coinName,symbol } = React.use<any>(params);
  
   const { data: coin, isError } = useCoinsData(ids);
   const { data: chartData, isLoading } = useChartData(coinName);
