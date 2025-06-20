@@ -1,3 +1,4 @@
+// lib/store.ts (or any client-safe file)
 import { create } from "zustand";
 
 interface FavoriteCoinsStore {
@@ -18,20 +19,20 @@ export const useFavoriteCoinsStore = create<FavoriteCoinsStore>((set) => ({
 
   fetchFavorites: async () => {
     try {
-      const response = await fetch("/api/user-coin");
-      const data = await response.json();
-      set({ favorites: Array.isArray(data) ? data.map((c) => c.coinId) : [] });
-    } catch (error) {
-      console.error("Error fetching favorite coins:", error);
+      const res = await fetch("/api/user-coin");
+      const json = await res.json();
+      set({ favorites: json.map((item: any) => item.coinId) });
+    } catch (err) {
+      console.error("❌ Fetch error:", err);
       set({ favorites: [] });
     }
   },
 
-  addFavorite: async (coinId) => {
+  addFavorite: async (coinId: string) => {
     set((state) => ({
       favorites: state.favorites.includes(coinId)
-        ? state.favorites.filter((id) => id !== coinId) // Remove if exists
-        : [...state.favorites, coinId], // Add if not exists
+        ? state.favorites.filter((id) => id !== coinId)
+        : [...state.favorites, coinId],
     }));
 
     try {
@@ -41,10 +42,9 @@ export const useFavoriteCoinsStore = create<FavoriteCoinsStore>((set) => ({
         headers: { "Content-Type": "application/json" },
       });
 
-      // Refresh to ensure correct data after API update
       await useFavoriteCoinsStore.getState().fetchFavorites();
     } catch (error) {
-      console.error("Error updating favorite:", error);
+      console.error("❌ Failed to add favorite:", error);
     }
   },
 

@@ -1,38 +1,27 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import { ChevronDown } from "lucide-react";
-import { sortedList } from "@/lib/sort";
 
 interface CryptoIndexBarProps {
-  sort: any;
+  sort: (order: string) => void;
 }
 
 const CryptoIndexBar: FC<CryptoIndexBarProps> = ({ sort }) => {
   return (
-    <div className=" h-16 w-full flex items-center justify-between p-1 px-6   text-zinc-900  ">
-      <div className=" h-full flex items-center justify-start">
-        <span className="flex items-center w-36  gap-2  text-sm font-semibold">
-          Coin
+    <div className="w-full py-2 px-4 flex justify-between items-center text-white bg-zinc-900 rounded-md mb-4">
+      <span className="text-sm font-semibold w-24 sm:w-36">Coin</span>
+      <div className="flex gap-4 sm:gap-10 text-xs sm:text-sm font-medium">
+        <span
+          onClick={() => sort("price")}
+          className="flex items-center gap-1 cursor-pointer hover:text-green-400"
+        >
+          Price <ChevronDown size={16} />
         </span>
-      </div>
-      <div className="   text-right  flex justify-end sm:gap-10 text-xs sm:text-sm md:text-base font-medium max-sm:pl-8">
-        <div className="h-full flex items-center ">
-          <span
-            onClick={() => sort("price")}
-            className=" cursor-pointer text-sm w-36 flex items-center  font-semibold"
-          >
-            Price
-            <ChevronDown className="p-1 " />
-          </span>
-        </div>
-        <div className=" h-full  items-center ">
-          <span
-            onClick={() => sort("volume")}
-            className="cursor-pointer  text-sm w-36 flex font-bold items-center"
-          >
-            Volume
-            <ChevronDown className="p-1 " />
-          </span>
-        </div>
+        <span
+          onClick={() => sort("volume")}
+          className="flex items-center gap-1 cursor-pointer hover:text-green-400"
+        >
+          Volume <ChevronDown size={16} />
+        </span>
       </div>
     </div>
   );
