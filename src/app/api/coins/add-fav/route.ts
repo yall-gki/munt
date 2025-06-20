@@ -9,7 +9,10 @@ export async function POST(req: Request) {
 
     const session = await getAuthSession();
     if (!session?.user?.id) {
-      return new Response("Unauthorized", { status: 401 });
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
     await db.userCoin.upsert({
@@ -19,19 +22,28 @@ export async function POST(req: Request) {
           coinId,
         },
       },
-      update: {}, // Already exists — do nothing
+      update: {},
       create: {
         userId: session.user.id,
         coinId,
       },
     });
 
-    return Response.json({ message: "✅ Coin saved to favorites." });
+    return new Response(
+      JSON.stringify({ message: "✅ Coin saved to favorites." }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (error) {
     console.error("❌ Error adding favorite coin:", error);
-    return Response.json(
-      { error: "Failed to add coin to favorites." },
-      { status: 500 }
+    return new Response(
+      JSON.stringify({ error: "Failed to add coin to favorites." }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
     );
   }
 }
