@@ -2,9 +2,9 @@
 import { useEffect, useState } from "react";
 
 interface Trade {
-  p: string;
-  q: string;
-  T: number;
+  p: string; // price
+  q: string; // quantity
+  T: number; // timestamp
 }
 
 const TradeHistory: React.FC<{ symbol: string }> = ({ symbol }) => {
@@ -15,11 +15,13 @@ const TradeHistory: React.FC<{ symbol: string }> = ({ symbol }) => {
     const ws = new WebSocket(
       `wss://stream.binance.com:9443/ws/${symbol}usdt@trade`
     );
+
     ws.onmessage = (event) => {
       const trade: Trade = JSON.parse(event.data);
       setTrades((prev) => [trade, ...prev.slice(0, 20)]);
       setPrevPrice(parseFloat(trade.p));
     };
+
     return () => ws.close();
   }, [symbol]);
 
@@ -31,20 +33,26 @@ const TradeHistory: React.FC<{ symbol: string }> = ({ symbol }) => {
           <span className="w-1/3">Amount</span>
           <span className="w-1/3 text-right">Time</span>
         </li>
+
         {trades.map((trade, index) => {
           const price = parseFloat(trade.p);
-          let textColor = "text-white";
-          if (prevPrice !== null) {
-            if (price > prevPrice) textColor = "text-green-500";
-            else if (price < prevPrice) textColor = "text-red-500";
-          }
+          const quantity = parseFloat(trade.q);
+          const color =
+            prevPrice === null
+              ? "text-white"
+              : price > prevPrice
+              ? "text-green-500"
+              : price < prevPrice
+              ? "text-red-500"
+              : "text-white";
+
           return (
             <li
-              key={index}
+              key={`${trade.T}-${index}`}
               className="text-xs h-8 px-4 border-b border-b-zinc-700 flex justify-between font-bold"
             >
-              <span className={`${textColor} w-1/3`}>{trade.p}</span>
-              <span className="w-1/3">{trade.q}</span>
+              <span className={`${color} w-1/3`}>{price.toFixed(4)}</span>
+              <span className="w-1/3">{quantity.toFixed(6)}</span>
               <span className="w-1/3 text-right">
                 {new Date(trade.T).toLocaleTimeString()}
               </span>

@@ -1,23 +1,30 @@
-export const sortedList = (list: any[], order: string, sortOrder: string) => {
+export const sortedList = (
+  list: any[],
+  order: string,
+  sortOrder: "asc" | "desc"
+) => {
+  const sorted = [...list];
+
   switch (order) {
     case "price":
-      if (sortOrder == "asc") {
-        return [...list].sort(
-          (a: any, b: any) => b.current_price - a.current_price
-        );
-      } else {
-        return [...list].sort(
-          (a: any, b: any) => a.current_price - b.current_price
-        );
-      }
+      sorted.sort((a, b) =>
+        sortOrder === "asc"
+          ? a.current_price - b.current_price
+          : b.current_price - a.current_price
+      );
+      break;
 
     case "volume":
-      if (sortOrder == "asc") {
-        return [...list].sort((a: any, b: any) => b.market_cap - a.market_cap);
-      } else {
-        return [...list].sort((a: any, b: any) => a.market_cap - b.market_cap);
-      }
+      sorted.sort((a, b) =>
+        sortOrder === "asc"
+          ? a.market_cap - b.market_cap
+          : b.market_cap - a.market_cap
+      );
+      break;
+
     default:
       return list;
   }
+
+  return sorted;
 };

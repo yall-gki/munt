@@ -9,14 +9,14 @@ const Navbar: any = async () => {
   const session = await getAuthSession();
 
   return (
-    <div className="  inset-x-0 h-[3rem] flex justify-center items-center    z-[10] py-2 mx-8">
+    <div className="  inset-x-0 h-[3rem] flex justify-center items-center bg-zinc-950   z-[10] py-9 px-11 ">
       <div className=" w-full h-full mx-auto flex items-center justify-between ">
         
         <Link href="/" className="flex h-fit gap-2 items-center">
           <Icons.logo className=" h-9 w-9 sm:h-7 sm:w-7  " />
         </Link>
         <ul className="flex items-center justify-between list-none gap-16">
-          <li className="font-semibold text-sm cursor-pointer w-auto ">
+          <li className="font-semibold py-2 px-3 bg-white text-zinc-950 text-sm cursor-pointer w-auto ">
             <a href="/dashboard"> Dashboard</a>
           </li>
          

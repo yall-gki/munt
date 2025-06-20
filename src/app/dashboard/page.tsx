@@ -10,16 +10,30 @@ import axios from "axios";
 
 function Page() {
   const [data, setData] = useState<any[]>([]);
-  const [sortOrder, setSortOrder] = useState<string>("asc");
   const [sortedData, setSortedData] = useState<any[]>([]);
   const [favcoin, setFavcoin] = useState<any[]>([]);
   const { data: cacheD, isLoading, isError } = useCoinsData(ids);
 
-  const handleSort = (order: string) => {
-    const sorted = sortedList(data, order, sortOrder);
-    setSortedData(sorted);
-    setSortOrder(order);
+  const [sortConfig, setSortConfig] = useState({
+    field: "price",
+    order: "desc" as "asc" | "desc",
+  });
+
+  const handleSort = (field: string) => {
+    setSortConfig((prev) => {
+      const newOrder =
+        prev.field === field && prev.order === "desc" ? "asc" : "desc";
+      return { field, order: newOrder };
+    });
   };
+
+  useEffect(() => {
+    if (data.length > 0) {
+      const sorted = sortedList(data, sortConfig.field, sortConfig.order);
+      setSortedData(sorted);
+    }
+  }, [data, sortConfig]);
+  
 
   const getFav = async () => {
     try {
@@ -60,7 +74,7 @@ function Page() {
   return (
     <div className="min-h-screen bg-black text-white p-4 sm:p-6">
       <div className="max-w-5xl mx-auto">
-        <CryptoIndexBar sort={handleSort} />
+        <CryptoIndexBar currentSort={sortConfig} onSortChange={handleSort} />
         {sortedData?.map((coin) => (
           <Coin
             key={coin.symbol}
