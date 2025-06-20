@@ -30,8 +30,8 @@ const CryptoIndexBar: FC<CryptoIndexBarProps> = ({
           <span
             key={field}
             onClick={() => onSortChange(field)}
-            className={`flex items-center gap-1 cursor-pointer hover:text-green-400 ${
-              currentSort.field === field ? "text-green-400" : ""
+            className={`flex items-center gap-1 cursor-pointer hover:text-blue-500 ${
+              currentSort.field === field ? "text-blue-500" : ""
             }`}
           >
             {field.charAt(0).toUpperCase() + field.slice(1)}{" "}
