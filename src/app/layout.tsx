@@ -23,16 +23,16 @@ export default function RootLayout({
     <html
       lang="en"
       className={cn(
-        "bg-white text-slate-900 antialiased light",
+        "bg-zinc-950 min-h-screen text-slate-900 antialiased light",
         inter.className
       )}
     >
-      <body className="min-h-screen antialiased">
+      <body className=" antialiased">
         <Providers>
           <Navbar />
           <FavoriteCoins />
           {authModal}
-          <main className="w-full  h-[calc(100vh-11rem)] max-md:h-auto ">{children}</main>
+          <main className="w-full bg-zinc-950  h-[calc(100vh-11rem)] max-md:h-auto ">{children}</main>
         </Providers>
         <Toaster />
       </body>
