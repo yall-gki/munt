@@ -45,6 +45,7 @@ const CoinLineChart: React.FC<{ data: any; symbol: any }> = ({
     new Date(entry[0]).toLocaleDateString()
   );
   const dataValues = data?.prices?.map((entry: any) => entry[1]);
+console.log(dataValues);
 
   const initialData = {
     labels,
