@@ -16,4 +16,3 @@ export function useCoinsData(ids: string[]) {
     staleTime: 1000 * 60 * 5,
   });
 }
-g
