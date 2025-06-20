@@ -1,3 +1,4 @@
+// CoinLineChart.tsx
 import React from "react";
 import {
   Chart as ChartJS,
@@ -30,8 +31,8 @@ export const options: any = {
     tooltip: { mode: "index", intersect: false },
   },
   scales: {
-    x: { display: false }, // Hide X-axis
-    y: { display: false }, // Hide Y-axis
+    x: { display: false },
+    y: { display: false },
   },
 };
 
@@ -40,22 +41,19 @@ const CoinLineChart: React.FC<{ data: any; symbol: any }> = ({
   symbol,
 }) => {
   const { line, candle, trades, toggleState } = useFavoriteCoinsStore();
-
   const labels = data?.prices?.map((entry: any) =>
     new Date(entry[0]).toLocaleDateString()
   );
   const dataValues = data?.prices?.map((entry: any) => entry[1]);
-console.log(dataValues);
-
-  const initialData = {
+  const chartData = {
     labels,
     datasets: [
       {
         label: "Price",
         data: dataValues,
         borderColor: "#3691ff",
-        borderWidth: 2,
         backgroundColor: "#27272a",
+        borderWidth: 2,
         pointRadius: 0,
         tension: 0.4,
         fill: "origin",
@@ -64,33 +62,20 @@ console.log(dataValues);
   };
 
   return (
-    <div className="h-full flex items-center justify-between flex-col w-1/2">
-      <div className="wrap h-full p-2 gap-2 w-full flex flex-col rounded-md">
-        <span className="flex gap-2 md:hidden">
-          <span
-            onClick={() => toggleState("candle")}
-            className="cursor-pointer"
-          >
-            Candle
-          </span>
-          <span onClick={() => toggleState("line")} className="cursor-pointer">
-            Line
-          </span>
-          <span
-            onClick={() => toggleState("trades")}
-            className="cursor-pointer"
-          >
-            Trades
-          </span>
-        </span>
-        {candle && <CandlestickChart symbol={symbol} />}
-        {line && (
-          <div className="relative h-64 w-full bg-zinc-900 rounded-md">
-            <Line options={options} data={initialData} />
-          </div>
-        )}
-        {trades && <TradeHistory symbol={symbol} />}
+    <div className="w-full overflow-hidden
+    ">
+      <div className="md:hidden flex gap-2 mb-2">
+        <button onClick={() => toggleState("candle")}>Candle</button>
+        <button onClick={() => toggleState("line")}>Line</button>
+        <button onClick={() => toggleState("trades")}>Trades</button>
       </div>
+      {candle && <CandlestickChart className="h-33" symbol={symbol} />}
+      {line && (
+        <div className="relative h-33 w-full bg-zinc-900 rounded-md">
+          <Line options={options} data={chartData} />
+        </div>
+      )}
+      {trades && <TradeHistory symbol={symbol} />}
     </div>
   );
 };
