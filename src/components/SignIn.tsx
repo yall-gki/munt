@@ -8,7 +8,7 @@ const SignIn = () => (
       <Icons.logo className="mx-auto h-6 w-6" />
       <h1 className="text-2xl font-semibold tracking-tight">Welcome Back!</h1>
       <p className="text-sm max-w-xs mx-auto font-medium">
-        By continuing you are setting a reddit account and agree to our privacy
+        By continuing you are setting an account and agree to our privacy
         policy
       </p>
       <UserAuthForm />
