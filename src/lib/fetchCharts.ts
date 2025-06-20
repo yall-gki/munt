@@ -1,47 +1,54 @@
 import axios from "axios";
-import redisClient from "./redis";
+import redisClient from "./redis"; // make sure this path is correct
 
 export async function fetchCharts(coinName: string): Promise<any> {
   const cacheKey = `coinsChartData-${coinName}`;
 
   try {
-    // Check Redis cache
-    let cachedData = await redisClient.get(cacheKey);
+    // Try fetching from Redis cache
+    const cachedData = await redisClient.get(cacheKey);
 
-    if (
-      cachedData 
-    ) {
+    if (cachedData) {
       try {
-        console.log("✅ Data from Redis cache");
-        return cachedData// Ensure parsing only if it's a valid JSON string
+        console.log("✅ Chart data from Redis cache");
+        if (typeof cachedData === "string") {
+          return JSON.parse(cachedData); // ✅ Parse before returning
+        } else {
+          console.error("❌ Cached data is not a string, clearing cache.");
+          await redisClient.del(cacheKey);
+        }
       } catch (parseError) {
-        console.error("❌ JSON Parse Error:", parseError);
-        await redisClient.del(cacheKey); // Delete corrupted cache
+        console.error("❌ JSON parse error, clearing cache:", parseError);
+        await redisClient.del(cacheKey); // Clear corrupted cache
       }
-    }else{
-      // Fetch from API if no valid cache
-      const response = await axios.get(
-        `https://api.coingecko.com/api/v3/coins/${coinName}/market_chart?vs_currency=usd&days=10`
-      );
-
-      if (response.status !== 200) {
-        throw new Error(`CoinGecko API error: ${response.statusText}`);
-      }
-
-      const data = response.data;
-
-      // Ensure JSON data is correctly stored in Redis
-      if (data) {
-        await redisClient.set(cacheKey, JSON.stringify(data));
-        await redisClient.expire(cacheKey, 3600); // Set cache expiry
-      }
-
-      return data;
     }
 
+    // If no cache or cache failed, fetch from CoinGecko API
+    const response = await axios.get(
+      `https://api.coingecko.com/api/v3/coins/${coinName}/market_chart`,
+      {
+        params: {
+          vs_currency: "usd",
+          days: 10,
+        },
+        timeout: 10000,
+      }
+    );
 
+    if (response.status !== 200 || !response.data) {
+      throw new Error(`CoinGecko API error: ${response.statusText}`);
+    }
+
+    const data = response.data;
+
+    // Cache the new data in Redis
+    await redisClient.set(cacheKey, JSON.stringify(data));
+    await redisClient.expire(cacheKey, 3600); // Cache for 1 hour
+
+    console.log("✅ Fresh chart data fetched and cached");
+    return data;
   } catch (error: any) {
-    console.error("❌ API Error:", error.message || error);
+    console.error("❌ fetchCharts error:", error.message || error);
     throw new Error("Failed to fetch chart data. Please try again later.");
   }
 }

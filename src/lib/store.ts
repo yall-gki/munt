@@ -2,12 +2,19 @@ import { create } from "zustand";
 
 interface FavoriteCoinsStore {
   favorites: string[];
+  line: boolean;
+  candle: boolean;
+  trades: boolean;
   fetchFavorites: () => Promise<void>;
   addFavorite: (coinId: string) => Promise<void>;
+  toggleState: (key: "line" | "candle" | "trades") => void;
 }
 
 export const useFavoriteCoinsStore = create<FavoriteCoinsStore>((set) => ({
   favorites: [],
+  line: true,
+  candle: true,
+  trades: true,
 
   fetchFavorites: async () => {
     try {
@@ -40,4 +47,6 @@ export const useFavoriteCoinsStore = create<FavoriteCoinsStore>((set) => ({
       console.error("Error updating favorite:", error);
     }
   },
+
+  toggleState: (key) => set((state) => ({ [key]: !state[key] })),
 }));

@@ -10,6 +10,8 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import CandlestickChart from "./charty";
+import { useFavoriteCoinsStore } from "@/lib/store";
+import TradeHistory from "./tradeHi";
 
 ChartJS.register(
   CategoryScale,
@@ -20,7 +22,7 @@ ChartJS.register(
   Legend
 );
 
-export const options:any = {
+export const options: any = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -31,15 +33,18 @@ export const options:any = {
     x: { display: false }, // Hide X-axis
     y: { display: false }, // Hide Y-axis
   },
-} ;
+};
 
-const CoinLineChart: React.FC<{ data: any; symbol : any }> = ({ data, symbol }) => {
+const CoinLineChart: React.FC<{ data: any; symbol: any }> = ({
+  data,
+  symbol,
+}) => {
+  const { line, candle, trades, toggleState } = useFavoriteCoinsStore();
+
   const labels = data?.prices?.map((entry: any) =>
     new Date(entry[0]).toLocaleDateString()
   );
   const dataValues = data?.prices?.map((entry: any) => entry[1]);
-
-  const greenColor = "#00ff00"; // Adjust to match candlestick green
 
   const initialData = {
     labels,
@@ -49,23 +54,41 @@ const CoinLineChart: React.FC<{ data: any; symbol : any }> = ({ data, symbol }) 
         data: dataValues,
         borderColor: "#3691ff",
         borderWidth: 2,
-        backgroundColor: "#27272a", // More visible fill
+        backgroundColor: "#27272a",
         pointRadius: 0,
-        tension: 0.4, // Smooth curve
-        fill: "origin", // Ensures fill is applied correctly
+        tension: 0.4,
+        fill: "origin",
       },
     ],
   };
 
   return (
     <div className="h-full flex items-center justify-between flex-col w-1/2">
-      <div className="wrap h-full p-2 gap-2  w-full flex flex-col rounded-md">
-        <CandlestickChart symbol={symbol} />
-        <div className="relative h-64 w-full bg-zinc-900  rounded-md ">
-          {" "}
-          {/* Ensure background contrast */}
-          <Line options={options} data={initialData} />
-        </div>
+      <div className="wrap h-full p-2 gap-2 w-full flex flex-col rounded-md">
+        <span className="flex gap-2 md:hidden">
+          <span
+            onClick={() => toggleState("candle")}
+            className="cursor-pointer"
+          >
+            Candle
+          </span>
+          <span onClick={() => toggleState("line")} className="cursor-pointer">
+            Line
+          </span>
+          <span
+            onClick={() => toggleState("trades")}
+            className="cursor-pointer"
+          >
+            Trades
+          </span>
+        </span>
+        {candle && <CandlestickChart symbol={symbol} />}
+        {line && (
+          <div className="relative h-64 w-full bg-zinc-900 rounded-md">
+            <Line options={options} data={initialData} />
+          </div>
+        )}
+        {trades && <TradeHistory symbol={symbol} />}
       </div>
     </div>
   );
