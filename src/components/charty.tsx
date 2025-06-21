@@ -78,8 +78,8 @@ const CandlestickChart = ({ symbol }: any) => {
   return (
     <div
       ref={chartContainerRef}
-      className="overflow-hidden h-3/4 w-full relative rounded-md p-0 text-neutral-600 "
-      style={{ width: "100%", height: "500px" }}
+      className="overflow-hidden h-3/4 w-full m-0 relative rounded-md p-0 text-neutral-600 "
+      style={{ width: "100%", height: "500px" ,margin: "0 auto",padding: "0"}}
     />
   );
 };

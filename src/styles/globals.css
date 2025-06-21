@@ -20,7 +20,10 @@
   opacity: 0.9;
 }
 
-
+canva{
+  height: 100% !important;
+  width: 90% !important;
+}
 @layer base {
   :root {
     --background: 0 0% 100%;

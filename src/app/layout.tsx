@@ -7,7 +7,7 @@ import "@/styles/globals.css";
 import { Inter } from "next/font/google";
 export const metadata = {
   title: "Flow",
-  description: "A Reddit clone built with Next.js and TypeScript.",
+  description: "A crypto info website.",
 };
 const inter = Inter({
   subsets: ["latin"],
@@ -32,7 +32,13 @@ export default function RootLayout({
           <Navbar />
           <FavoriteCoins />
           {authModal}
-          <main className="w-full bg-zinc-950  h-[calc(100vh-11rem)] max-md:h-auto ">{children}</main>
+          <main className="w-full bg-zinc-950  h-[calc(100vh-11rem)] max-md:h-auto ">
+            {children}{" "}
+            <h1 className=" w-full text-center  z-50   text-white">
+              {" "}
+              created by Hichem Benali.
+            </h1>
+          </main>
         </Providers>
         <Toaster />
       </body>

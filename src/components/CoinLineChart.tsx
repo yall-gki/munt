@@ -75,7 +75,6 @@ const CoinLineChart: React.FC<{ data: any; symbol: any }> = ({
           <Line options={options} data={chartData} />
         </div>
       )}
-      {trades && <TradeHistory symbol={symbol} />}
     </div>
   );
 };

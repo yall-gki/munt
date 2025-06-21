@@ -6,7 +6,7 @@ import { Icons } from "./Icons";
 import { useFavoriteCoinsStore } from "@/lib/store";
 
 const CoinInfo = ({ data }: any) => {
-  const { favorites, fetchFavorites, addFavorite } = useFavoriteCoinsStore();
+  const { favorites, fetchFavorites, toggleFavorite } = useFavoriteCoinsStore();
   const [color, setColor] = useState("text-slate-500");
   const [change24, setChange] = useState<number>(0);
 
@@ -16,18 +16,13 @@ const CoinInfo = ({ data }: any) => {
 
   const isFavorite = favorites.includes(data?.id);
 
-  const toggleFavorite = async () => {
-    const newFavorites = isFavorite
-      ? favorites.filter((coin) => coin !== data?.id)
-      : [...favorites, data?.id];
-    useFavoriteCoinsStore.setState({ favorites: newFavorites });
-    await addFavorite(data?.id);
-    fetchFavorites();
+  const handleToggleFavorite = async () => {
+    await toggleFavorite(data?.id);
   };
 
   useEffect(() => {
     if (data?.price_change_percentage_24h !== undefined) {
-      let curr = data.price_change_percentage_24h;
+      const curr = data.price_change_percentage_24h;
       setColor(curr < 0 ? "text-red-500" : "text-green-500");
       setChange(Number(Math.abs(curr).toFixed(2)));
     }
@@ -50,7 +45,7 @@ const CoinInfo = ({ data }: any) => {
         <div className="flex items-center gap-2">
           <Star
             fill={isFavorite ? "gold" : "none"}
-            onClick={toggleFavorite}
+            onClick={handleToggleFavorite}
             className={`h-8 w-8 p-2 rounded-md ${
               isFavorite ? "text-[#ffd700]" : "text-slate-500"
             } cursor-pointer`}

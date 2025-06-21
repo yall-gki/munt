@@ -1,4 +1,4 @@
-// lib/store.ts (or any client-safe file)
+// lib/store.ts
 import { create } from "zustand";
 
 interface FavoriteCoinsStore {
@@ -7,7 +7,7 @@ interface FavoriteCoinsStore {
   candle: boolean;
   trades: boolean;
   fetchFavorites: () => Promise<void>;
-  addFavorite: (coinId: string) => Promise<void>;
+  toggleFavorite: (coinId: string) => Promise<void>;
   toggleState: (key: "line" | "candle" | "trades") => void;
 }
 
@@ -28,7 +28,7 @@ export const useFavoriteCoinsStore = create<FavoriteCoinsStore>((set) => ({
     }
   },
 
-  addFavorite: async (coinId: string) => {
+  toggleFavorite: async (coinId: string) => {
     set((state) => ({
       favorites: state.favorites.includes(coinId)
         ? state.favorites.filter((id) => id !== coinId)
@@ -36,15 +36,19 @@ export const useFavoriteCoinsStore = create<FavoriteCoinsStore>((set) => ({
     }));
 
     try {
-      await fetch("/api/coins/add-fav", {
-        method: "POST",
+      const isAlreadyFavorite = useFavoriteCoinsStore
+        .getState()
+        .favorites.includes(coinId);
+
+      await fetch("/api/user-coin", {
+        method: isAlreadyFavorite ? "DELETE" : "POST",
         body: JSON.stringify({ coinId }),
         headers: { "Content-Type": "application/json" },
       });
 
       await useFavoriteCoinsStore.getState().fetchFavorites();
     } catch (error) {
-      console.error("❌ Failed to add favorite:", error);
+      console.error("❌ Failed to update favorite:", error);
     }
   },
 

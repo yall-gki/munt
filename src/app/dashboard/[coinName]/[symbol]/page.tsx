@@ -32,14 +32,14 @@ const Page: ({ params }: pageProps) => any = ({ params }) => {
   }
 
   return (
-    <div className="max-w-screen h-full p-4 md:p-10 md:px-44 bg-black flex flex-wrap items-start justify-center gap-4">
-      <div className="w-full md:w-[30%]">
+    <div className="max-w-screen h-full p-4 max-sm:p-4 md:p-10 md:px-44 bg-black flex flex-wrap items-start justify-center gap-4">
+      <div className="w-full md:w-[30%] ">
         <CoinInfo data={coinData} />
       </div>
-      <div className="w-full md:w-[40%]">
+      <div className="w-full md:w-[40%]    ">
         <CoinLineChart data={chartData} symbol={symbol} />
       </div>
-      <div className="w-full md:w-[25%]">
+      <div className="w-full md:w-[25%]  ">
         <TradeHistory symbol={coinData?.symbol} />
       </div>
     </div>
