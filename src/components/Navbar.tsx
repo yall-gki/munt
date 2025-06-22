@@ -22,8 +22,8 @@ const Navbar: any = async () => {
 
         {/* Center: Logo */}
         <div className="flex justify-center items-center">
-          <Link href="/" className="flex h-fit gap-2 items-center">
-            <Icons.logo className="h-9 w-9 sm:h-7 sm:w-7" />
+          <Link href="/" className="flex bg-blue-500  p-3  rounded-full gap-2 items-center">
+            <Icons.logo className="h-4 w-4 " />
           </Link>
         </div>
 
