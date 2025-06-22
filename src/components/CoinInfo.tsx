@@ -1,14 +1,15 @@
-// CoinInfo.tsx
 import { cn } from "@/lib/utils";
 import { Share, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Icons } from "./Icons";
 import { useFavoriteCoinsStore } from "@/lib/store";
 import Image from "next/image";
+
 const CoinInfo = ({ data }: any) => {
   const { favorites, fetchFavorites, toggleFavorite } = useFavoriteCoinsStore();
   const [color, setColor] = useState("text-slate-500");
   const [change24, setChange] = useState<number>(0);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     fetchFavorites();
@@ -17,7 +18,9 @@ const CoinInfo = ({ data }: any) => {
   const isFavorite = favorites.includes(data?.id);
 
   const handleToggleFavorite = async () => {
+    setLoading(true);
     await toggleFavorite(data?.id);
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -44,17 +47,25 @@ const CoinInfo = ({ data }: any) => {
             {data?.symbol?.toUpperCase()}
           </h2>
         </div>
-        <div className="flex items-center gap-2">
+
+        <div className="flex items-center gap-2 relative">
           <Star
             fill={isFavorite ? "gold" : "none"}
             onClick={handleToggleFavorite}
-            className={`h-8 w-8 p-2 rounded-md ${
-              isFavorite ? "text-[#ffd700]" : "text-slate-500"
-            } cursor-pointer`}
+            className={cn(
+              "h-8 w-8 p-2 rounded-md cursor-pointer transition-colors",
+              isFavorite ? "text-blue-500" : "text-slate-500"
+            )}
           />
+          {loading && (
+            <div className="absolute -right-5 top-1/2 -translate-y-1/2">
+              <div className="h-3 w-3 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
+            </div>
+          )}
           <Share className="h-8 w-8 p-2 text-slate-500 rounded-md bg-zinc-800 cursor-pointer" />
         </div>
       </div>
+
       <h1 className="text-4xl font-bold">
         ${data?.current_price.toLocaleString("en-US")}
       </h1>

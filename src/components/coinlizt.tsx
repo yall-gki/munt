@@ -40,9 +40,7 @@ const Oinli = () => {
                 disabled={isToggling}
                 className={cn(
                   "flex items-center gap-3 transition p-3 rounded-md shadow-sm w-full",
-                  isFav
-                    ? "bg-blue-500 hover:bg-blue-600 text-white"
-                    : "bg-zinc-800 hover:bg-zinc-700 text-zinc-200",
+
                   isToggling && "opacity-70 cursor-not-allowed"
                 )}
               >
@@ -77,10 +75,10 @@ const Oinli = () => {
                 ) : (
                   <Star
                     size={20}
-                    fill={isFav ? "#FFD700" : "none"}
+                    fill={isFav ? "#3b82f6" : "none"}
                     className={cn(
                       "transition",
-                      isFav ? "text-yellow-400" : "text-zinc-400"
+                      isFav ? "text-blue-500" : "text-zinc-400"
                     )}
                   />
                 )}
