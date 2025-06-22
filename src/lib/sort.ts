@@ -1,8 +1,10 @@
 export const sortedList = (
-  list: any[],
+  list: any[] = [], // ✅ fallback if undefined
   order: string,
   sortOrder: "asc" | "desc"
 ) => {
+  if (!Array.isArray(list)) return [];
+
   const sorted = [...list];
 
   switch (order) {
@@ -21,9 +23,16 @@ export const sortedList = (
           : b.market_cap - a.market_cap
       );
       break;
+    case "marketCap":
+      sorted.sort((a, b) =>
+        sortOrder === "asc"
+          ? a.market_cap - b.market_cap
+          : b.market_cap - a.market_cap
+      );
+      break;
 
     default:
-      return list;
+      return sorted; // ✅ still return sorted (not original) if no match
   }
 
   return sorted;

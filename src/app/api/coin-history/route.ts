@@ -1,54 +1,80 @@
 import { NextResponse } from "next/server";
+import redis from "@/lib/redis"; // 👈 your existing Redis client
+
+const ids = [
+  "bitcoin",
+  "ethereum",
+  "binancecoin",
+  "cardano",
+  "xrp",
+  "polkadot",
+  "uniswap",
+  "chainlink",
+  "litecoin",
+  "stellar",
+  "usdc",
+  "dogecoin",
+  "vechain",
+  "filecoin",
+  "tron",
+  "eos",
+  "aave",
+  "monero",
+  "cosmos",
+  "tezos",
+  "algorand",
+  "nem",
+  "compound",
+  "kusama",
+  "zilliqa",
+  "neo",
+  "sushiswap",
+  "maker",
+  "dash",
+  "elrond",
+];
+
+const COINGECKO_KEY = "coingecko:market_data";
 
 export async function GET() {
-  const ids = [
-    "bitcoin",
-    "ethereum",
-    "binancecoin",
-    "cardano",
-    "xrp",
-    "polkadot",
-    "uniswap",
-    "chainlink",
-    "litecoin",
-    "stellar",
-    "usdc",
-    "dogecoin",
-    "vechain",
-    "filecoin",
-    "tron",
-    "eos",
-    "aave",
-    "monero",
-    "cosmos",
-    "tezos",
-    "algorand",
-    "nem",
-    "compound",
-    "kusama",
-    "zilliqa",
-    "neo",
-    "sushiswap",
-    "maker",
-    "dash",
-    "elrond",
-  ];
-
   try {
+    // Check Redis cache
+    const cached = await redis.get(COINGECKO_KEY);
+    if (cached) {
+      return NextResponse.json(cached);
+    }
+
+    // Fetch fresh data from CoinGecko
     const res = await fetch(
       `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids.join(
         ","
       )}&sparkline=true`,
       {
-        headers: { Accept: "application/json" },
+        headers: {
+          Accept: "application/json",
+        },
+        // Optional: prevent Vercel's ISR from caching
         next: { revalidate: 0 },
       }
     );
 
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error("CoinGecko error:", errorText);
+      return NextResponse.json(
+        { error: "CoinGecko error", details: errorText },
+        { status: 500 }
+      );
+    }
+
     const data = await res.json();
+
+    // Cache for 5 minutes (300 seconds)
+    await redis.set(COINGECKO_KEY, data, { ex: 300 });
+
     return NextResponse.json(data);
-  } catch (error) {
-    console.error("CoinGecko fetch error:", error);
+  } catch (err) {
+    console.error("CoinGecko fetch error:", err);
     return NextResponse.json(
       { error: "Failed to fetch market data" },
       { status: 500 }

@@ -9,6 +9,11 @@ interface CryptoIndexBarProps {
   onSortChange: (field: string) => void;
 }
 
+const fieldMap: Record<string, string> = {
+  price: "Price",
+  marketCap: "Market Cap",
+};
+
 const CryptoIndexBar: FC<CryptoIndexBarProps> = ({
   currentSort,
   onSortChange,
@@ -25,17 +30,16 @@ const CryptoIndexBar: FC<CryptoIndexBarProps> = ({
   return (
     <div className="w-full py-2 px-4 flex justify-between items-center text-white bg-zinc-900 rounded-md mb-4">
       <span className="text-sm font-semibold w-24 sm:w-36">Coin</span>
-      <div className="flex gap-4 sm:gap-10  text-xs sm:text-sm font-medium">
-        {["price", "volume"].map((field) => (
+      <div className="flex gap-4 sm:gap-10 text-xs sm:text-sm font-medium">
+        {Object.keys(fieldMap).map((field) => (
           <span
             key={field}
             onClick={() => onSortChange(field)}
-            className={`flex items-center gap-1 cursor-pointer hover:text-blue-500 ${
-              currentSort.field === field ? "text-blue-500" : ""
+            className={`flex items-center gap-1 cursor-pointer transition-colors hover:text-blue-500 ${
+              currentSort.field === field ? "text-blue-500" : "text-white"
             }`}
           >
-            {field.charAt(0).toUpperCase() + field.slice(1)}{" "}
-            {renderSortIcon(field)}
+            {fieldMap[field]} {renderSortIcon(field)}
           </span>
         ))}
       </div>
