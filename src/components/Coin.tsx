@@ -45,7 +45,7 @@ const Coin: FC<CoinProps> = ({
         </div>
 
         {/* Price, Market Cap, Chart */}
-        <div className="flex flex-col sm:flex-row sm:gap-10 items-start sm:items-center w-full sm:w-auto">
+        <div className="flex  sm:flex-row sm:gap-10 items-start sm:items-center w-full sm:w-auto">
           <MiniSparkline prices={sparkline} />
           <span className="w-24 text-xs sm:text-sm font-medium">
             ${price.toLocaleString("en-US")}
