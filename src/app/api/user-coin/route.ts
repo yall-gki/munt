@@ -1,51 +1,41 @@
+import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
 
-// Get favorites
-export async function GET(req: Request) {
+// 🔁 Get all favorites
+export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-    let userId = session?.user?.id;
-
-    if (!userId) {
-      const authHeader = req.headers.get("Authorization");
-      if (authHeader?.startsWith("Bearer ")) {
-        userId = authHeader.replace("Bearer ", "").trim();
-      }
+    const session = await getAuthSession();
+    if (!session?.user?.id) {
+      return new Response(JSON.stringify([]), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
     }
 
-    if (!userId) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized: Missing user ID" }),
-        { status: 401, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    const userCoins = await db.userCoin.findMany({
-      where: { userId },
+    const favorites = await db.userCoin.findMany({
+      where: { userId: session.user.id },
       select: { coinId: true },
     });
 
-    return new Response(JSON.stringify(userCoins), {
+    return new Response(JSON.stringify(favorites), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("❌ Error fetching user coins:", error);
-    return new Response(
-      JSON.stringify({ error: "Could not fetch user coins" }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
+    console.error("❌ Error fetching favorites:", error);
+    return new Response(JSON.stringify([]), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
 
-// Add to favorites
+// ✅ Add to favorites
 export async function POST(req: Request) {
   try {
     const { coinId }: { coinId: string } = await req.json();
-    const session = await getServerSession(authOptions);
 
+    const session = await getAuthSession();
     if (!session?.user?.id) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
@@ -53,6 +43,7 @@ export async function POST(req: Request) {
       });
     }
 
+    // Prevent duplicates (optional, Prisma compound key should also guard)
     await db.userCoin.upsert({
       where: {
         userId_coinId: {
@@ -86,12 +77,13 @@ export async function POST(req: Request) {
   }
 }
 
-// Remove from favorites
 export async function DELETE(req: Request) {
   try {
-    const { coinId }: { coinId: string } = await req.json();
-    const session = await getServerSession(authOptions);
+    // ✅ Use await req.json() properly
+    const body = await req.json();
+    const coinId: string = body.coinId;
 
+    const session = await getAuthSession();
     if (!session?.user?.id) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,

@@ -21,7 +21,11 @@ export const useFavoriteCoinsStore = create<FavoriteCoinsStore>((set) => ({
     try {
       const res = await fetch("/api/user-coin");
       const json = await res.json();
-      set({ favorites: json.map((item: any) => item.coinId) });
+      if (Array.isArray(json) && json.length > 0) {
+        set({ favorites: json.map((item: any) => item.coinId) });
+      } else {
+        set({ favorites: [] });
+      }
     } catch (err) {
       console.error("❌ Fetch error:", err);
       set({ favorites: [] });
@@ -29,28 +33,24 @@ export const useFavoriteCoinsStore = create<FavoriteCoinsStore>((set) => ({
   },
 
   toggleFavorite: async (coinId: string) => {
-    set((state) => ({
-      favorites: state.favorites.includes(coinId)
-        ? state.favorites.filter((id) => id !== coinId)
-        : [...state.favorites, coinId],
-    }));
-
+    const isAlreadyFavorite = useFavoriteCoinsStore
+      .getState()
+      .favorites.includes(coinId);
+  
     try {
-      const isAlreadyFavorite = useFavoriteCoinsStore
-        .getState()
-        .favorites.includes(coinId);
-
       await fetch("/api/user-coin", {
         method: isAlreadyFavorite ? "DELETE" : "POST",
         body: JSON.stringify({ coinId }),
         headers: { "Content-Type": "application/json" },
       });
-
+  
+      // ✅ Re-fetch server state after toggling
       await useFavoriteCoinsStore.getState().fetchFavorites();
     } catch (error) {
       console.error("❌ Failed to update favorite:", error);
     }
   },
+  
 
   toggleState: (key) => set((state) => ({ [key]: !state[key] })),
 }));

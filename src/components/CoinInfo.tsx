@@ -4,7 +4,7 @@ import { Share, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Icons } from "./Icons";
 import { useFavoriteCoinsStore } from "@/lib/store";
-
+import Image from "next/image";
 const CoinInfo = ({ data }: any) => {
   const { favorites, fetchFavorites, toggleFavorite } = useFavoriteCoinsStore();
   const [color, setColor] = useState("text-slate-500");
@@ -32,9 +32,11 @@ const CoinInfo = ({ data }: any) => {
     <div className="w-full bg-zinc-900 p-4 rounded-md text-white">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-2">
-          <img
+          <Image
             src={data?.image}
             alt={data?.name}
+            width={24}
+            height={24}
             className="h-6 w-6 rounded-full bg-[#EFF2F5]"
           />
           <h1 className="text-lg font-bold">{data?.name}</h1>

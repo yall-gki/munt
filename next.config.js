@@ -10,6 +10,7 @@ const nextConfig = {
       "lh3.googleusercontent.com",
       "ethereum.org",
       "images.unsplash.com",
+      "coin-images.coingecko.com",
     ],
   },
   experimental: {

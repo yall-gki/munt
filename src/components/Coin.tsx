@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { FC } from "react";
-
+import Image from "next/image";
 interface CoinProps {
   name: string;
   price: number;
@@ -15,11 +15,14 @@ const Coin: FC<CoinProps> = ({ image, name, price, marketCap, symbol }) => {
       <div className="w-full p-3 sm:p-4 mb-2 bg-zinc-800 rounded-md hover:bg-zinc-700 transition-all flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-white">
         {/* Coin Identity */}
         <div className="flex items-center gap-2">
-          <img
+          <Image
             src={image}
             alt={name}
+            width={24}
+            height={24}
             className="w-6 h-6 rounded-full bg-white"
           />
+
           <div className="flex flex-col sm:flex-row sm:gap-2 items-start sm:items-center">
             <span className="font-bold text-sm">{name}</span>
             <span className="text-zinc-400 text-xs">
