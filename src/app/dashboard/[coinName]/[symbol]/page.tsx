@@ -26,7 +26,7 @@ const Page: ({ params }: pageProps) => any = ({ params }) => {
   if (isLoading) {
     return (
       <div className="h-full flex items-center justify-center">
-        <Loader2 className="mr-2 h-8 w-8 text-green-500 animate-spin" />
+        <Loader2 className="mr-2 h-8 w-8 text-blue-500 animate-spin" />
       </div>
     );
   }

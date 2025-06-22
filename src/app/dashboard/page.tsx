@@ -58,7 +58,7 @@ function Page() {
   if (isLoading) {
     return (
       <div className="h-screen flex items-center justify-center bg-black">
-        <Loader2 className="h-8 w-8 text-green-500 animate-spin" />
+        <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
       </div>
     );
   }
@@ -66,7 +66,7 @@ function Page() {
   if (isError) {
     return (
       <div className="text-red-500 text-center mt-4">
-        ❌ Failed to fetch data
+        Failed to fetch data
       </div>
     );
   }
