@@ -1,22 +1,23 @@
-"use client"
+"use client";
 import Image from "next/image";
 
 export default function Home() {
   return (
-    
-      <div className="relative h-full max-sm:bg-zinc-950 w-full overflow-hidden">
-        {/* Background Image */}
-      
+    <div className="relative w-full h-full overflow-hidden">
+      {/* ✅ Background Image always visible */}
+      <Image
+        src="/hero.png"
+        alt="Hero background"
+        fill
+        priority
+        className="object-cover object-center z-0 filter grayscale"
+      />
 
+      {/* ✅ Optional dark overlay */}
+      <div className="absolute inset-0 bg-black/40 z-10" />
 
-        {/* Centered Content */}
-        <div className="absolute top-1/2 max-sm:hidden left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-          <h1 className="text-white text-4xl font-bold"></h1>
-          <p className="text-white mt-2 text-lg">
-         
-          </p>
-        </div>
-      </div>
-    
+      {/* ✅ Centered Content, now visible on all screens */}
+      <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center z-20 px-4"></div>
+    </div>
   );
 }

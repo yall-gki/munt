@@ -12,7 +12,14 @@
     background-position: 0% 50%;
   }
 }
-
+/* hide scrollbars but allow scrolling */
+.scrollbar-hide {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
 .animate-greenGlow {
   background-size: 200% 200%;
   animation: greenGlow 6s ease infinite;

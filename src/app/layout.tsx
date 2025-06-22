@@ -32,12 +32,9 @@ export default function RootLayout({
           <Navbar />
           <FavoriteCoins />
           {authModal}
-          <main className="w-full bg-zinc-950  h-[calc(100vh-11rem)] max-md:h-auto ">
+          <main className="w-full bg-zinc-950   h-[calc(94vh-8rem)] max-md:min-h-screen ">
             {children}{" "}
-            <h1 className=" w-full text-center  z-50   text-white">
-              {" "}
-              created by Hichem Benali.
-            </h1>
+           
           </main>
         </Providers>
         <Toaster />

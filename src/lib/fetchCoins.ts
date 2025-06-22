@@ -1,14 +1,27 @@
-// src/lib/fetchCoinsBrowser.ts
 import axios from "axios";
+import redisClient from "./redis"; // ✅ Ensure correct path
 
 export async function fetchCoins(ids: string[]): Promise<any[]> {
   if (!ids || ids.length === 0) {
     throw new Error("❌ No coin IDs provided.");
   }
-  console.log("🔎 Coin IDs to fetch:", ids);
+
+  const sortedIds = [...ids].sort();
+  const cacheKey = `coinsData-${sortedIds.join(",")}`;
+  console.log(`🔎 Coin IDs: ${sortedIds}, cacheKey: ${cacheKey}`);
+
+  // Try Redis cache
+  try {
+    const cachedData = await redisClient.get(cacheKey);
+    if (typeof cachedData === "string" && cachedData.length > 0) {
+      console.log("✅ Returning coins data from Redis cache");
+      return JSON.parse(cachedData);
+    }
+  } catch (redisError) {
+    console.error("❌ Redis GET failed:", redisError);
+  }
 
   const batchSize = 20;
-  const sortedIds = [...ids].sort();
   let allCoins: any[] = [];
 
   for (let i = 0; i < sortedIds.length; i += batchSize) {
@@ -45,12 +58,21 @@ export async function fetchCoins(ids: string[]): Promise<any[]> {
       });
     }
 
-    // Optional: avoid triggering rate limits
+    // Avoid rate limit
     await new Promise((r) => setTimeout(r, 500));
   }
 
   if (allCoins.length === 0) {
     throw new Error("❌ No data returned from CoinGecko.");
+  }
+
+  // Cache fetched data
+  try {
+    await redisClient.set(cacheKey, JSON.stringify(allCoins));
+    await redisClient.expire(cacheKey, 3600); // TTL = 1 hour
+    console.log("✅ Coins data cached in Redis");
+  } catch (redisSetError) {
+    console.error("❌ Redis SET/EXPIRE failed:", redisSetError);
   }
 
   return allCoins;
