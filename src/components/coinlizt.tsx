@@ -22,13 +22,7 @@ const Oinli = () => {
   };
 
   return (
-    <div className="relative w-full p-4 pt-6 flex flex-col items-center bg-zinc-900 text-white">
-      <div className="absolute top-6 right-6">
-        <CloseModal />
-      </div>
-
-      <h2 className="text-xl font-semibold mb-4 text-white">Add a Coin</h2>
-
+    <div className="relative w-full p-4 pt-6 flex flex-col min-h-full items-center bg-zinc-900 text-white ">
       {!cacheD ? (
         <div className="flex justify-center items-center h-32">
           <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>

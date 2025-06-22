@@ -5,13 +5,7 @@ export default function Home() {
   return (
     <div className="relative w-full h-full overflow-hidden">
       {/* ✅ Background Image always visible */}
-      <Image
-        src="/hero.png"
-        alt="Hero background"
-        fill
-        priority
-        className="object-cover object-center z-0 filter grayscale"
-      />
+      
 
       {/* ✅ Optional dark overlay */}
       <div className="absolute inset-0 bg-black/40 z-10" />

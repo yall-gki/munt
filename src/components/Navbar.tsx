@@ -8,7 +8,7 @@ const Navbar: any = async () => {
   const session = await getAuthSession();
 
   return (
-    <div className="inset-x-0 flex justify-center items-center border-b-2 border-blue-500 bg-zinc-950 z-[10] h-[6vh] px-11 max-sm:px-4 max-sm:py-3">
+    <div className="inset-x-0 flex justify-center items-center border-b-2 border-blue-500 bg-zinc-950 z-[10] h-[6vh] px-11 max-sm:px-4 ">
       <div className="w-full h-full mx-auto flex items-center justify-between max-sm:grid max-sm:grid-cols-3">
         {/* Left: Dashboard link */}
         <div className="max-sm:flex max-sm:justify-start max-sm:items-center">
