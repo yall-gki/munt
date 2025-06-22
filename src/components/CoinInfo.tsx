@@ -34,6 +34,7 @@ const CoinInfo = ({ data }: any) => {
   return (
     <div className="w-full bg-zinc-900 p-4 rounded-md text-white">
       <div className="flex justify-between items-center mb-4">
+        {/* Coin Identity */}
         <div className="flex items-center gap-2">
           <Image
             src={data?.image}
@@ -48,19 +49,21 @@ const CoinInfo = ({ data }: any) => {
           </h2>
         </div>
 
-        <div className="flex items-center gap-2 relative">
-          <Star
-            fill={isFavorite ? "gold" : "none"}
-            onClick={handleToggleFavorite}
-            className={cn(
-              "h-8 w-8 p-2 rounded-md cursor-pointer transition-colors",
-              isFavorite ? "text-blue-500" : "text-slate-500"
-            )}
-          />
-          {loading && (
-            <div className="absolute -right-5 top-1/2 -translate-y-1/2">
-              <div className="h-3 w-3 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
+        {/* Favorite + Share */}
+        <div className="flex items-center gap-2">
+          {loading ? (
+            <div className="h-8 w-8 flex items-center justify-center">
+              <div className="h-4 w-4 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
             </div>
+          ) : (
+            <Star
+              onClick={handleToggleFavorite}
+              className={cn(
+                "h-8 w-8 p-2 rounded-md cursor-pointer transition-colors",
+                isFavorite ? "text-blue-500" : "text-slate-500"
+              )}
+              fill={isFavorite ? "#3b82f6" : "none"} // Tailwind's blue-500 hex
+            />
           )}
           <Share className="h-8 w-8 p-2 text-slate-500 rounded-md bg-zinc-800 cursor-pointer" />
         </div>

@@ -25,7 +25,7 @@ const CryptoIndexBar: FC<CryptoIndexBarProps> = ({
   return (
     <div className="w-full py-2 px-4 flex justify-between items-center text-white bg-zinc-900 rounded-md mb-4">
       <span className="text-sm font-semibold w-24 sm:w-36">Coin</span>
-      <div className="flex gap-4 sm:gap-10 text-xs sm:text-sm font-medium">
+      <div className="flex gap-4 sm:gap-10  text-xs sm:text-sm font-medium">
         {["price", "volume"].map((field) => (
           <span
             key={field}

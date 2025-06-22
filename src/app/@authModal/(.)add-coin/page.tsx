@@ -6,18 +6,21 @@ import CloseModal from "@/components/CloseModal";
 
 const page: FC = () => {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
       <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
+        initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.8 }}
+        exit={{ opacity: 0, scale: 0.9 }}
         transition={{
           type: "spring",
           stiffness: 200,
           damping: 20,
           duration: 0.4,
         }}
-        className="border-2 border-zinc-100 p-4 bg-zinc-900 w-3/4 max-w-lg h-[50vh] rounded-3xl shadow-lg flex flex-col gap-4"
+        className="w-3/4 max-w-lg h-[50vh] rounded-3xl p-4 shadow-xl
+          border border-white/10
+          bg-white/10 backdrop-blur-md
+          flex flex-col gap-4"
       >
         <div className="w-full p-4 flex justify-between items-center">
           <h2 className="text-l font-semibold italic text-white">Watchlist</h2>

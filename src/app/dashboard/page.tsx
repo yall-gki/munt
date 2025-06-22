@@ -1,10 +1,10 @@
 "use client";
+
 import Coin from "@/components/Coin";
 import { useEffect, useState } from "react";
 import { ids } from "@/lib/ids";
 import CryptoIndexBar from "@/components/CryptoIndexBar";
 import { sortedList } from "@/lib/sort";
-import { useCoinsData } from "@/hooks/useCoinData";
 import { Loader2 } from "lucide-react";
 import axios from "axios";
 
@@ -12,7 +12,6 @@ function Page() {
   const [data, setData] = useState<any[]>([]);
   const [sortedData, setSortedData] = useState<any[]>([]);
   const [favcoin, setFavcoin] = useState<any[]>([]);
-  const { data: cacheD, isLoading, isError } = useCoinsData(ids);
 
   const [sortConfig, setSortConfig] = useState({
     field: "price",
@@ -27,13 +26,16 @@ function Page() {
     });
   };
 
-  useEffect(() => {
-    if (data.length > 0) {
-      const sorted = sortedList(data, sortConfig.field, sortConfig.order);
-      setSortedData(sorted);
+  const getMarketData = async () => {
+    try {
+      const res = await fetch("/api/coin-history");
+      const json = await res.json();
+      setData(json);
+      setSortedData(sortedList(json, sortConfig.field, sortConfig.order));
+    } catch (err) {
+      console.error("Failed to fetch market data", err);
     }
-  }, [data, sortConfig]);
-  
+  };
 
   const getFav = async () => {
     try {
@@ -45,28 +47,20 @@ function Page() {
   };
 
   useEffect(() => {
+    getMarketData();
     getFav();
   }, []);
 
   useEffect(() => {
-    if (cacheD) {
-      setData(cacheD);
-      setSortedData(cacheD);
+    if (data.length > 0) {
+      setSortedData(sortedList(data, sortConfig.field, sortConfig.order));
     }
-  }, [cacheD]);
+  }, [sortConfig]);
 
-  if (isLoading) {
+  if (data.length === 0) {
     return (
       <div className="h-screen flex items-center justify-center bg-black">
         <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
-      </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="text-red-500 text-center mt-4">
-        Failed to fetch data
       </div>
     );
   }
@@ -75,14 +69,16 @@ function Page() {
     <div className="min-h-screen bg-black text-white p-4 sm:p-6">
       <div className="max-w-5xl mx-auto">
         <CryptoIndexBar currentSort={sortConfig} onSortChange={handleSort} />
-        {sortedData?.map((coin) => (
+        {sortedData.map((coin) => (
           <Coin
-            key={coin.symbol}
+            key={coin.id}
+            id={coin.id}
             name={coin.name}
             price={coin.current_price}
             image={coin.image}
             marketCap={coin.market_cap}
             symbol={coin.symbol}
+            sparkline={coin.sparkline_in_7d?.price || []} // ✅ pass it here
           />
         ))}
       </div>

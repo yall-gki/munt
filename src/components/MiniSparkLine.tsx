@@ -5,10 +5,19 @@ import {
   LinearScale,
   LineElement,
   PointElement,
+  Tooltip,
+  Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 
-ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Tooltip,
+  Legend
+);
 
 const chartOptions = {
   responsive: true,
@@ -32,13 +41,17 @@ const chartOptions = {
   },
 };
 
-const MiniSparkline: React.FC<{ data: any }> = ({ data }) => {
+const MiniSparkline: React.FC<{ prices: number[] }> = ({ prices }) => {
+  if (!prices || prices.length === 0) {
+    return <div className="w-24 h-12 animate-pulse bg-zinc-700 rounded" />;
+  }
+
   const chartData = {
-    labels: data?.prices?.map((p: any) => p[0]),
+    labels: prices.map((_, i) => i),
     datasets: [
       {
-        data: data?.prices?.map((p: any) => p[1]),
-        borderColor: "#3b82f6", // Tailwind's blue-500
+        data: prices,
+        borderColor: "#3b82f6",
         backgroundColor: "transparent",
       },
     ],
