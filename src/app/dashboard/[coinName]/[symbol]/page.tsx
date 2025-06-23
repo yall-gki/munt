@@ -36,7 +36,7 @@ const Page: ({ params }: pageProps) => any = ({ params }) => {
       <div className="w-full md:w-[30%] ">
         <CoinInfo data={coinData} />
       </div>
-      <div className="w-full md:w-[40%]    ">
+      <div className="w-full  md:w-[40%]    ">
         <CoinLineChart data={chartData} symbol={symbol} />
       </div>
       <div className="w-full md:w-[25%]  ">
