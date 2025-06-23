@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,6 +10,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 
+// Register chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -19,6 +20,7 @@ ChartJS.register(
   Legend
 );
 
+// Sparkline chart options
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -41,6 +43,7 @@ const chartOptions = {
   },
 };
 
+// Functional Component
 const MiniSparkline: React.FC<{ prices: number[] }> = ({ prices }) => {
   if (!prices || prices.length === 0) {
     return <div className="w-24 h-12 animate-pulse bg-zinc-700 rounded" />;
@@ -51,7 +54,7 @@ const MiniSparkline: React.FC<{ prices: number[] }> = ({ prices }) => {
     datasets: [
       {
         data: prices,
-        borderColor: "#3b82f6",
+        borderColor: "#3b82f6", // blue-500
         backgroundColor: "transparent",
       },
     ],
@@ -64,4 +67,5 @@ const MiniSparkline: React.FC<{ prices: number[] }> = ({ prices }) => {
   );
 };
 
-export default MiniSparkline;
+// ✅ Use memo to avoid unnecessary re-renders
+export default memo(MiniSparkline);

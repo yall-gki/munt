@@ -1,15 +1,28 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider  = "postgresql"
-  url  	    = env("DATABASE_URL")
-  // uncomment next line if you use Prisma <5.10
-  // directUrl = env("DATABASE_URL_UNPOOLED")
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  username      String?   @unique
+  image         String?
+
+  accounts   Account[]
+  sessions   Session[]
+  coins      UserCoin[]
+  strategies Strategy[]
+  trades     Trade[]
+  wallets    Wallet[]
+  backtests  Backtest[]
 }
 
 model Account {
@@ -36,29 +49,96 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
 
-
-
-model User {
-  id            String     @id @default(cuid())
-  name          String?
-  email         String?    @unique
-  emailVerified DateTime?
-  username      String?    @unique
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  coins         UserCoin[] // Relation to connect users with coins
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserCoin {
   userId       String
   coinId       String
-  isOptimistic Boolean? @default(false) // Whether the user is optimistic about the future price of the coin
-  user         User   @relation(fields: [userId], references: [id])
- 
+  isOptimistic Boolean? @default(false)
+
+  user User @relation(fields: [userId], references: [id])
 
   @@id([userId, coinId])
+}
+
+model Strategy {
+  id        String       @id @default(cuid())
+  userId    String
+  name      String
+  type      StrategyType
+  settings  Json
+  coinId    String?
+  timeframe String?
+  isActive  Boolean      @default(false)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trades    Trade[]
+  backtests Backtest[]
+}
+
+model Trade {
+  id         String      @id @default(cuid())
+  userId     String
+  strategyId String?
+  coinId     String
+  mode       TradeMode
+  entryPrice Float
+  exitPrice  Float?
+  amount     Float
+  profitLoss Float?
+  status     TradeStatus @default(OPEN)
+  executedAt DateTime    @default(now())
+  closedAt   DateTime?
+
+  user     User      @relation(fields: [userId], references: [id])
+  strategy Strategy? @relation(fields: [strategyId], references: [id])
+}
+
+model Wallet {
+  id        String   @id @default(cuid())
+  userId    String
+  provider  String // e.g., "Binance", "MetaMask"
+  address   String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Backtest {
+  id          String   @id @default(cuid())
+  strategyId  String
+  userId      String
+  timeframe   String
+  fromDate    DateTime
+  toDate      DateTime
+  pnlPercent  Float
+  numTrades   Int
+  winRate     Float?
+  maxDrawdown Float?
+
+  strategy Strategy @relation(fields: [strategyId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum StrategyType {
+  DCA
+  GRID
+  INDICATOR
+  MANUAL
+}
+
+enum TradeMode {
+  TEST
+  REAL
+}
+
+enum TradeStatus {
+  OPEN
+  CLOSED
+  CANCELLED
 }

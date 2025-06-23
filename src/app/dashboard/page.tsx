@@ -1,16 +1,16 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
+import axios from "axios";
+import { Loader2 } from "lucide-react";
+
 import Coin from "@/components/Coin";
-import { useEffect, useState } from "react";
 import { ids } from "@/lib/ids";
 import CryptoIndexBar from "@/components/CryptoIndexBar";
 import { sortedList } from "@/lib/sort";
-import { Loader2 } from "lucide-react";
-import axios from "axios";
 
 function Page() {
   const [data, setData] = useState<any[]>([]);
-  const [sortedData, setSortedData] = useState<any[]>([]);
   const [favcoin, setFavcoin] = useState<any[]>([]);
 
   const [sortConfig, setSortConfig] = useState({
@@ -31,7 +31,6 @@ function Page() {
       const res = await fetch("/api/coin-history");
       const json = await res.json();
       setData(json);
-      setSortedData(sortedList(json, sortConfig.field, sortConfig.order));
     } catch (err) {
       console.error("Failed to fetch market data", err);
     }
@@ -51,11 +50,9 @@ function Page() {
     getFav();
   }, []);
 
-  useEffect(() => {
-    if (data.length > 0) {
-      setSortedData(sortedList(data, sortConfig.field, sortConfig.order));
-    }
-  }, [sortConfig]);
+  const sortedData = useMemo(() => {
+    return sortedList(data, sortConfig.field, sortConfig.order);
+  }, [data, sortConfig]);
 
   if (data.length === 0) {
     return (
@@ -78,7 +75,7 @@ function Page() {
             image={coin.image}
             marketCap={coin.market_cap}
             symbol={coin.symbol}
-            sparkline={coin.sparkline_in_7d?.price || []} // ✅ pass it here
+            sparkline={coin.sparkline_in_7d?.price || []}
           />
         ))}
       </div>
