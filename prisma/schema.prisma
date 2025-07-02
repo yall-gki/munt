@@ -96,6 +96,7 @@ model Trade {
 
   user     User      @relation(fields: [userId], references: [id])
   strategy Strategy? @relation(fields: [strategyId], references: [id])
+    @@unique([id, userId])
 }
 
 model Wallet {
