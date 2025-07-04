@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/Toaster";
 import { cn } from "@/lib/utils";
 import "@/styles/globals.css";
 import { Inter } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 export const metadata = {
   title: "Flow",
   description: "A crypto info website.",
@@ -29,6 +30,7 @@ export default function RootLayout({
     >
       <body className=" antialiased">
         <Providers>
+          <SpeedInsights />
           <Navbar />
           <FavoriteCoins />
           {authModal}
