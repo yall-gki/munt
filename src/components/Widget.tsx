@@ -92,7 +92,7 @@ const TradingInput = () => {
 
 const PortfolioBalance = () => {
   const { favorites } = useFavoriteCoinsStore();
-  const mockBalances = {
+  const mockBalances : any = {
     bitcoin: 0.42,
     ethereum: 1.7,
     binancecoin: 3.2,
