@@ -38,18 +38,17 @@ export default function UserAccountNav({ user }: UserAccountNavProps) {
           </div>
         </div>
         <DropdownMenuSeparator />
+
         <DropdownMenuItem asChild>
-          <Link href="/">Feed</Link>
+          <Link href="/account">Account</Link>
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
-          <Link href="/r/create">Create Community</Link>
+          <Link href="/wallet">Wallet</Link>
         </DropdownMenuItem>
 
-        <DropdownMenuItem asChild>
-          <Link href="/settings">Settings</Link>
-        </DropdownMenuItem>
         <DropdownMenuSeparator />
+
         <DropdownMenuItem
           className="cursor-pointer"
           onSelect={(event) => {

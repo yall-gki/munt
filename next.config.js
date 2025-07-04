@@ -1,5 +1,5 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig = { 
   env: {
     REDIS_URL: process.env.REDIS_URL,
     REDIS_SECRET: process.env.REDIS_SECRET,
@@ -13,10 +13,11 @@ const nextConfig = {
       "coin-images.coingecko.com",
     ],
   },
-  experimental: {
-    appDir: true,
+  experimental: {}, // Can be removed if empty
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production", // Optional
   },
-  swcMinify: true,
+  // turbo: false, // <-- Uncomment to temporarily use Webpack if Turbopack causes issues
 };
 
 module.exports = nextConfig;

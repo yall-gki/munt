@@ -34,7 +34,6 @@ export default function RootLayout({
           {authModal}
           <main className="w-full bg-zinc-950   h-[calc(92vh-8rem)] max-md:min-h-screen ">
             {children}{" "}
-           
           </main>
         </Providers>
         <Toaster />

@@ -23,6 +23,7 @@ model User {
   trades     Trade[]
   wallets    Wallet[]
   backtests  Backtest[]
+  balances   Balance[] // ✅ Added for Balance relation
 }
 
 model Account {
@@ -59,6 +60,7 @@ model UserCoin {
   isOptimistic Boolean? @default(false)
 
   user User @relation(fields: [userId], references: [id])
+  coin Coin @relation(fields: [coinId], references: [id]) // ✅ Added
 
   @@id([userId, coinId])
 }
@@ -78,6 +80,7 @@ model Strategy {
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   trades    Trade[]
   backtests Backtest[]
+  coin      Coin?      @relation(fields: [coinId], references: [id]) // ✅ Added
 }
 
 model Trade {
@@ -96,7 +99,9 @@ model Trade {
 
   user     User      @relation(fields: [userId], references: [id])
   strategy Strategy? @relation(fields: [strategyId], references: [id])
-    @@unique([id, userId])
+  coin     Coin      @relation(fields: [coinId], references: [id]) // ✅ Added
+
+  @@unique([id, userId])
 }
 
 model Wallet {
@@ -124,6 +129,31 @@ model Backtest {
 
   strategy Strategy @relation(fields: [strategyId], references: [id], onDelete: Cascade)
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Coin {
+  id     String @id // e.g., "bitcoin"
+  name   String
+  symbol String
+  image  String
+
+  balances   Balance[]
+  userCoins  UserCoin[]
+  trades     Trade[]
+  strategies Strategy[]
+}
+
+model Balance {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  coin      Coin     @relation(fields: [coinId], references: [id])
+  coinId    String
+  amount    Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, coinId])
 }
 
 enum StrategyType {

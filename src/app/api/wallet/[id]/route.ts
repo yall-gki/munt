@@ -18,7 +18,7 @@ export async function PUT(
     const updated = await db.wallet.update({
       where: {
         id: params.id,
-        userId: session.user.id,
+        userId: session.user.id,clear
       },
       data: { isActive },
     });
