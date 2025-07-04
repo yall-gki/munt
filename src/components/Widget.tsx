@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { Lock, Coins, ArrowLeftRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useFavoriteCoinsStore } from "@/lib/store";
-import { Coins, ArrowLeftRight } from "lucide-react";
 
 const coins = [
   { id: "bitcoin", symbol: "BTC" },
@@ -38,51 +40,68 @@ const coins = [
   { id: "elrond", symbol: "EGLD" },
 ];
 
+const Overlay = () => (
+  <div className="absolute inset-0 bg-zinc-950/60 backdrop-blur-md flex items-center justify-center rounded-md z-10">
+    <Link href="/sign-in" className="text-white hover:text-zinc-300">
+      <Lock className="h-10 w-10" />
+    </Link>
+  </div>
+);
+
 const TradingInput = () => {
   const [fromCoin, setFromCoin] = useState("bitcoin");
   const [toCoin, setToCoin] = useState("ethereum");
   const [amount, setAmount] = useState(0);
+  const { data: session } = useSession();
 
   return (
-    <div className="w-full bg-zinc-900 p-4 mt-4 rounded-md text-white">
-      <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-        <ArrowLeftRight className="w-5 h-5" /> Trade
-      </h2>
-      <div className="flex flex-col gap-4">
-        <div className="flex gap-2 items-center">
-          <select
-            className="bg-zinc-800 text-white px-2 py-1 rounded-md"
-            value={fromCoin}
-            onChange={(e) => setFromCoin(e.target.value)}
-          >
-            {coins.map((coin) => (
-              <option key={coin.id} value={coin.id}>
-                {coin.symbol}
-              </option>
-            ))}
-          </select>
-          <input
-            type="number"
-            className="flex-1 bg-zinc-800 px-2 py-1 rounded-md"
-            placeholder="Amount"
-            value={amount}
-            onChange={(e) => setAmount(Number(e.target.value))}
-          />
-        </div>
-        <div className="flex gap-2 items-center">
-          <select
-            className="bg-zinc-800 text-white px-2 py-1 rounded-md"
-            value={toCoin}
-            onChange={(e) => setToCoin(e.target.value)}
-          >
-            {coins.map((coin) => (
-              <option key={coin.id} value={coin.id}>
-                {coin.symbol}
-              </option>
-            ))}
-          </select>
-          <div className="flex-1 bg-zinc-800 px-2 py-1 rounded-md text-right">
-            ≈ {amount * 0.94} {toCoin.toUpperCase()}
+    <div className="relative">
+      {!session && <Overlay />}
+      <div
+        className={cn(
+          "w-full bg-zinc-900 p-4 mt-4 rounded-md text-white transition-all",
+          !session && "blur-sm pointer-events-none select-none"
+        )}
+      >
+        <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+          <ArrowLeftRight className="w-5 h-5" /> Trade
+        </h2>
+        <div className="flex flex-col gap-4">
+          <div className="flex gap-2 items-center">
+            <select
+              className="bg-zinc-800 text-white px-2 py-1 rounded-md"
+              value={fromCoin}
+              onChange={(e) => setFromCoin(e.target.value)}
+            >
+              {coins.map((coin) => (
+                <option key={coin.id} value={coin.id}>
+                  {coin.symbol}
+                </option>
+              ))}
+            </select>
+            <input
+              type="number"
+              className="flex-1 bg-zinc-800 px-2 py-1 rounded-md"
+              placeholder="Amount"
+              value={amount}
+              onChange={(e) => setAmount(Number(e.target.value))}
+            />
+          </div>
+          <div className="flex gap-2 items-center">
+            <select
+              className="bg-zinc-800 text-white px-2 py-1 rounded-md"
+              value={toCoin}
+              onChange={(e) => setToCoin(e.target.value)}
+            >
+              {coins.map((coin) => (
+                <option key={coin.id} value={coin.id}>
+                  {coin.symbol}
+                </option>
+              ))}
+            </select>
+            <div className="flex-1 bg-zinc-800 px-2 py-1 rounded-md text-right">
+              ≈ {amount * 0.94} {toCoin.toUpperCase()}
+            </div>
           </div>
         </div>
       </div>
@@ -91,8 +110,9 @@ const TradingInput = () => {
 };
 
 const PortfolioBalance = () => {
+  const { data: session } = useSession();
   const { favorites } = useFavoriteCoinsStore();
-  const mockBalances : any = {
+  const mockBalances: any = {
     bitcoin: 0.42,
     ethereum: 1.7,
     binancecoin: 3.2,
@@ -101,26 +121,34 @@ const PortfolioBalance = () => {
   };
 
   return (
-    <div className="w-full bg-zinc-900 p-4 mt-4 rounded-md text-white">
-      <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-        <Coins className="w-5 h-7" /> Portfolio Balances
-      </h2>
-      <ul className="space-y-2">
-        {coins.map(
-          (coin) =>
-            mockBalances[coin.id] && (
-              <li
-                key={coin.id}
-                className="flex justify-between items-center border-b p-3 border-zinc-800 pb-1"
-              >
-                <span className="text-white font-medium">{coin.symbol}</span>
-                <span className="text-green-400">
-                  {mockBalances[coin.id]} {coin.symbol}
-                </span>
-              </li>
-            )
+    <div className="relative">
+      {!session && <Overlay />}
+      <div
+        className={cn(
+          "w-full bg-zinc-900 p-4 mt-4 rounded-md text-white transition-all",
+          !session && "blur-sm pointer-events-none select-none"
         )}
-      </ul>
+      >
+        <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
+          <Coins className="w-5 h-7" /> Portfolio Balances
+        </h2>
+        <ul className="space-y-2">
+          {coins.map(
+            (coin) =>
+              mockBalances[coin.id] && (
+                <li
+                  key={coin.id}
+                  className="flex justify-between items-center border-b p-3 border-zinc-800 pb-1"
+                >
+                  <span className="text-white font-medium">{coin.symbol}</span>
+                  <span className="text-green-400">
+                    {mockBalances[coin.id]} {coin.symbol}
+                  </span>
+                </li>
+              )
+          )}
+        </ul>
+      </div>
     </div>
   );
 };
