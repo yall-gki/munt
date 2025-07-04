@@ -13,6 +13,7 @@ interface CoinProps {
   marketCap: number;
   symbol: string;
   sparkline: number[];
+  change24h: number;
 }
 
 const Coin: FC<CoinProps> = ({
@@ -23,10 +24,14 @@ const Coin: FC<CoinProps> = ({
   marketCap,
   symbol,
   sparkline,
+  change24h,
 }) => {
+  const isNegative = change24h < 0;
+  const changeColor = isNegative ? "text-red-500" : "text-green-400";
+
   return (
     <Link href={`/dashboard/${name.toLowerCase()}/${symbol.toUpperCase()}`}>
-      <div className="w-full p-3 sm:p-4 mb-2 bg-zinc-800 rounded-xl hover:bg-zinc-700 transition-all flex flex-col max-sm:gap-4 sm:flex-row sm:items-center sm:justify-between text-white">
+      <div className="w-full p-3 sm:p-4 mb-2 bg-zinc-800 rounded-xl hover:bg-zinc-700 transition-all flex max-sm:gap-4 sm:flex-row sm:items-center sm:justify-between text-white">
         {/* Coin identity */}
         <div className="flex items-center gap-3">
           <Image
@@ -45,19 +50,33 @@ const Coin: FC<CoinProps> = ({
         </div>
 
         {/* Chart and data */}
-        <div className="flex flex-row gap-4 sm:gap-10 items-center justify-between w-full sm:w-auto text-xs sm:text-sm font-medium">
-          <MiniSparkline prices={sparkline} />
-          <span className="w-24 text-right">
-            ${price.toLocaleString("en-US")}
-          </span>
-          <span className="w-24 text-right truncate">
-            {marketCap.toLocaleString("en-US")}
-          </span>
+        <div className="flex flex-row gap-4 sm:gap-10 items-center max-sm:items-end max-sm:justify-end justify-between w-full sm:w-auto text-xs sm:text-sm font-medium">
+          <MiniSparkline
+            prices={sparkline}
+            color={isNegative ? "#ef4444" : "#22c55e"}
+          />
+
+          {/* Price + 24h change */}
+          <div className="flex flex-col w-24 text-right">
+            <span className="max-sm:font-semibold text-base">
+              ${price.toLocaleString("en-US")}
+            </span>
+            <span className={`sm:hidden text-xs ${changeColor}`}>
+              {change24h.toFixed(2)}%
+            </span>
+          </div>
+
+          {/* Market cap + 24h change for desktop */}
+          <div className="hidden sm:flex flex-col text-right w-24 truncate">
+            <span>{marketCap.toLocaleString("en-US")}</span>
+            <span className={`${changeColor} text-xs`}>
+              {change24h.toFixed(2)}%
+            </span>
+          </div>
         </div>
       </div>
     </Link>
   );
 };
 
-// 👇 Prevent re-renders if props don't change
 export default memo(Coin);

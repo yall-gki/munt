@@ -1,4 +1,6 @@
-import React, { memo } from "react";
+"use client";
+
+import React, { memo, useEffect, useRef, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -7,20 +9,21 @@ import {
   PointElement,
   Tooltip,
   Legend,
+  Filler,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 
-// Register chart.js components
+// Register chart.js modules
 ChartJS.register(
   CategoryScale,
   LinearScale,
   LineElement,
   PointElement,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
-// Sparkline chart options
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -43,29 +46,48 @@ const chartOptions = {
   },
 };
 
-// Functional Component
-const MiniSparkline: React.FC<{ prices: number[] }> = ({ prices }) => {
-  if (!prices || prices.length === 0) {
-    return <div className="w-24 h-12 animate-pulse bg-zinc-700 rounded" />;
-  }
+interface MiniSparklineProps {
+  prices: number[];
+  color?: string;
+}
+
+const MiniSparkline: React.FC<MiniSparklineProps> = ({
+  prices,
+  color = "#3b82f6",
+}) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [gradientBg, setGradientBg] = useState<string | CanvasGradient>(color);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, color + "88"); // semi-transparent
+    gradient.addColorStop(1, color + "00"); // fully transparent
+    setGradientBg(gradient);
+  }, [color, prices]);
 
   const chartData = {
     labels: prices.map((_, i) => i),
     datasets: [
       {
         data: prices,
-        borderColor: "#3b82f6", // blue-500
-        backgroundColor: "transparent",
+        borderColor: color,
+        backgroundColor: gradientBg,
+        fill: true,
       },
     ],
   };
 
   return (
-    <div className="w-24 h-12 max-sm:w-20 max-sm:h-10">
+    <div className="w-24 h-12 max-sm:w-20 max-sm:h-9">
+      <canvas ref={canvasRef} className="hidden" />
       <Line data={chartData} options={chartOptions} />
     </div>
   );
 };
 
-// ✅ Use memo to avoid unnecessary re-renders
 export default memo(MiniSparkline);

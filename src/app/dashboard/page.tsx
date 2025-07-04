@@ -31,6 +31,7 @@ function Page() {
       const res = await fetch("/api/coin-history");
       const json = await res.json();
       setData(json);
+      
     } catch (err) {
       console.error("Failed to fetch market data", err);
     }
@@ -76,6 +77,7 @@ function Page() {
             marketCap={coin.market_cap}
             symbol={coin.symbol}
             sparkline={coin.sparkline_in_7d?.price || []}
+            change24h={coin.price_change_percentage_24h}
           />
         ))}
       </div>

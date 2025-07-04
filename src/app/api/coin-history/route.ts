@@ -71,6 +71,7 @@ export async function GET() {
 
     // Cache for 5 minutes (300 seconds)
     await redis.set(COINGECKO_KEY, data, { ex: 300 });
+console.log(data);
 
     return NextResponse.json(data);
   } catch (err) {
