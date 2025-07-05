@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Lock, Coins, ArrowLeftRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useFavoriteCoinsStore } from "@/lib/store";
+import axios from "axios";
 
 const coins = [
   { id: "bitcoin", symbol: "BTC" },
@@ -48,19 +48,54 @@ const Overlay = () => (
   </div>
 );
 
+// ✅ Combined hook
+const useAuth = () => {
+  const [isAuth, setIsAuth] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      // Fast local token check
+      const token =
+        typeof window !== "undefined" &&
+        (localStorage.getItem("next-auth.session-token") ||
+          localStorage.getItem("__Secure-next-auth.session-token"));
+
+      if (token) {
+        setIsAuth(true);
+        return;
+      }
+
+      // Fallback to API route
+      try {
+        const res = await axios.get("/api/auth/verify");
+        setIsAuth(!!res.data?.user);
+      } catch {
+        setIsAuth(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  return isAuth;
+};
+
+// ✅ TradingInput component
 const TradingInput = () => {
+  const isAuth = useAuth();
   const [fromCoin, setFromCoin] = useState("bitcoin");
   const [toCoin, setToCoin] = useState("ethereum");
   const [amount, setAmount] = useState(0);
-  const { data: session } = useSession();
+
+  if (isAuth === null) return null;
 
   return (
     <div className="relative">
-      {!session && <Overlay />}
+      {!isAuth && <Overlay />}
       <div
         className={cn(
           "w-full bg-zinc-900 p-4 mt-4 rounded-md text-white transition-all",
-          !session && "blur-sm pointer-events-none select-none"
+          !isAuth && "blur-sm pointer-events-none select-none"
         )}
       >
         <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
@@ -109,8 +144,9 @@ const TradingInput = () => {
   );
 };
 
+// ✅ PortfolioBalance component
 const PortfolioBalance = () => {
-  const { data: session } = useSession();
+  const isAuth = useAuth();
   const { favorites } = useFavoriteCoinsStore();
   const mockBalances: any = {
     bitcoin: 0.42,
@@ -120,13 +156,15 @@ const PortfolioBalance = () => {
     xrp: 520,
   };
 
+  if (isAuth === null) return null;
+
   return (
     <div className="relative">
-      {!session && <Overlay />}
+      {!isAuth && <Overlay />}
       <div
         className={cn(
           "w-full bg-zinc-900 p-4 mt-4 rounded-md text-white transition-all",
-          !session && "blur-sm pointer-events-none select-none"
+          !isAuth && "blur-sm pointer-events-none select-none"
         )}
       >
         <h2 className="text-lg font-bold mb-4 flex items-center gap-2">

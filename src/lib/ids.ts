@@ -3,7 +3,7 @@ export const ids: string[] = [
   "ethereum",
   "binancecoin",
   "cardano",
-  "xrp",
+  "ripple",
   "polkadot",
   "uniswap",
   "chainlink",

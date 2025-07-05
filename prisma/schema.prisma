@@ -135,7 +135,7 @@ model Coin {
   id     String @id // e.g., "bitcoin"
   name   String
   symbol String
-  image  String
+  image  String?
 
   balances   Balance[]
   userCoins  UserCoin[]

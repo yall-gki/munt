@@ -1,22 +1,35 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
+import axios from "axios";
 
 import Coin from "@/components/Coin";
 import { ids } from "@/lib/ids";
 import CryptoIndexBar from "@/components/CryptoIndexBar";
 import { sortedList } from "@/lib/sort";
+import { useFavoriteCoinsStore } from "@/lib/store";
 
-function Page() {
-  const [data, setData] = useState<any[]>([]);
-  const [favcoin, setFavcoin] = useState<any[]>([]);
+type CoinData = {
+  id: string;
+  name: string;
+  current_price: number;
+  image: string;
+  market_cap: number;
+  symbol: string;
+  sparkline_in_7d?: { price: number[] };
+  price_change_percentage_24h: number;
+};
 
+const Page = () => {
+  const [data, setData] = useState<CoinData[]>([]);
   const [sortConfig, setSortConfig] = useState({
     field: "price",
     order: "desc" as "asc" | "desc",
   });
+
+  // ✅ FIX: use direct selector for stable reference
+  const fetchFavorites = useFavoriteCoinsStore((s) => s.fetchFavorites);
 
   const handleSort = (field: string) => {
     setSortConfig((prev) => {
@@ -26,30 +39,22 @@ function Page() {
     });
   };
 
-  const getMarketData = async () => {
+  const fetchAllData = useCallback(async () => {
     try {
-      const res = await fetch("/api/coin-history");
-      const json = await res.json();
-      setData(json);
-      
-    } catch (err) {
-      console.error("Failed to fetch market data", err);
-    }
-  };
+      const marketRes = await fetch("/api/coin-history").then((res) =>
+        res.json()
+      );
+      setData(marketRes);
 
-  const getFav = async () => {
-    try {
-      const response = await axios.get("/api/user-coin");
-      setFavcoin(response.data);
-    } catch (error) {
-      console.error("Error fetching favorite coins:", error);
+      await fetchFavorites(); // ✅ safely called here
+    } catch (err) {
+      console.error("Error fetching data:", err);
     }
-  };
+  }, [fetchFavorites]);
 
   useEffect(() => {
-    getMarketData();
-    getFav();
-  }, []);
+    fetchAllData();
+  }, [fetchAllData]);
 
   const sortedData = useMemo(() => {
     return sortedList(data, sortConfig.field, sortConfig.order);
@@ -57,7 +62,7 @@ function Page() {
 
   if (data.length === 0) {
     return (
-      <div className="h-screen flex items-center justify-center bg-black">
+      <div className="min-h-screen flex items-center justify-center bg-black">
         <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
       </div>
     );
@@ -83,6 +88,6 @@ function Page() {
       </div>
     </div>
   );
-}
+};
 
 export default Page;

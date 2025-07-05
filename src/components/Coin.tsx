@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { FC, memo } from "react";
+import { FC, memo, useMemo, useState } from "react";
 import Image from "next/image";
-import MiniSparkline from "./MiniSparkLine";
+import MiniSparkline from "@/components/MiniSparkLine";
+import { useFavoriteCoinsStore } from "@/lib/store";
+import { Star, Loader2 } from "lucide-react";
 
 interface CoinProps {
   id: string;
@@ -26,56 +28,97 @@ const Coin: FC<CoinProps> = ({
   sparkline,
   change24h,
 }) => {
-  const isNegative = change24h < 0;
+  const favorites = useFavoriteCoinsStore((s) => s.favorites);
+  const toggleFavorite = useFavoriteCoinsStore((s) => s.toggleFavorite);
+  const [loading, setLoading] = useState(false);
+
+  const isFavorited = favorites.includes(id);
+  const isNegative = useMemo(() => change24h < 0, [change24h]);
   const changeColor = isNegative ? "text-red-500" : "text-green-400";
+  const formattedPrice = `$${price?.toLocaleString("en-US") || "0.00"}`;
+  const formattedMarketCap = marketCap?.toLocaleString("en-US") || "0";
+  const formattedChange = `${change24h?.toFixed(2) || "0.00"}%`;
+
+  const handleToggle = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setLoading(true);
+    await toggleFavorite(id);
+    setLoading(false);
+  };
 
   return (
-    <Link href={`/dashboard/${name.toLowerCase()}/${symbol.toUpperCase()}`}>
-      <div className="w-full p-3 sm:p-4 mb-2 bg-zinc-800 rounded-xl hover:bg-zinc-700 transition-all flex max-sm:gap-4 sm:flex-row sm:items-center sm:justify-between text-white">
-        {/* Coin identity */}
-        <div className="flex items-center gap-3">
+    <div className="w-full p-4 mb-3 bg-zinc-900 rounded-2xl hover:bg-zinc-800 transition-all shadow-md text-white">
+      <Link
+        href={`/dashboard/${name.toLowerCase()}/${symbol.toUpperCase()}`}
+        prefetch={false}
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6"
+      >
+        {/* Top-left: Image + Name + Symbol */}
+        <div className="flex items-center gap-4 w-full sm:w-auto">
           <Image
             src={image}
             alt={name}
-            width={28}
-            height={28}
-            className="w-7 h-7 rounded-full bg-white"
+            width={40}
+            height={40}
+            className="w-10 h-10 rounded-full bg-white"
           />
-          <div className="flex flex-col sm:flex-row sm:gap-2 items-start sm:items-center">
-            <span className="font-bold text-sm">{name}</span>
-            <span className="text-zinc-400 text-xs">
-              {symbol.toUpperCase()}
-            </span>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-base">{name}</span>
+              <button
+                onClick={handleToggle}
+                className="transition-all text-blue-500 hover:text-blue-400"
+                title={isFavorited ? "Unfavorite" : "Favorite"}
+              >
+                {loading ? (
+                  <Loader2 className="animate-spin w-4 h-4" />
+                ) : (
+                  <Star
+                    className="w-4 h-4"
+                    stroke="currentColor"
+                    fill={isFavorited ? "currentColor" : "none"}
+                    strokeWidth={2}
+                  />
+                )}
+              </button>
+            </div>
+            <span className="text-xs uppercase text-zinc-400">{symbol}</span>
           </div>
         </div>
 
-        {/* Chart and data */}
-        <div className="flex flex-row gap-4 sm:gap-10 items-center max-sm:items-end max-sm:justify-end justify-between w-full sm:w-auto text-xs sm:text-sm font-medium">
-          <MiniSparkline
-            prices={sparkline}
-            color={isNegative ? "#ef4444" : "#22c55e"}
-          />
+        {/* Right: Graph + Data */}
+        <div className="grid grid-cols-2 sm:flex sm:gap-8 gap-y-3 sm:items-center w-full sm:w-auto text-right text-sm font-medium">
+          {/* Sparkline */}
+          <div className="flex flex-col items-end">
+            <MiniSparkline
+              prices={sparkline}
+              color={isNegative ? "#ef4444" : "#22c55e"}
+            />
+          </div>
 
-          {/* Price + 24h change */}
-          <div className="flex flex-col w-24 text-right">
-            <span className="max-sm:font-semibold text-base">
-              ${price.toLocaleString("en-US")}
-            </span>
-            <span className={`sm:hidden text-xs ${changeColor}`}>
-              {change24h.toFixed(2)}%
+          {/* Price */}
+          <div className="flex flex-col items-end">
+            <span className="text-xs text-zinc-400">Price</span>
+            <span className="text-base font-semibold">{formattedPrice}</span>
+          </div>
+
+          {/* 24h Change */}
+          <div className="flex flex-col items-end">
+            <span className="text-xs text-zinc-400">24h</span>
+            <span className={`text-base ${changeColor}`}>
+              {formattedChange}
             </span>
           </div>
 
-          {/* Market cap + 24h change for desktop */}
-          <div className="hidden sm:flex flex-col text-right w-24 truncate">
-            <span>{marketCap.toLocaleString("en-US")}</span>
-            <span className={`${changeColor} text-xs`}>
-              {change24h.toFixed(2)}%
-            </span>
+          {/* Market Cap */}
+          <div className="flex flex-col items-end">
+            <span className="text-xs text-zinc-400">M. Cap</span>
+            <span className="text-base">{formattedMarketCap}</span>
           </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
 };
 

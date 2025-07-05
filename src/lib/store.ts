@@ -1,4 +1,3 @@
-// lib/store.ts
 import { create } from "zustand";
 
 interface FavoriteCoinsStore {
@@ -8,10 +7,17 @@ interface FavoriteCoinsStore {
   trades: boolean;
   fetchFavorites: () => Promise<void>;
   toggleFavorite: (coinId: string) => Promise<void>;
-  toggleState: (key: "line" | "candle" | "trades") => void;
+  toggleState: (
+    key: keyof Pick<FavoriteCoinsStore, "line" | "candle" | "trades">
+  ) => void;
 }
 
-export const useFavoriteCoinsStore = create<FavoriteCoinsStore>((set) => ({
+// Optional: define expected API response shape
+interface FavoriteCoin {
+  coinId: string;
+}
+
+export const useFavoriteCoinsStore = create<FavoriteCoinsStore>((set, get) => ({
   favorites: [],
   line: true,
   candle: true,
@@ -20,10 +26,13 @@ export const useFavoriteCoinsStore = create<FavoriteCoinsStore>((set) => ({
   fetchFavorites: async () => {
     try {
       const res = await fetch("/api/user-coin");
-      const json = await res.json();
-      if (Array.isArray(json) && json.length > 0) {
-        set({ favorites: json.map((item: any) => item.coinId) });
+      const json: FavoriteCoin[] = await res.json();
+
+      if (Array.isArray(json)) {
+        const ids = json.map((item) => item.coinId);
+        set({ favorites: ids });
       } else {
+        console.warn("⚠️ Unexpected favorite response:", json);
         set({ favorites: [] });
       }
     } catch (err) {
@@ -33,24 +42,29 @@ export const useFavoriteCoinsStore = create<FavoriteCoinsStore>((set) => ({
   },
 
   toggleFavorite: async (coinId: string) => {
-    const isAlreadyFavorite = useFavoriteCoinsStore
-      .getState()
-      .favorites.includes(coinId);
-  
+    const { favorites, fetchFavorites } = get();
+    const isAlreadyFavorite = favorites.includes(coinId);
+
     try {
-      await fetch("/api/user-coin", {
+      const res = await fetch("/api/user-coin", {
         method: isAlreadyFavorite ? "DELETE" : "POST",
         body: JSON.stringify({ coinId }),
         headers: { "Content-Type": "application/json" },
       });
-  
-      // ✅ Re-fetch server state after toggling
-      await useFavoriteCoinsStore.getState().fetchFavorites();
+
+      if (!res.ok) throw new Error(`Server returned ${res.status}`);
+
+      // ✅ Refresh favorites after update
+      await fetchFavorites();
     } catch (error) {
-      console.error("❌ Failed to update favorite:", error);
+      console.error(
+        `❌ Failed to ${isAlreadyFavorite ? "remove" : "add"} favorite:`,
+        error
+      );
     }
   },
-  
 
-  toggleState: (key) => set((state) => ({ [key]: !state[key] })),
+  toggleState: (key) => {
+    set((state) => ({ [key]: !state[key] }));
+  },
 }));
