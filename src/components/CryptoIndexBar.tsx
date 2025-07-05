@@ -1,5 +1,7 @@
-import { FC } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+"use client";
+
+import { FC, useState } from "react";
+import { ChevronDown, ChevronUp, ListFilter, CheckCircle2 } from "lucide-react";
 
 interface CryptoIndexBarProps {
   currentSort: {
@@ -10,6 +12,7 @@ interface CryptoIndexBarProps {
 }
 
 const fieldMap: Record<string, string> = {
+  popularity: "Popularity",
   price: "Price",
   marketCap: "Market Cap",
 };
@@ -18,30 +21,43 @@ const CryptoIndexBar: FC<CryptoIndexBarProps> = ({
   currentSort,
   onSortChange,
 }) => {
-  const renderSortIcon = (field: string) => {
-    if (currentSort.field !== field) return <ChevronDown size={16} />;
-    return currentSort.order === "asc" ? (
-      <ChevronUp size={16} />
-    ) : (
-      <ChevronDown size={16} />
-    );
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const toggleSort = (field: string) => {
+    setMenuOpen(false);
+    onSortChange(field);
   };
 
   return (
-    <div className="w-full py-2 px-4 flex justify-between items-center text-white bg-zinc-900 rounded-md mb-4">
-      <span className="text-sm font-semibold w-24 sm:w-36">Coin</span>
-      <div className="flex gap-4 sm:gap-10 text-xs sm:text-sm font-medium">
-        {Object.keys(fieldMap).map((field) => (
-          <span
-            key={field}
-            onClick={() => onSortChange(field)}
-            className={`flex items-center gap-1 cursor-pointer transition-colors hover:text-blue-500 ${
-              currentSort.field === field ? "text-blue-500" : "text-white"
-            }`}
-          >
-            {fieldMap[field]} {renderSortIcon(field)}
-          </span>
-        ))}
+    <div className="flex items-center justify-start gap-4">
+      <div className="relative inline-block text-left">
+        <button
+          onClick={() => setMenuOpen((prev) => !prev)}
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition"
+        >
+          <ListFilter className="w-4 h-4" />
+          {fieldMap[currentSort.field] || "Sort"}
+          {menuOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </button>
+
+        {menuOpen && (
+          <div className="absolute mt-2 w-48 z-20 bg-zinc-900 rounded-xl shadow-lg p-2">
+            {Object.entries(fieldMap).map(([field, label]) => (
+              <button
+                key={field}
+                onClick={() => toggleSort(field)}
+                className={`w-full flex items-center justify-between px-4 py-2 rounded-xl text-sm font-medium text-white hover:bg-zinc-700 transition ${
+                  currentSort.field === field ? "bg-zinc-700" : ""
+                }`}
+              >
+                {label}
+                {currentSort.field === field && (
+                  <CheckCircle2 className="w-4 h-4 text-blue-500" />
+                )}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

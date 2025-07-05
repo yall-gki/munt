@@ -48,13 +48,23 @@ const Coin: FC<CoinProps> = ({
   };
 
   return (
-    <div className="w-full p-4 mb-3 bg-zinc-900 rounded-2xl hover:bg-zinc-800 transition-all shadow-md text-white">
+    <div className="relative w-full p-4 mb-4 rounded-2xl overflow-hidden bg-zinc-950 text-white group hover:bg-zinc-900 transition-all shadow-sm">
+      {/* SVG background */}
+      <div
+        className="absolute inset-0 z-0 opacity-10 group-hover:opacity-20 transition-opacity"
+        style={{
+          backgroundImage: "url('/haikei-list.svg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
+
       <Link
         href={`/dashboard/${name.toLowerCase()}/${symbol.toUpperCase()}`}
         prefetch={false}
-        className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6"
+        className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6"
       >
-        {/* Top-left: Image + Name + Symbol */}
+        {/* Left: Icon + Name */}
         <div className="flex items-center gap-4 w-full sm:w-auto">
           <Image
             src={image}
@@ -87,23 +97,20 @@ const Coin: FC<CoinProps> = ({
           </div>
         </div>
 
-        {/* Right: Graph + Data */}
+        {/* Right: Sparkline + Data */}
         <div className="grid grid-cols-2 sm:flex sm:gap-8 gap-y-3 sm:items-center w-full sm:w-auto text-right text-sm font-medium">
-          {/* Sparkline */}
           <div className="flex flex-col items-end">
             <MiniSparkline
               prices={sparkline}
-              color={isNegative ? "#ef4444" : "#22c55e"}
+              color={isNegative ? "#ef4444" : "#3b82f6"} // red or blue
             />
           </div>
 
-          {/* Price */}
           <div className="flex flex-col items-end">
             <span className="text-xs text-zinc-400">Price</span>
             <span className="text-base font-semibold">{formattedPrice}</span>
           </div>
 
-          {/* 24h Change */}
           <div className="flex flex-col items-end">
             <span className="text-xs text-zinc-400">24h</span>
             <span className={`text-base ${changeColor}`}>
@@ -111,7 +118,6 @@ const Coin: FC<CoinProps> = ({
             </span>
           </div>
 
-          {/* Market Cap */}
           <div className="flex flex-col items-end">
             <span className="text-xs text-zinc-400">M. Cap</span>
             <span className="text-base">{formattedMarketCap}</span>

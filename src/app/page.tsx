@@ -15,7 +15,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="relative w-full min-h-screen overflow-hidden bg-black text-white">
+    <div className="relative w-full min-h-full overflow-hidden bg-black text-white">
       {/* ✅ Background Image */}
       <Image
         src="/bg-crypto.jpg"
