@@ -34,7 +34,7 @@ export default function RootLayout({
           <Navbar />
           <FavoriteCoins />
           {authModal}
-          <main className="w-full bg-zinc-950   h-[calc(92vh-8rem)] max-md:min-h-screen ">
+          <main className="w-full bg-zinc-950   h-[calc(92vh-8rem)]  ">
             {children}{" "}
           </main>
         </Providers>

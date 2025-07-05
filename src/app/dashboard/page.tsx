@@ -69,7 +69,7 @@ const Page = () => {
         <CryptoIndexBar currentSort={sortConfig} onSortChange={handleSort} />
 
         {/* Coin List */}
-        <div className="flex flex-col gap-4 mt-2">
+        <div className="flex flex-col  mt-2">
           {sortedData.map((coin) => (
             <Coin
               key={coin.id}
