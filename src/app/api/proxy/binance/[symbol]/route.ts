@@ -3,11 +3,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { symbol: string } }
-) {
-  const symbol = params.symbol.toUpperCase();
+export async function GET(req: NextRequest) {
+  // Parse URL to extract the symbol param
+  const url = new URL(req.url);
+  const parts = url.pathname.split("/");
+  const symbol = parts[parts.length - 1]?.toUpperCase();
 
   if (!symbol) {
     return NextResponse.json({ error: "Missing symbol" }, { status: 400 });
