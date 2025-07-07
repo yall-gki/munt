@@ -3,30 +3,38 @@ import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth";
 
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { coinId: string } }
+  request: NextRequest,
+  context: { params: { coinId: string } }
 ) {
   const session = await getAuthSession();
-  if (!session?.user)
+
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-  const days = parseInt(req.nextUrl.searchParams.get("days") || "30");
-  const fromDate = new Date();
-  fromDate.setDate(fromDate.getDate() - days);
+  const { coinId } = context.params;
 
-  const history = await db.portfolioHistory.findMany({
-    where: {
-      userId: session.user.id,
-      coinId: params.coinId,
-      date: { gte: fromDate },
-    },
-    orderBy: { date: "asc" },
-  });
+  if (!coinId) {
+    return NextResponse.json({ error: "coinId is required" }, { status: 400 });
+  }
 
-  return NextResponse.json(
-    history.map((entry) => ({
-      date: entry.date.toISOString().split("T")[0],
-      value: Number(entry.usdValue.toFixed(2)),
-    }))
-  );
+  try {
+    const history = await db.portfolioHistory.findMany({
+      where: {
+        userId: session.user.id,
+        coinId,
+      },
+      orderBy: {
+        date: "asc",
+      },
+    });
+
+    return NextResponse.json({ history });
+  } catch (error) {
+    console.error("Error fetching portfolio history:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
 }
