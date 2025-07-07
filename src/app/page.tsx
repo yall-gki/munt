@@ -14,16 +14,9 @@ export default function Home() {
 
 
   return (
-    <div className="relative w-full max-h-full overflow-hidden bg-black text-white">
+    <div className="relative w-full h-full overflow-hidden bg-black text-white">
       {/* ✅ Background Image */}
-      <Image
-        src="/bg-crypto.jpg"
-        alt="Crypto Background"
-        layout="fill"
-        objectFit="cover"
-        className="absolute inset-0 z-0 opacity-30"
-        priority
-      />
+    
 
       {/* ✅ Dark Overlay */}
       <div className="absolute inset-0 z-10 max-h-full" />
@@ -63,7 +56,7 @@ export default function Home() {
       </div>
 
       {/* ✅ Ticker */}
-      <div className="relative z-20 w-full overflow-hidden">
+      <div className=" z-20 w-full absolute bottom-0 overflow-hidden">
         <LiveTicker />
       </div>
     </div>
