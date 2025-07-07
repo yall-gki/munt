@@ -24,6 +24,7 @@ model User {
   wallets    Wallet[]
   backtests  Backtest[]
   balances   Balance[]
+  portfolioHistory PortfolioHistory[]
 }
 
 model Account {
@@ -137,10 +138,11 @@ model Coin {
   symbol String
   image  String?
 
-  balances   Balance[]
-  userCoins  UserCoin[]
-  trades     Trade[]
-  strategies Strategy[]
+  balances          Balance[]
+  userCoins         UserCoin[]
+  trades            Trade[]
+  strategies        Strategy[]
+  portfolioHistory  PortfolioHistory[]
 }
 
 model Balance {
@@ -160,11 +162,11 @@ model PortfolioHistory {
   id        String   @id @default(cuid())
   userId    String
   coinId    String
-  name      String
-  symbol    String
-  amount    Float
-  usdValue  Float
   date      DateTime @default(now())
+  usdValue  Float
+
+  user      User     @relation(fields: [userId], references: [id])
+  coin      Coin     @relation(fields: [coinId], references: [id])
 
   @@unique([userId, coinId, date])
 }

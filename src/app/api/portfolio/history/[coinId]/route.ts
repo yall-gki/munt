@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   }
 
   const url = new URL(req.url);
-  const coinId = url.pathname.split("/").pop(); // extracts coinId from URL
+  const coinId = url.pathname.split("/").pop();
   const skip = parseInt(url.searchParams.get("skip") || "0");
   const take = parseInt(url.searchParams.get("take") || "100");
 

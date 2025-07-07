@@ -37,15 +37,14 @@ const coinToBinanceSymbol: Record<string, string> = {
 
 export async function GET() {
   const users = await db.user.findMany();
-
-  // Set the date to exact UTC midnight
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
+
+  const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
   for (const user of users) {
     const balances = await db.balance.findMany({
       where: { userId: user.id },
-      include: { coin: true },
     });
 
     for (const b of balances) {
@@ -53,11 +52,9 @@ export async function GET() {
       if (!symbol) continue;
 
       try {
-        const { data } = await axios.get(
-          `https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`
-        );
-        const price = parseFloat(data.price);
-        const usdValue = price * b.amount;
+        const res = await axios.get(`${base}/api/proxy/binance/${symbol}`);
+        const price = parseFloat(res.data.price);
+        const usdValue = b.amount * price;
 
         await db.portfolioHistory.upsert({
           where: {
@@ -67,27 +64,16 @@ export async function GET() {
               date: today,
             },
           },
-          update: {
-            amount: b.amount,
-            usdValue,
-            name: b.coin.name,
-            symbol: b.coin.symbol,
-          },
+          update: { usdValue },
           create: {
             userId: user.id,
             coinId: b.coinId,
-            name: b.coin.name,
-            symbol: b.coin.symbol,
-            amount: b.amount,
-            usdValue,
             date: today,
+            usdValue,
           },
         });
-      } catch (e) {
-        console.error(
-          `❌ Failed for ${b.coinId}:`,
-          e instanceof Error ? e.message : e
-        );
+      } catch (err) {
+        console.error(`Failed log for ${symbol}`, err);
       }
     }
   }
