@@ -93,7 +93,7 @@ export default function Page() {
   useEffect(() => {
     if (!selectedCoin) return;
     axios
-      .get(`/api/portfolio/history?coinId=${selectedCoin}`)
+      .get(`/api/portfolio/history/${selectedCoin}`)
       .then((res) => setHistory(res.data));
   }, [selectedCoin]);
 

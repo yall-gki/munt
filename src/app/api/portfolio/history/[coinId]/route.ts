@@ -7,18 +7,24 @@ export async function GET(
   { params }: { params: { coinId: string } }
 ) {
   const session = await getAuthSession();
+
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const { coinId } = params;
+  if (!coinId) {
+    return NextResponse.json({ error: "Missing coinId" }, { status: 400 });
+  }
+
   const url = new URL(req.url);
   const skip = parseInt(url.searchParams.get("skip") || "0");
-  const take = parseInt(url.searchParams.get("take") || "10");
+  const take = parseInt(url.searchParams.get("take") || "100"); // You can adjust the default
 
   const history = await db.portfolioHistory.findMany({
     where: {
       userId: session.user.id,
-      coinId: params.coinId,
+      coinId,
     },
     skip,
     take,
