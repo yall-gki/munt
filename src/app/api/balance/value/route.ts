@@ -1,4 +1,6 @@
-import { NextResponse } from "next/server";
+// src/app/api/balance/value/route.ts
+
+import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import axios from "axios";
@@ -36,7 +38,7 @@ const coinToBinanceSymbol: Record<string, string> = {
   elrond: "EGLDUSDT",
 };
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const session = await getAuthSession();
   if (!session?.user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -48,24 +50,30 @@ export async function GET() {
   });
 
   const prices: Record<string, number> = {};
-  const base = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
   await Promise.all(
     balances.map(async (b) => {
-      const coinId = b.coinId.toLowerCase();
-      const symbol = coinToBinanceSymbol[coinId];
-
+      const symbol = coinToBinanceSymbol[b.coinId.toLowerCase()];
       if (!symbol) {
-        prices[coinId] = 0;
+        prices[b.coinId] = 0;
         return;
       }
 
+      // Build absolute URL to your own proxy route
+      const proxyUrl = new URL(
+        `/api/proxy/binance/${symbol}`,
+        req.url
+      ).toString();
+
       try {
-        const res = await axios.get(`${base}/api/proxy/binance/${symbol}`);
-        prices[coinId] = parseFloat(res.data.price);
-      } catch (err) {
-        prices[coinId] = 0;
-        console.error(`❌ Failed price for ${symbol}`, err);
+        const res = await axios.get(proxyUrl);
+        prices[b.coinId] = parseFloat(res.data.price);
+      } catch (err : any) {
+        console.error(
+          `❌ Proxy fetch failed for ${symbol}:`,
+          err.message || err
+        );
+        prices[b.coinId] = 0;
       }
     })
   );
@@ -76,12 +84,9 @@ export async function GET() {
     maximumFractionDigits: 2,
   });
 
-  const coinValues = balances.map((b) => {
-    const coinId = b.coinId.toLowerCase();
+  const breakdown = balances.map((b) => {
     const amount = Number(b.amount) || 0;
-    const price = prices[coinId] ?? 0;
-    const usdValue = amount * price;
-
+    const usdValue = amount * (prices[b.coinId] || 0);
     return {
       id: b.coinId,
       name: b.coin.name,
@@ -92,17 +97,14 @@ export async function GET() {
     };
   });
 
-  const totalValueRaw = coinValues.reduce((acc, c) => acc + c.usdValue, 0);
-  const totalValueFormatted = formatter.format(totalValueRaw);
-
-  const pieData = coinValues.map((c) => ({
-    ...c,
-    percentage: totalValueRaw > 0 ? (c.usdValue / totalValueRaw) * 100 : 0,
-  }));
+  const totalValue = breakdown.reduce((sum, c) => sum + c.usdValue, 0);
 
   return NextResponse.json({
-    totalValue: totalValueRaw,
-    formattedTotalValue: totalValueFormatted,
-    breakdown: pieData,
+    totalValue,
+    formattedTotalValue: formatter.format(totalValue),
+    breakdown: breakdown.map((c) => ({
+      ...c,
+      percentage: totalValue > 0 ? (c.usdValue / totalValue) * 100 : 0,
+    })),
   });
 }
