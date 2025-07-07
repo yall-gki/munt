@@ -8,13 +8,13 @@ import { Inter } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 export const metadata = {
-  title: "Flow-Crypto Dashboard",
+  title: "Flow — Crypto Dashboard",
   description: "A crypto info website.",
-   
-    icons: {
-      icon: "/favicon.ico", // This line adds the favicon
-    },
-  };
+
+  icons: {
+    icon: "/favicon.ico", // This line adds the favicon
+  },
+};
 
 const inter = Inter({
   subsets: ["latin"],
