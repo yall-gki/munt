@@ -23,7 +23,7 @@ model User {
   trades     Trade[]
   wallets    Wallet[]
   backtests  Backtest[]
-  balances   Balance[] // ✅ Added for Balance relation
+  balances   Balance[]
 }
 
 model Account {
@@ -60,7 +60,7 @@ model UserCoin {
   isOptimistic Boolean? @default(false)
 
   user User @relation(fields: [userId], references: [id])
-  coin Coin @relation(fields: [coinId], references: [id]) // ✅ Added
+  coin Coin @relation(fields: [coinId], references: [id])
 
   @@id([userId, coinId])
 }
@@ -80,7 +80,7 @@ model Strategy {
   user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   trades    Trade[]
   backtests Backtest[]
-  coin      Coin?      @relation(fields: [coinId], references: [id]) // ✅ Added
+  coin      Coin?      @relation(fields: [coinId], references: [id])
 }
 
 model Trade {
@@ -99,7 +99,7 @@ model Trade {
 
   user     User      @relation(fields: [userId], references: [id])
   strategy Strategy? @relation(fields: [strategyId], references: [id])
-  coin     Coin      @relation(fields: [coinId], references: [id]) // ✅ Added
+  coin     Coin      @relation(fields: [coinId], references: [id])
 
   @@unique([id, userId])
 }
@@ -107,7 +107,7 @@ model Trade {
 model Wallet {
   id        String   @id @default(cuid())
   userId    String
-  provider  String // e.g., "Binance", "MetaMask"
+  provider  String
   address   String
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
@@ -155,12 +155,16 @@ model Balance {
 
   @@unique([userId, coinId])
 }
+
 model PortfolioHistory {
   id        String   @id @default(cuid())
   userId    String
   coinId    String
-  date      DateTime @default(now())
+  name      String
+  symbol    String
+  amount    Float
   usdValue  Float
+  date      DateTime @default(now())
 
   @@unique([userId, coinId, date])
 }
