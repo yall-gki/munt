@@ -5,24 +5,17 @@ export async function GET(
   req: NextRequest,
   context: { params: { symbol: string } }
 ) {
-  const { symbol } = context.params;
-
-  if (!symbol) {
-    return NextResponse.json({ error: "Missing symbol" }, { status: 400 });
-  }
+  const symbol = context.params.symbol.toUpperCase();
 
   try {
-    const response = await axios.get(
+    const { data } = await axios.get(
       `https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`
     );
-    return NextResponse.json(response.data);
-  } catch (error: any) {
-    console.error(
-      `Proxy Binance fetch failed for ${symbol}`,
-      error?.message || error
-    );
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error(`Error fetching ${symbol} from Binance:`, error);
     return NextResponse.json(
-      { error: "Failed to fetch price from Binance" },
+      { error: "Failed to fetch price" },
       { status: 500 }
     );
   }
