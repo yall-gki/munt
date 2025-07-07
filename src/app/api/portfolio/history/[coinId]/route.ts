@@ -2,24 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { coinId: string } }
-) {
+export async function GET(req: NextRequest) {
   const session = await getAuthSession();
 
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { coinId } = params;
+  const url = new URL(req.url);
+  const coinId = url.pathname.split("/").pop(); // extracts coinId from URL
+  const skip = parseInt(url.searchParams.get("skip") || "0");
+  const take = parseInt(url.searchParams.get("take") || "100");
+
   if (!coinId) {
     return NextResponse.json({ error: "Missing coinId" }, { status: 400 });
   }
-
-  const url = new URL(req.url);
-  const skip = parseInt(url.searchParams.get("skip") || "0");
-  const take = parseInt(url.searchParams.get("take") || "100"); // You can adjust the default
 
   const history = await db.portfolioHistory.findMany({
     where: {
