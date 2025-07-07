@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth";
+import { NextResponse } from "next/server";
 
 export async function GET(
-  request: NextRequest,
-  context: { params: { coinId: string } }
+  req: Request,
+  { params }: { params: { coinId: string } }
 ) {
   const session = await getAuthSession();
 
@@ -12,16 +12,13 @@ export async function GET(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { coinId } = context.params;
-
-  if (!coinId) {
-    return NextResponse.json({ error: "coinId is required" }, { status: 400 });
-  }
+  const userId = session.user.id;
+  const coinId = params.coinId;
 
   try {
     const history = await db.portfolioHistory.findMany({
       where: {
-        userId: session.user.id,
+        userId,
         coinId,
       },
       orderBy: {
@@ -29,12 +26,9 @@ export async function GET(
       },
     });
 
-    return NextResponse.json({ history });
+    return NextResponse.json(history);
   } catch (error) {
-    console.error("Error fetching portfolio history:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
+    console.error("Error fetching coin history:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }

@@ -10,7 +10,12 @@ import { Analytics } from "@vercel/analytics/next";
 export const metadata = {
   title: "Flow",
   description: "A crypto info website.",
-};
+   
+    icons: {
+      icon: "/favicon.ico", // This line adds the favicon
+    },
+  };
+
 const inter = Inter({
   subsets: ["latin"],
 });
