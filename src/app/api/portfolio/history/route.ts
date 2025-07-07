@@ -1,38 +1,40 @@
+import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { NextResponse } from "next/server";
 
-export async function GET(req: Request) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { coinId: string } }
+) {
   const session = await getAuthSession();
-  if (!session?.user) {
+
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { searchParams } = new URL(req.url);
-  const coinId = searchParams.get("coinId");
+  const { coinId } = params;
 
   if (!coinId) {
     return NextResponse.json({ error: "Missing coinId" }, { status: 400 });
   }
 
-  const history = await db.portfolioHistory.findMany({
-    where: {
-      userId: session.user.id,
-      coinId,
-    },
-    orderBy: {
-      date: "asc", // Use 'date' as defined in the PortfolioHistory model
-    },
-    select: {
-      usdValue: true,
-      date: true,
-    },
-  });
+  try {
+    const history = await db.portfolioHistory.findMany({
+      where: {
+        userId: session.user.id,
+        coinId,
+      },
+      orderBy: {
+        date: "asc",
+      },
+    });
 
-  const result = history.map((h) => ({
-    date: h.date.toISOString(),
-    value: h.usdValue,
-  }));
-
-  return NextResponse.json(result);
+    return NextResponse.json({ history });
+  } catch (error) {
+    console.error("Portfolio history error:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  }
 }
