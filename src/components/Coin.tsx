@@ -35,9 +35,13 @@ const Coin: FC<CoinProps> = ({
   const isFavorited = favorites.includes(id);
   const isNegative = useMemo(() => change24h < 0, [change24h]);
   const changeColor = isNegative ? "text-red-500" : "text-green-400";
+
   const formattedPrice = `$${price?.toLocaleString("en-US") || "0.00"}`;
-  const formattedMarketCap = marketCap?.toLocaleString("en-US") || "0";
   const formattedChange = `${change24h?.toFixed(2) || "0.00"}%`;
+  const formattedMarketCap = Intl.NumberFormat("en-US", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(marketCap || 0);
 
   const handleToggle = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -98,29 +102,35 @@ const Coin: FC<CoinProps> = ({
         </div>
 
         {/* Right: Sparkline + Data */}
-        <div className="grid grid-cols-2 sm:flex sm:gap-8 gap-y-3 sm:items-center w-full sm:w-auto text-right text-sm font-medium">
-          <div className="flex flex-col items-end">
+        <div className="grid grid-cols-2 sm:flex sm:justify-end sm:gap-4 sm:items-end w-full text-sm font-medium">
+          {/* Sparkline */}
+          <div className="flex flex-col items-end w-[100px] sm:w-[140px] sm:justify-end">
             <MiniSparkline
               prices={sparkline}
-              color={isNegative ? "#ef4444" : "#3b82f6"} // red or blue
+              color={isNegative ? "#ef4444" : "#3b82f6"}
             />
           </div>
 
-          <div className="flex flex-col items-end">
+          {/* Price */}
+          <div className="flex flex-col w-[100px] text-right sm:justify-end">
             <span className="text-xs text-zinc-400">Price</span>
-            <span className="text-base font-semibold">{formattedPrice}</span>
+            <span className="text-base font-semibold tabular-nums">
+              {formattedPrice}
+            </span>
           </div>
 
-          <div className="flex flex-col items-end">
+          {/* 24h Change */}
+          <div className="flex flex-col w-[100px] text-right sm:justify-end">
             <span className="text-xs text-zinc-400">24h</span>
-            <span className={`text-base ${changeColor}`}>
+            <span className={`text-base ${changeColor} tabular-nums`}>
               {formattedChange}
             </span>
           </div>
 
-          <div className="flex flex-col items-end">
+          {/* Market Cap */}
+          <div className="flex flex-col w-[100px] text-right sm:justify-end">
             <span className="text-xs text-zinc-400">M. Cap</span>
-            <span className="text-base">{formattedMarketCap}</span>
+            <span className="text-base tabular-nums">{formattedMarketCap}</span>
           </div>
         </div>
       </Link>

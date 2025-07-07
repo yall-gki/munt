@@ -1,21 +1,20 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import FavoriteCoins from "@/components/FavoriteCoins";
 import { useFavoriteCoinsStore } from "@/lib/store";
+import LiveTicker from "@/components/Ticker";
+
+// Inside return()
+
 
 export default function Home() {
-  const { fetchFavorites } = useFavoriteCoinsStore();
 
-  useEffect(() => {
-    fetchFavorites();
-  }, []);
 
   return (
-    <div className="relative w-full min-h-full overflow-hidden bg-black text-white">
+    <div className="relative w-full max-h-full overflow-hidden bg-black text-white">
       {/* ✅ Background Image */}
       <Image
         src="/bg-crypto.jpg"
@@ -27,7 +26,7 @@ export default function Home() {
       />
 
       {/* ✅ Dark Overlay */}
-      <div className="absolute inset-0 bg-black/60 z-10 backdrop-blur-sm" />
+      <div className="absolute inset-0 z-10 max-h-full" />
 
       {/* ✅ Hero Section */}
       <div className="relative z-20 flex flex-col items-center justify-center text-center h-[70vh] px-4">
@@ -37,7 +36,7 @@ export default function Home() {
           transition={{ duration: 0.8 }}
           className="text-4xl sm:text-5xl font-extrabold mb-4"
         >
-          Welcome to <span className="text-blue-500">CryptoBoard</span>
+          Welcome to <span className="text-blue-500">Munt</span>
         </motion.h1>
 
         <motion.p
@@ -46,8 +45,8 @@ export default function Home() {
           transition={{ delay: 0.2, duration: 0.8 }}
           className="text-lg sm:text-xl text-zinc-300 max-w-xl mb-8"
         >
-          Track your favorite cryptocurrencies, analyze trends, and simulate
-          trades all in one place.
+          Your all-in-one crypto dashboard — track your assets, monitor price
+          trends, and get deep portfolio analysis with precision.
         </motion.p>
 
         <motion.div
@@ -63,8 +62,11 @@ export default function Home() {
         </motion.div>
       </div>
 
-      {/* ✅ Favorite Coins Strip */}
-     
+      {/* ✅ Ticker */}
+      <div className="relative z-20 w-full overflow-hidden">
+        <LiveTicker />
+      </div>
     </div>
   );
+  
 }

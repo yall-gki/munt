@@ -30,7 +30,7 @@ const chartOptions = {
   elements: {
     line: {
       tension: 0.3,
-      borderWidth: 2,
+      borderWidth: 1,
     },
     point: {
       radius: 0,
@@ -83,11 +83,12 @@ const MiniSparkline: React.FC<MiniSparklineProps> = ({
   };
 
   return (
-    <div className="w-24 h-12 max-sm:w-20 max-sm:h-9">
+    <div className="w-24 h-12 max-sm:w-20 max-sm:h-9 sm:w-full">
       <canvas ref={canvasRef} className="hidden" />
       <Line data={chartData} options={chartOptions} />
     </div>
   );
+  
 };
 
 export default memo(MiniSparkline);

@@ -8,7 +8,7 @@ import { Inter } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 export const metadata = {
-  title: "Flow — Crypto Dashboard",
+  title: "Munt — Crypto Dashboard",
   description: "A crypto info website.",
 
   icons: {
