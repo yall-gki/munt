@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import "@/styles/globals.css";
 import { Inter } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 export const metadata = {
   title: "Flow",
   description: "A crypto info website.",
@@ -31,6 +32,7 @@ export default function RootLayout({
       <body className=" antialiased">
         <Providers>
           <SpeedInsights />
+          <Analytics />
           <Navbar />
           <FavoriteCoins />
           {authModal}
