@@ -155,6 +155,15 @@ model Balance {
 
   @@unique([userId, coinId])
 }
+model PortfolioHistory {
+  id        String   @id @default(cuid())
+  userId    String
+  coinId    String
+  date      DateTime @default(now())
+  usdValue  Float
+
+  @@unique([userId, coinId, date])
+}
 
 enum StrategyType {
   DCA

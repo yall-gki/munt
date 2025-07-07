@@ -37,6 +37,11 @@ type CoinBalance = {
   percentage: number;
 };
 
+type HistoryPoint = {
+  date: string;
+  value: number;
+};
+
 type WalletData = {
   totalValue: number;
   breakdown: CoinBalance[];
@@ -62,15 +67,35 @@ export default function Page() {
   const [isSmallScreen, setIsSmallScreen] = useState(false);
   const [mode, setMode] = useState<ChartMode>("Doughnut");
   const [selectedCoin, setSelectedCoin] = useState<string>("");
+  const [history, setHistory] = useState<HistoryPoint[]>([]);
+
+  const currencyFormatter = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 2,
+  });
+
+  const gainLoss =
+    history.length >= 2
+      ? ((history.at(-1)!.value - history[0].value) / history[0].value) * 100
+      : 0;
 
   useEffect(() => {
     axios.get("/api/balance/value").then((res) => {
+      res.data.breakdown.sort((a: any, b: any) => b.usdValue - a.usdValue);
       setData(res.data);
       if (res.data.breakdown.length) {
         setSelectedCoin(res.data.breakdown[0].id);
       }
     });
   }, []);
+
+  useEffect(() => {
+    if (!selectedCoin) return;
+    axios
+      .get(`/api/portfolio/history?coinId=${selectedCoin}`)
+      .then((res) => setHistory(res.data));
+  }, [selectedCoin]);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)");
@@ -86,8 +111,6 @@ export default function Page() {
   );
   const usdValues = coins.map((c) => c.usdValue || 0);
   const coinLabels = coins.map((c) => c.symbol.toUpperCase());
-
-  // ensure pie/doughnut show even if zero
   const allZero = usdValues.every((v) => v === 0);
   const displayValues = allZero
     ? usdValues.map((v, i) => (i === 0 ? 0.00001 : 0))
@@ -96,27 +119,19 @@ export default function Page() {
   const doughnutData = {
     labels: coinLabels,
     datasets: [
-      { data: displayValues, backgroundColor: chartColorsUsed, borderWidth: 0 },
+      {
+        data: displayValues,
+        backgroundColor: chartColorsUsed,
+        borderWidth: 0,
+      },
     ],
   };
 
-  const selectedBalanceHistory = (() => {
-    const now = Date.now();
-    const coin = coins.find((c) => c.id === selectedCoin);
-    const amount = coin?.amount || 0;
-    // Mock recent points: [6 days ago... today]
-    const history = Array.from({ length: 7 }, (_, i) => ({
-      date: new Date(now - (6 - i) * 86400000).toLocaleDateString("en-US"),
-      value: amount * Math.random() * 0.2 + amount * 0.9,
-    }));
-    return history;
-  })();
-
   const lineData = {
-    labels: selectedBalanceHistory.map((h) => h.date),
+    labels: history.map((h) => new Date(h.date).toLocaleDateString("en-US")),
     datasets: [
       {
-        data: selectedBalanceHistory.map((h) => h.value),
+        data: history.map((h) => h.value),
         backgroundColor:
           mode === "Area" ? "rgba(59,130,246,0.2)" : "transparent",
         borderColor: "#3B82F6",
@@ -128,7 +143,7 @@ export default function Page() {
 
   return (
     <div className="min-h-full bg-black text-white flex flex-col md:flex-row gap-4 p-4">
-      {/* Coin list */}
+      {/* Sidebar */}
       <div className="md:w-1/3 w-full bg-zinc-950 rounded-xl overflow-hidden">
         {isSmallScreen && (
           <button
@@ -150,7 +165,11 @@ export default function Page() {
               <p className="text-xl font-bold mb-2">Your Balances</p>
             )}
             {coins.map((c) => (
-              <CoinItem key={c.id} coin={c} />
+              <CoinItem
+                key={c.id}
+                coin={c}
+                currencyFormatter={currencyFormatter}
+              />
             ))}
           </div>
         )}
@@ -162,7 +181,7 @@ export default function Page() {
           <div>
             <h2 className="text-xl font-bold">Total Value</h2>
             <p className="text-4xl font-extrabold text-blue-500">
-              ${data?.totalValue.toFixed(2) || "0.00"}
+              {currencyFormatter.format(data?.totalValue || 0)}
             </p>
           </div>
           <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black font-semibold hover:opacity-90 transition">
@@ -170,8 +189,8 @@ export default function Page() {
           </button>
         </div>
 
-        {/* Mode tabs and coin selector */}
-        <div className="w-full flex flex-wrap gap-3">
+        {/* Chart controls */}
+        <div className="w-full flex flex-wrap gap-3 items-center">
           {chartModes.map((m) => (
             <button
               key={m}
@@ -198,10 +217,20 @@ export default function Page() {
               ))}
             </select>
           )}
+          {history.length > 1 && (mode === "Line" || mode === "Area") && (
+            <span
+              className={`text-sm ml-auto font-semibold ${
+                gainLoss >= 0 ? "text-green-400" : "text-red-400"
+              }`}
+            >
+              {gainLoss >= 0 ? "+" : ""}
+              {gainLoss.toFixed(2)}%
+            </span>
+          )}
         </div>
 
-        {/* Chart container */}
-        <div className="relative w-full md:max-w-2xl h-[300px] mt-20">
+        {/* Chart */}
+        <div className="relative w-full md:max-w-2xl h-[300px] mt-12">
           <AnimatePresence mode="wait">
             <motion.div
               key={mode + selectedCoin}
@@ -221,7 +250,8 @@ export default function Page() {
                       tooltip: {
                         enabled: !allZero,
                         callbacks: {
-                          label: (ctx) => `$${(ctx.raw as number).toFixed(2)}`,
+                          label: (ctx) =>
+                            currencyFormatter.format(ctx.raw as number),
                         },
                       },
                     },
@@ -236,7 +266,8 @@ export default function Page() {
                       legend: { display: false },
                       tooltip: {
                         callbacks: {
-                          label: (ctx) => `$${(ctx.raw as number).toFixed(2)}`,
+                          label: (ctx) =>
+                            currencyFormatter.format(ctx.raw as number),
                         },
                       },
                     },
@@ -261,7 +292,13 @@ export default function Page() {
   );
 }
 
-function CoinItem({ coin }: { coin: CoinBalance }) {
+function CoinItem({
+  coin,
+  currencyFormatter,
+}: {
+  coin: CoinBalance;
+  currencyFormatter: Intl.NumberFormat;
+}) {
   return (
     <div className="flex justify-between items-center p-3 rounded-lg bg-zinc-900">
       <Image
@@ -283,7 +320,7 @@ function CoinItem({ coin }: { coin: CoinBalance }) {
           {coin.name} ({coin.symbol.toUpperCase()})
         </p>
         <p className="text-sm text-zinc-400">
-          {coin.amount} • ${coin.usdValue.toFixed(2)}
+          {coin.amount} • {currencyFormatter.format(coin.usdValue)}
         </p>
       </div>
       <span className="text-sm text-zinc-400 whitespace-nowrap">
