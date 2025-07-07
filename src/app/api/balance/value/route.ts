@@ -15,7 +15,7 @@ export async function GET() {
     where: { userId },
     orderBy: { date: "desc" },
     take: 1,
-    include: { coins: true },
+    // include: { coins: true }, // Removed or update this line if you have a correct relation
   });
 
   if (!latestHistory.length) {
