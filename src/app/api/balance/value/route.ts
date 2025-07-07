@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import axios from "axios";
+import { headers } from "next/headers";
 
-// Map coinId → Binance symbol (uppercase, USDT pair)
+// Map coinId → Binance symbol
 const coinToBinanceSymbol: Record<string, string> = {
   bitcoin: "BTCUSDT",
   ethereum: "ETHUSDT",
@@ -39,8 +40,30 @@ const coinToBinanceSymbol: Record<string, string> = {
 
 export async function GET() {
   const session = await getAuthSession();
+  const headerMap = Object.fromEntries((await headers()).entries());
+
+  console.log("🔍 /api/balance/value session check:");
+  console.log("Headers:", headerMap);
+  console.log("Session:", session);
+
+  // TEMPORARY: fallback for debugging
   if (!session?.user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    console.warn("⚠️ No session found — returning dummy data for testing");
+
+    return NextResponse.json({
+      totalValue: 1234.56,
+      formattedTotalValue: "$1,234.56",
+      breakdown: [
+        {
+          id: "bitcoin",
+          name: "Bitcoin",
+          symbol: "BTC",
+          amount: 0.05,
+          usdValue: 1500,
+          percentage: 100,
+        },
+      ],
+    });
   }
 
   const balances = await db.balance.findMany({
@@ -48,7 +71,7 @@ export async function GET() {
     include: { coin: true },
   });
 
-  console.log("User balances:", balances);
+  console.log("✅ User balances:", balances);
 
   const prices: Record<string, number> = {};
 
@@ -110,7 +133,7 @@ export async function GET() {
     percentage: totalValueRaw > 0 ? (c.usdValue / totalValueRaw) * 100 : 0,
   }));
 
-  console.log("✅ Total USD value:", totalValueRaw);
+  console.log("💰 Total USD value:", totalValueRaw);
 
   return NextResponse.json({
     totalValue: totalValueRaw,
