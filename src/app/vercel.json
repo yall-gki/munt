@@ -1,7 +1,7 @@
 {
-  "crons": [
+  "cron": [
     {
-      "path": "/api/portfolio/log" ,
+      "path": "/api/portfolio/log",
       "schedule": "0 0 * * *"
     }
   ]
