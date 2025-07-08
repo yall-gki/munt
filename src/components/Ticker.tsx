@@ -126,18 +126,18 @@ export default function LiveTicker() {
   // 🌀 Global Loading Spinner
   if (loading) {
     return (
-      <div className="w-full flex justify-center items-center h-20 bg-zinc-950 border-t border-zinc-800">
+      <div className="w-full flex justify-center items-center h-20 ">
         <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="w-full flex justify-center gap-4 px-4 py-4 bg-zinc-950 border-t border-zinc-800">
+    <div className="w-full flex justify-center gap-4 px-4 py-4  ">
       {Object.entries(prices).map(([key, coin]) => (
         <div
           key={key}
-          className="flex items-center gap-3 px-4 py-2 rounded-xl bg-zinc-900 shadow-sm border border-zinc-800 min-w-[130px] justify-center"
+          className="flex items-center gap-3 px-4 py-2 rounded-xl bg-zinc-900 shadow-sm border border-zinc-800 min-w-[150px] justify-between"
         >
           <Image
             src={coin.icon}
@@ -146,7 +146,7 @@ export default function LiveTicker() {
             height={24}
             className="rounded-full"
           />
-          <div className="flex flex-col items-start text-xs sm:text-sm">
+          <div className="flex flex-col items-end text-xs sm:text-sm w-3/4">
             <span className="text-zinc-400">{coin.symbol}</span>
             <span className={`font-semibold ${coin.color}`}>
               {coin.price ? `$${coin.price.toLocaleString()}` : "..."}

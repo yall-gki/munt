@@ -14,7 +14,7 @@ export default function Home() {
 
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-black text-white">
+    <div className="relative w-full max-h-full overflow-hidden bg-black text-white">
       {/* ✅ Background Image */}
     
 
