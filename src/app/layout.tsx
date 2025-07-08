@@ -7,6 +7,7 @@ import "@/styles/globals.css";
 import { Inter } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
+import NavbarWrapper from "@/components/NavbarWrapper";
 export const metadata = {
   title: "Munt — Crypto Dashboard",
   description: "A crypto info website.",
@@ -38,7 +39,7 @@ export default function RootLayout({
         <Providers>
           <SpeedInsights />
           <Analytics />
-          <Navbar />
+          <NavbarWrapper />
           <FavoriteCoins />
           {authModal}
           <main className="w-full bg-zinc-950   h-[calc(92vh-8rem)]  ">

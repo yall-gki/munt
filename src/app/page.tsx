@@ -49,7 +49,7 @@ export default function Home() {
         >
           <Link href="/dashboard">
             <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold rounded-full transition-all shadow-lg">
-              🚀 Go to Dashboard
+              Go to Dashboard
             </button>
           </Link>
         </motion.div>

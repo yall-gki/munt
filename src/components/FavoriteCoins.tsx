@@ -36,18 +36,17 @@ const FavoriteCoins = () => {
 
   if (!favorites.length) {
     return (
-      <div className="relative h-32 p-4 px-6 min-w-full flex items-center justify-between overflow-x-auto bg-zinc-950">
-        <p className="text-sm text-gray-300 whitespace-nowrap">
-          No favorite coins
-        </p>
-        <Link href="/add-coin" className="shrink-0 ml-auto">
-          <button className="w-12 h-12 flex items-center justify-center rounded-full bg-white text-black hover:scale-110 transition-all shadow-lg">
-            <Plus className="w-6 h-6" />
+      <div className="relative h-32 w-full flex flex-col items-center justify-center text-center bg-zinc-950 border-t border-zinc-800">
+      
+        <Link href="/add-coin">
+          <button className="mt-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-full transition-all shadow-lg">
+            <Plus className="w-4 h-4 inline mr-1" /> Add Coins
           </button>
         </Link>
       </div>
     );
   }
+  
 
   return (
     <div className="relative h-32 p-4 px-6 min-w-full flex items-center gap-4 overflow-x-auto scroll-smooth bg-zinc-950">
