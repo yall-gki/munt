@@ -5,12 +5,15 @@ import { useRouter } from "next/navigation";
 import { useTransition } from "react";
 import { LayoutGrid } from "lucide-react";
 import { Icons } from "./Icons";
-import { useSession } from "next-auth/react";
 import UserAccountNav from "./UserAccountNav";
+import { Session } from "next-auth";
 
-export default function Navbar() {
+type NavbarClientProps = {
+  session: Session | null;
+};
+
+export default function NavbarClient({ session }: NavbarClientProps) {
   const router = useRouter();
-  const { data: session } = useSession();
   const [isPending, startTransition] = useTransition();
 
   const handleDashboardClick = () => {

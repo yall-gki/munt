@@ -1,4 +1,3 @@
-// components/Navbar.tsx
 import { getAuthSession } from "@/lib/auth";
 import NavbarClient from "./NavbarClient";
 
