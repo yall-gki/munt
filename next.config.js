@@ -2,7 +2,7 @@
 const nextConfig = { 
   env: {
     REDIS_URL: process.env.REDIS_URL,
-    REDIS_SECRET: process.env.REDIS_SECRET,
+    REDIS_SECRET: process.env.REDIS_SECRET,CRON_SECRET : "s3cr3tXyz!@#"
   },
   images: {
     domains: [
