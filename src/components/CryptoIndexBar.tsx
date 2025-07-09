@@ -33,7 +33,7 @@ const CryptoIndexBar: FC<CryptoIndexBarProps> = ({
       <div className="relative inline-block text-left">
         <button
           onClick={() => setMenuOpen((prev) => !prev)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition"
         >
           <ListFilter className="w-4 h-4" />
           {fieldMap[currentSort.field] || "Sort"}
@@ -52,7 +52,7 @@ const CryptoIndexBar: FC<CryptoIndexBarProps> = ({
               >
                 {label}
                 {currentSort.field === field && (
-                  <CheckCircle2 className="w-4 h-4 text-blue-500" />
+                  <CheckCircle2 className="w-4 h-4 text-blue-600" />
                 )}
               </button>
             ))}

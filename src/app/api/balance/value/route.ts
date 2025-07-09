@@ -1,5 +1,3 @@
-// src/app/api/balance/value/route.ts
-
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -51,6 +49,9 @@ export async function GET(req: NextRequest) {
 
   const prices: Record<string, number> = {};
 
+  const host = req.headers.get("host");
+  const protocol = host?.includes("localhost") ? "http" : "https";
+
   await Promise.all(
     balances.map(async (b) => {
       const symbol = coinToBinanceSymbol[b.coinId.toLowerCase()];
@@ -59,19 +60,15 @@ export async function GET(req: NextRequest) {
         return;
       }
 
-      // Build absolute URL to your own proxy route
-      const proxyUrl = new URL(
-        `/api/proxy/binance/${symbol}`,
-        req.url
-      ).toString();
+      const proxyUrl = `${protocol}://${host}/api/proxy/binance/${symbol}`;
 
       try {
         const res = await axios.get(proxyUrl);
         prices[b.coinId] = parseFloat(res.data.price);
-      } catch (err : any) {
+      } catch (err: any) {
         console.error(
           `❌ Proxy fetch failed for ${symbol}:`,
-          err.message || err
+          err?.message || err
         );
         prices[b.coinId] = 0;
       }

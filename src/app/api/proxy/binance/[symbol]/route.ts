@@ -1,10 +1,9 @@
-// src/app/api/proxy/binance/[symbol]/route.ts
+// Proxy route to Binance API
 
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 
 export async function GET(req: NextRequest) {
-  // Parse URL to extract the symbol param
   const url = new URL(req.url);
   const parts = url.pathname.split("/");
   const symbol = parts[parts.length - 1]?.toUpperCase();
@@ -18,10 +17,16 @@ export async function GET(req: NextRequest) {
       `https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`
     );
     return NextResponse.json(data);
-  } catch (error) {
-    console.error(`Binance proxy error for ${symbol}:`, error);
+  } catch (error: any) {
+    console.error(
+      `Binance proxy error for ${symbol}:`,
+      error?.response?.data || error.message
+    );
     return NextResponse.json(
-      { error: "Failed to fetch from Binance" },
+      {
+        error: "Failed to fetch from Binance",
+        detail: error?.response?.data || error.message,
+      },
       { status: 500 }
     );
   }
