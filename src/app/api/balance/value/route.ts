@@ -1,39 +1,42 @@
+// src/app/api/balance/value/route.ts
+
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import axios from "axios";
 
-const coinToBinanceSymbol: Record<string, string> = {
-  bitcoin: "BTCUSDT",
-  ethereum: "ETHUSDT",
-  binancecoin: "BNBUSDT",
-  cardano: "ADAUSDT",
-  ripple: "XRPUSDT",
-  polkadot: "DOTUSDT",
-  uniswap: "UNIUSDT",
-  chainlink: "LINKUSDT",
-  litecoin: "LTCUSDT",
-  stellar: "XLMUSDT",
-  "usd-coin": "USDCUSDT",
-  dogecoin: "DOGEUSDT",
-  vechain: "VETUSDT",
-  filecoin: "FILUSDT",
-  tron: "TRXUSDT",
-  eos: "EOSUSDT",
-  aave: "AAVEUSDT",
-  monero: "XMRUSDT",
-  cosmos: "ATOMUSDT",
-  tezos: "XTZUSDT",
-  algorand: "ALGOUSDT",
-  nem: "XEMUSDT",
-  compound: "COMPUSDT",
-  kusama: "KSMUSDT",
-  zilliqa: "ZILUSDT",
-  neo: "NEOUSDT",
-  sushiswap: "SUSHIUSDT",
-  maker: "MKRUSDT",
-  dash: "DASHUSDT",
-  elrond: "EGLDUSDT",
+// Map your internal coin IDs directly to CoinGecko IDs:
+const coinToGeckoId: Record<string, string> = {
+  bitcoin: "bitcoin",
+  ethereum: "ethereum",
+  binancecoin: "binancecoin",
+  cardano: "cardano",
+  ripple: "ripple",
+  polkadot: "polkadot",
+  uniswap: "uniswap",
+  chainlink: "chainlink",
+  litecoin: "litecoin",
+  stellar: "stellar",
+  "usd-coin": "usd-coin",
+  dogecoin: "dogecoin",
+  vechain: "vechain",
+  filecoin: "filecoin",
+  tron: "tron",
+  eos: "eos",
+  aave: "aave",
+  monero: "monero",
+  cosmos: "cosmos",
+  tezos: "tezos",
+  algorand: "algorand",
+  nem: "nem",
+  compound: "compound-governance-token",
+  kusama: "kusama",
+  zilliqa: "zilliqa",
+  neo: "neo",
+  sushiswap: "sushi",
+  maker: "maker",
+  dash: "dash",
+  elrond: "elrond-erd-2",
 };
 
 export async function GET(req: NextRequest) {
@@ -48,28 +51,25 @@ export async function GET(req: NextRequest) {
   });
 
   const prices: Record<string, number> = {};
-
   const host = req.headers.get("host");
   const protocol = host?.includes("localhost") ? "http" : "https";
 
   await Promise.all(
     balances.map(async (b) => {
-      const symbol = coinToBinanceSymbol[b.coinId.toLowerCase()];
-      if (!symbol) {
+      const geckoId = coinToGeckoId[b.coinId.toLowerCase()];
+      if (!geckoId) {
         prices[b.coinId] = 0;
         return;
       }
 
-      const proxyUrl = `${protocol}://${host}/api/proxy/binance/${symbol}`;
-      console.log(`🛰 Fetching Binance price from: ${proxyUrl}`);
-
+      const proxyUrl = `${protocol}://${host}/api/proxy/gecko/${geckoId}`;
       try {
         const res = await axios.get(proxyUrl);
         prices[b.coinId] = parseFloat(res.data.price);
       } catch (err: any) {
         console.error(
-          `❌ Proxy fetch failed for ${symbol}:`,
-          err?.message || err
+          `❌ Gecko proxy failed for ${geckoId}:`,
+          err.message || err
         );
         prices[b.coinId] = 0;
       }
