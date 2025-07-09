@@ -8,6 +8,9 @@ export async function GET(req: NextRequest) {
   const parts = url.pathname.split("/");
   const symbol = parts[parts.length - 1]?.toUpperCase();
 
+  console.log("🔍 Received symbol:", symbol);
+  console.log("📂 Full URL:", req.url);
+
   if (!symbol) {
     return NextResponse.json({ error: "Missing symbol" }, { status: 400 });
   }
@@ -18,10 +21,11 @@ export async function GET(req: NextRequest) {
     );
     return NextResponse.json(data);
   } catch (error: any) {
-    console.error(
-      `Binance proxy error for ${symbol}:`,
-      error?.response?.data || error.message
-    );
+    console.error(`❌ Binance proxy error for ${symbol}:`, {
+      message: error.message,
+      status: error?.response?.status,
+      response: error?.response?.data,
+    });
     return NextResponse.json(
       {
         error: "Failed to fetch from Binance",

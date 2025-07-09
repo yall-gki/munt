@@ -61,6 +61,7 @@ export async function GET(req: NextRequest) {
       }
 
       const proxyUrl = `${protocol}://${host}/api/proxy/binance/${symbol}`;
+      console.log(`🛰 Fetching Binance price from: ${proxyUrl}`);
 
       try {
         const res = await axios.get(proxyUrl);
