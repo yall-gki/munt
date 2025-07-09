@@ -1,4 +1,10 @@
 {
+  "rewrites": [
+    {
+      "source": "/api/proxy/binance/:symbol",
+      "destination": "/api/proxy/binance/:symbol"
+    }
+  ],
   "cron": [
     {
       "path": "/api/portfolio/log",
@@ -6,4 +12,3 @@
     }
   ]
 }
-

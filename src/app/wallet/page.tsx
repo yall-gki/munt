@@ -87,7 +87,7 @@ export default function Page() {
       if (res.data.breakdown.length) {
         setSelectedCoin(res.data.breakdown[0].id);
       }
-    });
+    })
   }, []);
 
   useEffect(() => {
