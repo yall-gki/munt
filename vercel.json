@@ -4,11 +4,5 @@
       "source": "/api/proxy/binance/:symbol",
       "destination": "/api/proxy/binance/:symbol"
     }
-  ],
-  "cron": [
-    {
-      "path": "/api/portfolio/log",
-      "schedule": "0 0 * * *"
-    }
   ]
 }
