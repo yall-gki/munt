@@ -5,8 +5,36 @@ import axios from "axios";
 const coinToGeckoId: Record<string, string> = {
   bitcoin: "bitcoin",
   ethereum: "ethereum",
-  // Add more mappings as needed
+  binancecoin: "binancecoin",
+  cardano: "cardano",
+  ripple: "ripple",
+  polkadot: "polkadot",
+  uniswap: "uniswap",
+  chainlink: "chainlink",
+  litecoin: "litecoin",
+  stellar: "stellar",
+  usdc: "usd-coin",
+  dogecoin: "dogecoin",
+  vechain: "vechain",
+  filecoin: "filecoin",
+  tron: "tron",
+  eos: "eos",
+  aave: "aave",
+  monero: "monero",
+  cosmos: "cosmos",
+  tezos: "tezos",
+  algorand: "algorand",
+  nem: "nem",
+  compound: "compound-governance-token",
+  kusama: "kusama",
+  zilliqa: "zilliqa",
+  neo: "neo",
+  sushiswap: "sushi",
+  maker: "maker",
+  dash: "dash",
+  elrond: "elrond-erd-2",
 };
+
 
 export async function GET(req: NextRequest) {
   console.log("⚡ Cron route triggered");
