@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
 
   // ✅ Step 3: Fetch prices from your Python API
   const muntApiURL =
-    "https://munt-api-production.up.railway.app:8080/all-prices";
+    "https://munt-api-production.up.railway.app/all-prices";
   let allPrices: Record<string, number> = {};
 
   try {
