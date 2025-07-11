@@ -5,7 +5,7 @@ import axios from "axios";
 export async function GET(req: NextRequest) {
   console.log("⚡ Cron route triggered");
 
-  // === 1. Auth check ===
+  // ✅ Step 1: Auth
   const auth = req.headers.get("authorization") || "";
   const expected = `Bearer ${process.env.CRON_SECRET}`;
   if (auth !== expected) {
@@ -13,44 +13,53 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // ✅ Step 2: Fetch all user data
   const users = await db.user.findMany();
   console.log(`👤 Found ${users.length} users`);
 
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
 
-  // === 2. Fetch all prices from FastAPI ===
-  const muntApiURL = "https://munt-api.up.railway.app";
+  // ✅ Step 3: Fetch prices from your Python API
+  const muntApiURL =
+    "https://munt-api-production.up.railway.app:8080/all-prices";
   let allPrices: Record<string, number> = {};
 
   try {
-    const res = await axios.get(`${muntApiURL}/all-prices`);
+    const res = await axios.get(muntApiURL, {
+      headers: {
+        Accept: "application/json",
+        "User-Agent": "nextjs-cron",
+      },
+      timeout: 10000,
+    });
     allPrices = res.data;
-    console.log("📡 Fetched all prices from Munt API");
+    console.log("📡 Prices fetched successfully");
   } catch (err: any) {
     console.error("❌ Failed to fetch from Munt API:", err.message || err);
+    if (err.response) {
+      console.error("Status:", err.response.status);
+      console.error("Body:", err.response.data);
+    }
     return NextResponse.json({ error: "Price fetch failed" }, { status: 500 });
   }
 
-  // === 3. Loop through users and balances ===
+  // ✅ Step 4: Iterate through users and upsert portfolio history
   for (const user of users) {
-    console.log(`➡️ Processing user ${user.id}`);
+    console.log(`➡️ User ${user.id}`);
 
     const balances = await db.balance.findMany({ where: { userId: user.id } });
-    console.log(`💰 Found ${balances.length} balances`);
 
     for (const b of balances) {
       const price = allPrices[b.coinId] ?? 0;
 
       if (!price || isNaN(price)) {
-        console.log(`⚠️ Skipping invalid price for ${b.coinId}`);
+        console.log(`⚠️ Invalid or missing price for ${b.coinId}`);
         continue;
       }
 
       const usdValue = b.amount * price;
-      console.log(
-        `📈 ${b.coinId}: ${b.amount} × $${price} = $${usdValue.toFixed(2)}`
-      );
+      console.log(`💵 ${b.coinId}: ${b.amount} × ${price} = ${usdValue}`);
 
       try {
         await db.portfolioHistory.upsert({
@@ -69,14 +78,13 @@ export async function GET(req: NextRequest) {
             usdValue,
           },
         });
-
-        console.log(`✅ Upserted for ${user.id} | ${b.coinId}`);
+        console.log(`✅ Upserted ${user.id} | ${b.coinId}`);
       } catch (upsertErr: any) {
         console.error("🔥 Upsert failed:", upsertErr.message || upsertErr);
       }
     }
   }
 
-  console.log("✅ Cron finished successfully");
+  console.log("🎯 Cron finished successfully");
   return NextResponse.json({ ok: true });
 }
