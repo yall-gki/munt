@@ -2,49 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import axios from "axios";
 
-const coinToGeckoId: Record<string, string> = {
-  bitcoin: "bitcoin",
-  ethereum: "ethereum",
-  binancecoin: "binancecoin",
-  cardano: "cardano",
-  ripple: "ripple",
-  polkadot: "polkadot",
-  uniswap: "uniswap",
-  chainlink: "chainlink",
-  litecoin: "litecoin",
-  stellar: "stellar",
-  usdc: "usd-coin",
-  dogecoin: "dogecoin",
-  vechain: "vechain",
-  filecoin: "filecoin",
-  tron: "tron",
-  eos: "eos",
-  aave: "aave",
-  monero: "monero",
-  cosmos: "cosmos",
-  tezos: "tezos",
-  algorand: "algorand",
-  nem: "nem",
-  compound: "compound-governance-token",
-  kusama: "kusama",
-  zilliqa: "zilliqa",
-  neo: "neo",
-  sushiswap: "sushi",
-  maker: "maker",
-  dash: "dash",
-  elrond: "elrond-erd-2",
-};
-
-
 export async function GET(req: NextRequest) {
   console.log("⚡ Cron route triggered");
 
-  // 1. Check auth
+  // === 1. Auth check ===
   const auth = req.headers.get("authorization") || "";
   const expected = `Bearer ${process.env.CRON_SECRET}`;
-  console.log("🔐 Received auth:", auth);
-  console.log("🔐 Expected auth:", expected);
-
   if (auth !== expected) {
     console.log("❌ Unauthorized");
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -56,69 +19,60 @@ export async function GET(req: NextRequest) {
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
 
-  const host = req.headers.get("host")!;
-  const protocol = host.includes("localhost") ? "http" : "https";
+  // === 2. Fetch all prices from FastAPI ===
+  const muntApiURL = "https://munt-api.up.railway.app";
+  let allPrices: Record<string, number> = {};
 
+  try {
+    const res = await axios.get(`${muntApiURL}/all-prices`);
+    allPrices = res.data;
+    console.log("📡 Fetched all prices from Munt API");
+  } catch (err: any) {
+    console.error("❌ Failed to fetch from Munt API:", err.message || err);
+    return NextResponse.json({ error: "Price fetch failed" }, { status: 500 });
+  }
+
+  // === 3. Loop through users and balances ===
   for (const user of users) {
     console.log(`➡️ Processing user ${user.id}`);
 
     const balances = await db.balance.findMany({ where: { userId: user.id } });
-    console.log(`💰 Found ${balances.length} balances for user ${user.id}`);
+    console.log(`💰 Found ${balances.length} balances`);
 
     for (const b of balances) {
-      console.log(`🔄 Processing coin: ${b.coinId}`);
+      const price = allPrices[b.coinId] ?? 0;
 
-      const geckoId = coinToGeckoId[b.coinId];
-      if (!geckoId) {
-        console.log(`⚠️ No geckoId for coin ${b.coinId}, skipping`);
+      if (!price || isNaN(price)) {
+        console.log(`⚠️ Skipping invalid price for ${b.coinId}`);
         continue;
       }
 
-      const proxyUrl = `${protocol}://${host}/api/proxy/gecko/${geckoId}`;
-      console.log(`🌐 Fetching price from ${proxyUrl}`);
+      const usdValue = b.amount * price;
+      console.log(
+        `📈 ${b.coinId}: ${b.amount} × $${price} = $${usdValue.toFixed(2)}`
+      );
 
       try {
-        const res = await axios.get(proxyUrl);
-        const price = parseFloat(res.data.price);
-        if (isNaN(price)) {
-          console.log(`❌ Invalid price from API for ${geckoId}`);
-          continue;
-        }
-
-        const usdValue = b.amount * price;
-        console.log(
-          `📈 ${b.coinId} amount ${b.amount} × $${price} = $${usdValue}`
-        );
-
-        try {
-          await db.portfolioHistory.upsert({
-            where: {
-              userId_coinId_date: {
-                userId: user.id,
-                coinId: b.coinId,
-                date: today,
-              },
-            },
-            update: { usdValue },
-            create: {
+        await db.portfolioHistory.upsert({
+          where: {
+            userId_coinId_date: {
               userId: user.id,
               coinId: b.coinId,
               date: today,
-              usdValue,
             },
-          });
+          },
+          update: { usdValue },
+          create: {
+            userId: user.id,
+            coinId: b.coinId,
+            date: today,
+            usdValue,
+          },
+        });
 
-          console.log(
-            `✅ Upserted: ${user.id} | ${b.coinId} | ${today.toISOString()}`
-          );
-        } catch (upsertErr: any) {
-          console.error("🔥 Upsert failed:", upsertErr.message || upsertErr);
-        }
-      } catch (fetchErr: any) {
-        console.error(
-          `❌ Failed to fetch price for ${geckoId}:`,
-          fetchErr.message || fetchErr
-        );
+        console.log(`✅ Upserted for ${user.id} | ${b.coinId}`);
+      } catch (upsertErr: any) {
+        console.error("🔥 Upsert failed:", upsertErr.message || upsertErr);
       }
     }
   }
