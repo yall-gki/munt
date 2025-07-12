@@ -6,6 +6,7 @@ import { Lock, Coins, ArrowLeftRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useFavoriteCoinsStore } from "@/lib/store";
 import axios from "axios";
+import { toast } from "sonner"; // or use any toast system
 
 const coins = [
   { id: "bitcoin", symbol: "BTC" },
@@ -48,13 +49,11 @@ const Overlay = () => (
   </div>
 );
 
-// ✅ Combined hook
 const useAuth = () => {
   const [isAuth, setIsAuth] = useState<boolean | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
-      // Fast local token check
       const token =
         typeof window !== "undefined" &&
         (localStorage.getItem("next-auth.session-token") ||
@@ -65,7 +64,6 @@ const useAuth = () => {
         return;
       }
 
-      // Fallback to API route
       try {
         const res = await axios.get("/api/auth/verify");
         setIsAuth(!!res.data?.user);
@@ -86,6 +84,36 @@ const TradingInput = () => {
   const [fromCoin, setFromCoin] = useState("bitcoin");
   const [toCoin, setToCoin] = useState("ethereum");
   const [amount, setAmount] = useState(0);
+  const [refresh, setRefresh] = useState(false);
+
+  const handleTrade = async () => {
+    if (amount <= 0 || fromCoin === toCoin) {
+      toast.error("Invalid trade input");
+      return;
+    }
+
+    try {
+      const res = await axios.post("/api/trade", {
+        fromCoin,
+        toCoin,
+        amount,
+      });
+
+      if (res.data.success) {
+        toast.success(
+          `Traded ${amount} ${fromCoin.toUpperCase()} for ~${res.data.traded.toAmount.toFixed(
+            6
+          )} ${toCoin.toUpperCase()}`
+        );
+        setAmount(0);
+        setRefresh((r) => !r); // signal refresh to PortfolioBalance
+      } else {
+        toast.error(res.data.error || "Trade failed");
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || "Error executing trade");
+    }
+  };
 
   if (isAuth === null) return null;
 
@@ -135,9 +163,15 @@ const TradingInput = () => {
               ))}
             </select>
             <div className="flex-1 bg-zinc-800 px-2 py-1 rounded-md text-right">
-              ≈ {amount * 0.94} {toCoin.toUpperCase()}
+              ≈ {(amount * 0.94).toFixed(6)} {toCoin.toUpperCase()}
             </div>
           </div>
+          <button
+            onClick={handleTrade}
+            className="mt-2 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500 transition"
+          >
+            Execute Trade
+          </button>
         </div>
       </div>
     </div>
@@ -148,13 +182,22 @@ const TradingInput = () => {
 const PortfolioBalance = () => {
   const isAuth = useAuth();
   const { favorites } = useFavoriteCoinsStore();
-  const mockBalances: any = {
-    bitcoin: 0.42,
-    ethereum: 1.7,
-    binancecoin: 3.2,
-    cardano: 230,
-    xrp: 520,
-  };
+  const [balances, setBalances] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!isAuth) return;
+
+    const fetchBalances = async () => {
+      try {
+        const res = await axios.get("/api/balance/value");
+        setBalances(res.data.breakdown);
+      } catch (err) {
+        console.error("Failed to load balances");
+      }
+    };
+
+    fetchBalances();
+  }, [isAuth]);
 
   if (isAuth === null) return null;
 
@@ -171,20 +214,17 @@ const PortfolioBalance = () => {
           <Coins className="w-5 h-7" /> Portfolio Balances
         </h2>
         <ul className="space-y-2">
-          {coins.map(
-            (coin) =>
-              mockBalances[coin.id] && (
-                <li
-                  key={coin.id}
-                  className="flex justify-between items-center border-b p-3 border-zinc-800 pb-1"
-                >
-                  <span className="text-white font-medium">{coin.symbol}</span>
-                  <span className="text-green-400">
-                    {mockBalances[coin.id]} {coin.symbol}
-                  </span>
-                </li>
-              )
-          )}
+          {balances.map((coin) => (
+            <li
+              key={coin.id}
+              className="flex justify-between items-center border-b p-3 border-zinc-800 pb-1"
+            >
+              <span className="text-white font-medium">{coin.symbol}</span>
+              <span className="text-green-400">
+                {coin.amount} {coin.symbol}
+              </span>
+            </li>
+          ))}
         </ul>
       </div>
     </div>
