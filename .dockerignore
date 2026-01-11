@@ -1,0 +1,33 @@
+# Ignore local node_modules (host)
+node_modules
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Ignore local build artifacts
+.next
+out
+dist
+coverage
+
+# Ignore OS / editor files
+.DS_Store
+Thumbs.db
+.vscode
+.idea
+
+# Ignore environment files (you pass them explicitly)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Ignore logs
+*.log
+
+# Keep Prisma generated client inside Docker
+!node_modules/.prisma
+
+# Optional: ignore local caches
+.cache

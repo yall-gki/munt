@@ -1,5 +1,5 @@
 import axios from "axios";
-import redisClient from "./redis"; // ✅ Ensure correct path
+import {getRedis} from "./redis"; // ✅ Ensure correct path
 
 export async function fetchCoins(ids: string[]): Promise<any[]> {
   if (!ids || ids.length === 0) {
@@ -12,7 +12,7 @@ export async function fetchCoins(ids: string[]): Promise<any[]> {
 
   // Try Redis cache
   try {
-    const cachedData = await redisClient.get(cacheKey);
+    const cachedData = await getRedis().get(cacheKey);
     if (typeof cachedData === "string" && cachedData.length > 0) {
       console.log("✅ Returning coins data from Redis cache");
       return JSON.parse(cachedData);
@@ -68,8 +68,8 @@ export async function fetchCoins(ids: string[]): Promise<any[]> {
 
   // Cache fetched data
   try {
-    await redisClient.set(cacheKey, JSON.stringify(allCoins));
-    await redisClient.expire(cacheKey, 3600); // TTL = 1 hour
+    await getRedis().set(cacheKey, JSON.stringify(allCoins));
+    await getRedis().expire(cacheKey, 3600); // TTL = 1 hour
     console.log("✅ Coins data cached in Redis");
   } catch (redisSetError) {
     console.error("❌ Redis SET/EXPIRE failed:", redisSetError);

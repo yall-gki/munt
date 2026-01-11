@@ -1,11 +1,21 @@
+// src/lib/redis.ts
 import { Redis } from "@upstash/redis";
-if (!process.env.REDIS_URL || !process.env.REDIS_SECRET) {
-  throw new Error("Missing Redis environment variables!");
+
+let redis: Redis | undefined;
+
+if (process.env.REDIS_URL && process.env.REDIS_SECRET) {
+  redis = new Redis({
+    url: process.env.REDIS_URL,
+    token: process.env.REDIS_SECRET,
+  });
+} else if (process.env.NODE_ENV !== "production") {
+  console.warn("Redis env variables missing — skipping Redis initialization at build time");
 }
-const redis = new Redis({
-  url: process.env.REDIS_URL!,
-  token: process.env.REDIS_SECRET!,
-});
 
-
-export default redis;
+// Export a function to get Redis client safely
+export function getRedis(): Redis {
+  if (!redis) {
+    throw new Error("Redis is not initialized. Make sure REDIS_URL and REDIS_SECRET are set.");
+  }
+  return redis;
+}

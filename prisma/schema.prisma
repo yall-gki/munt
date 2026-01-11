@@ -1,30 +1,30 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.1.x", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DATABASE_URL_UNPOOLED")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("DATABASE_shadow_URL")
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  username      String?   @unique
-  image         String?
-
-  accounts   Account[]
-  sessions   Session[]
-  coins      UserCoin[]
-  strategies Strategy[]
-  trades     Trade[]
-  wallets    Wallet[]
-  backtests  Backtest[]
-  balances   Balance[]
+  id               String             @id @default(cuid())
+  name             String?
+  email            String?            @unique
+  emailVerified    DateTime?
+  username         String?            @unique
+  image            String?
+  accounts         Account[]
+  backtests        Backtest[]
+  balances         Balance[]
   portfolioHistory PortfolioHistory[]
+  sessions         Session[]
+  strategies       Strategy[]
+  trades           Trade[]
+  coins            UserCoin[]
+  wallets          Wallet[]
 }
 
 model Account {
@@ -33,15 +33,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -51,17 +50,15 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserCoin {
   userId       String
   coinId       String
   isOptimistic Boolean? @default(false)
-
-  user User @relation(fields: [userId], references: [id])
-  coin Coin @relation(fields: [coinId], references: [id])
+  coin         Coin     @relation(fields: [coinId], references: [id])
+  user         User     @relation(fields: [userId], references: [id])
 
   @@id([userId, coinId])
 }
@@ -77,11 +74,10 @@ model Strategy {
   isActive  Boolean      @default(false)
   createdAt DateTime     @default(now())
   updatedAt DateTime     @updatedAt
-
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  trades    Trade[]
   backtests Backtest[]
-  coin      Coin?      @relation(fields: [coinId], references: [id])
+  coin      Coin?        @relation(fields: [coinId], references: [id])
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trades    Trade[]
 }
 
 model Trade {
@@ -97,10 +93,9 @@ model Trade {
   status     TradeStatus @default(OPEN)
   executedAt DateTime    @default(now())
   closedAt   DateTime?
-
-  user     User      @relation(fields: [userId], references: [id])
-  strategy Strategy? @relation(fields: [strategyId], references: [id])
-  coin     Coin      @relation(fields: [coinId], references: [id])
+  coin       Coin        @relation(fields: [coinId], references: [id])
+  strategy   Strategy?   @relation(fields: [strategyId], references: [id])
+  user       User        @relation(fields: [userId], references: [id])
 
   @@unique([id, userId])
 }
@@ -112,8 +107,7 @@ model Wallet {
   address   String
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Backtest {
@@ -127,46 +121,43 @@ model Backtest {
   numTrades   Int
   winRate     Float?
   maxDrawdown Float?
-
-  strategy Strategy @relation(fields: [strategyId], references: [id], onDelete: Cascade)
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  strategy    Strategy @relation(fields: [strategyId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Coin {
-  id     String @id // e.g., "bitcoin"
-  name   String
-  symbol String
-  image  String?
-
-  balances          Balance[]
-  userCoins         UserCoin[]
-  trades            Trade[]
-  strategies        Strategy[]
-  portfolioHistory  PortfolioHistory[]
+  id               String             @id
+  name             String
+  symbol           String
+  image            String?
+  balances         Balance[]
+  portfolioHistory PortfolioHistory[]
+  strategies       Strategy[]
+  trades           Trade[]
+  userCoins        UserCoin[]
 }
 
 model Balance {
   id        String   @id @default(cuid())
-  user      User     @relation(fields: [userId], references: [id])
   userId    String
-  coin      Coin     @relation(fields: [coinId], references: [id])
   coinId    String
   amount    Float    @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  coin      Coin     @relation(fields: [coinId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, coinId])
 }
 
 model PortfolioHistory {
-  id        String   @id @default(cuid())
-  userId    String
-  coinId    String
-  date      DateTime @default(now())
-  usdValue  Float
-
-  user      User     @relation(fields: [userId], references: [id])
-  coin      Coin     @relation(fields: [coinId], references: [id])
+  id       String   @id @default(cuid())
+  userId   String
+  coinId   String
+  date     DateTime @default(now())
+  usdValue Float
+  coin     Coin     @relation(fields: [coinId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, coinId, date])
 }

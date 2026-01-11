@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import redis from "@/lib/redis"; // 👈 your existing Redis client
+import { getRedis } from "@/lib/redis"; // 👈 your existing Redis client
 
 const ids = [
   "bitcoin",
@@ -39,7 +39,7 @@ const COINGECKO_KEY = "coingecko:market_data";
 export async function GET() {
   try {
     // Check Redis cache
-    const cached = await redis.get(COINGECKO_KEY);
+    const cached = await getRedis().get(COINGECKO_KEY);
     if (cached) {
       return NextResponse.json(cached);
     }
@@ -70,8 +70,8 @@ export async function GET() {
     const data = await res.json();
 
     // Cache for 5 minutes (300 seconds)
-    await redis.set(COINGECKO_KEY, data, { ex: 300 });
-console.log(data);
+    await getRedis().set(COINGECKO_KEY, data, { ex: 300 });
+    console.log(data);
 
     return NextResponse.json(data);
   } catch (err) {

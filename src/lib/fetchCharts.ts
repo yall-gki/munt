@@ -1,9 +1,9 @@
 import axios from "axios";
-import redisClient from "./redis"; // ✅ Ensure this path is correct
+import { getRedis } from "./redis"; // ✅ Ensure this path is correct
 
 export async function fetchCharts(coinName: string): Promise<any> {
   const cacheKey = `coinsChartData-${coinName}`;
-  console.log(`🔎 Coin request: ${coinName}, cacheKey: ${cacheKey}`);
+  const redisClient = getRedis();
 
   try {
     // Try Redis cache
@@ -11,12 +11,11 @@ export async function fetchCharts(coinName: string): Promise<any> {
     try {
       cachedData = await redisClient.get(cacheKey);
     } catch (redisError) {
-      console.error("❌ Redis GET failed:", redisError);
+     
     }
 
     if (cachedData) {
       try {
-        console.log("✅ Returning chart data from Redis cache");
         return JSON.parse(cachedData);
       } catch (parseError) {
         console.error("❌ JSON parse error in cached data:", parseError);
@@ -26,7 +25,6 @@ export async function fetchCharts(coinName: string): Promise<any> {
 
     // Construct URL
     const url = `https://api.coingecko.com/api/v3/coins/${coinName}/market_chart`;
-    console.log("📡 Fetching fresh data from:", url);
 
     // Fetch from CoinGecko
     const response = await axios.get(url, {
@@ -56,11 +54,7 @@ export async function fetchCharts(coinName: string): Promise<any> {
 
     return data;
   } catch (error: any) {
-    console.error("❌ fetchCharts error:", {
-      message: error.message,
-      code: error.code,
-      response: error.response?.data,
-    });
+    console.error();
 
     throw new Error("Failed to fetch chart data. Please try again later.");
   }
