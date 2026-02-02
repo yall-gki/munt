@@ -1,6 +1,7 @@
-// app/api/user-coin/route.ts
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
+
+export const dynamic = "force-dynamic"; // ← ensure cookies are read properly
 
 export async function DELETE(req: Request) {
   try {
@@ -8,6 +9,8 @@ export async function DELETE(req: Request) {
     const { coinId }: { coinId: string } = body;
 
     const session = await getAuthSession();
+    console.log("SESSION FROM DELETE:", session); // 🔹 debug
+
     if (!session?.user?.id) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
@@ -15,6 +18,7 @@ export async function DELETE(req: Request) {
       });
     }
 
+    console.log("Deleting coin:", coinId, "for user:", session.user.id);
     await db.userCoin.delete({
       where: {
         userId_coinId: {

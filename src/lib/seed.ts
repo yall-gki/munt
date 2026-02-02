@@ -1,4 +1,4 @@
-import { db } from "./db.cli";
+import { db } from "./db.cli.ts";
 
 const staticCoins = [
   { id: "bitcoin", name: "Bitcoin", symbol: "BTC" },

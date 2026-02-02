@@ -1,61 +1,46 @@
 import axios from "axios";
-import { getRedis } from "./redis"; // ✅ Ensure this path is correct
+import { getRedis } from "./redis";
 
 export async function fetchCharts(coinName: string): Promise<any> {
   const cacheKey = `coinsChartData-${coinName}`;
   const redisClient = getRedis();
+  const apiBase = "https://munt-api.onrender.com"; // your backend URL
 
   try {
     // Try Redis cache
     let cachedData: string | null = null;
     try {
       cachedData = await redisClient.get(cacheKey);
-    } catch (redisError) {
-     
-    }
+    } catch {}
 
     if (cachedData) {
       try {
         return JSON.parse(cachedData);
-      } catch (parseError) {
-        console.error("❌ JSON parse error in cached data:", parseError);
+      } catch {
         await redisClient.del(cacheKey);
       }
     }
 
-    // Construct URL
-    const url = `https://api.coingecko.com/api/v3/coins/${coinName}/market_chart`;
-
-    // Fetch from CoinGecko
-    const response = await axios.get(url, {
-      params: {
-        vs_currency: "usd",
-        days: 10,
-      },
+    // Fetch from FastAPI backend
+    const response = await axios.get(`${apiBase}/coins/${coinName}/market_chart`, {
+      params: { days: 10 },
       timeout: 10000,
     });
 
     if (response.status !== 200 || !response.data) {
-      throw new Error(
-        `CoinGecko API error: ${response.status} ${response.statusText}`
-      );
+      throw new Error(`Backend API error: ${response.status} ${response.statusText}`);
     }
 
     const data = response.data;
 
-    // Cache new data
+    // Cache in Redis
     try {
       await redisClient.set(cacheKey, JSON.stringify(data));
-      await redisClient.expire(cacheKey, 3600); // 1 hour TTL
-      console.log("✅ Chart data cached in Redis");
-    } catch (redisSetError) {
-      console.error("❌ Redis SET/EXPIRE failed:", redisSetError);
-    }
+      await redisClient.expire(cacheKey, 3600);
+    } catch {}
 
     return data;
-  } catch (error: any) {
-    console.error();
-
-    throw new Error("Failed to fetch chart data. Please try again later.");
+  } catch (error) {
+    throw new Error("Failed to fetch chart data from backend.");
   }
 }

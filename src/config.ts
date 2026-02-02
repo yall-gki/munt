@@ -1,1 +1,1 @@
-export const ISPR = 2;
+export const ISPR = 1;

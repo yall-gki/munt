@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
-import { ChevronDown, Wallet } from "lucide-react";
+import { ChevronDown, Wallet, Sparkles } from "lucide-react";
 import { Doughnut, Line } from "react-chartjs-2";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -68,6 +68,26 @@ export default function Page() {
   const [mode, setMode] = useState<ChartMode>("Doughnut");
   const [selectedCoin, setSelectedCoin] = useState<string>("");
   const [history, setHistory] = useState<HistoryPoint[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const handleGenerate = async () => {
+    try {
+      setIsGenerating(true);
+      await axios.post("/api/generate");
+
+      const res = await axios.get("/api/balance/value");
+      res.data.breakdown.sort((a: any, b: any) => b.usdValue - a.usdValue);
+      setData(res.data);
+
+      if (res.data.breakdown.length) {
+        setSelectedCoin(res.data.breakdown[0].id);
+      }
+    } catch (error) {
+      console.error("Failed to generate balances", error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -76,7 +96,7 @@ export default function Page() {
   });
 
   const gainLoss =
-    history.length >= 2
+    history?.length >= 2
       ? ((history.at(-1)!.value - history[0].value) / history[0].value) * 100
       : 0;
 
@@ -84,6 +104,8 @@ export default function Page() {
     axios.get("/api/balance/value").then((res) => {
       res.data.breakdown.sort((a: any, b: any) => b.usdValue - a.usdValue);
       setData(res.data);
+      console.log(res.data);
+
       if (res.data.breakdown.length) {
         setSelectedCoin(res.data.breakdown[0].id);
       }
@@ -184,9 +206,19 @@ export default function Page() {
               {currencyFormatter.format(data?.totalValue || 0)}
             </p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black font-semibold hover:opacity-90 transition">
-            <Wallet className="w-4 h-4" /> Connect Wallet
-          </button>
+          <div className="flex items-center gap-2">
+            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white text-black font-semibold hover:opacity-90 transition">
+              <Wallet className="w-4 h-4" /> Connect Wallet
+            </button>
+            <button
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="p-2 rounded-lg bg-zinc-800 text-white hover:bg-zinc-700 disabled:opacity-50 flex items-center justify-center"
+              aria-label="Generate demo balances"
+           >
+              <Sparkles className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Chart controls */}

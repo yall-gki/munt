@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 

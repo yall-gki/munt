@@ -1,6 +1,7 @@
 import FavoriteCoins from "@/components/FavoriteCoins";
 import NavbarWrapper from "@/components/NavbarWrapper";
 import Providers from "@/components/Providers";
+import VerifyEmailBanner from "@/components/VerifyEmailBanner";
 import { Toaster } from "@/components/ui/Toaster";
 import { cn } from "@/lib/utils";
 import "@/styles/globals.css";
@@ -41,7 +42,8 @@ export default async function RootLayout({
         <Providers>
           <SpeedInsights />
           <Analytics />
-          {navbar} {/* ✅ Use resolved JSX */}
+          {navbar}
+          <VerifyEmailBanner />
           <FavoriteCoins />
           {authModal}
           <main className="w-full bg-zinc-950 h-[calc(92vh-8rem)]">

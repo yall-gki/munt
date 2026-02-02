@@ -1,21 +1,63 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { useCoinsData } from "@/hooks/useCoinData";
-import { ids } from "@/lib/ids";
+import { useEffect, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 import { useFavoriteCoinsStore } from "@/lib/store";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+// Coin type for prices from backend
+type Coin = {
+  id: string;
+  symbol: string;
+  name: string;
+  image: string;
+  current_price: number;
+  price_change_percentage_24h: number;
+};
+
 const FavoriteCoins = () => {
   const { favorites, fetchFavorites } = useFavoriteCoinsStore();
-  const { data: coinList } = useCoinsData(ids);
+  const [prices, setPrices] = useState<Record<string, Coin>>({});
   const router = useRouter();
 
+  // Fetch latest prices from backend
+  const fetchPrices = async () => {
+    try {
+      const res = await fetch("https://munt-api.onrender.com/all-prices");
+      if (!res.ok) throw new Error("Failed to fetch prices");
+      const data = await res.json(); // { bitcoin: 30000, ethereum: 2000, ... }
+
+      // Map favorites to Coin objects
+      const coinsMap: Record<string, Coin> = {};
+      favorites.forEach((id) => {
+        const price = data[id] ?? 0;
+        coinsMap[id] = {
+          id,
+          symbol: id.toUpperCase(),
+          name: id,
+          image: `/coins/${id}.png`, // adjust if you have actual images
+          current_price: price,
+          price_change_percentage_24h: 0, // placeholder, can calculate if you have historical data
+        };
+      });
+
+      setPrices(coinsMap);
+    } catch (err) {
+      console.error("❌ Failed to fetch latest prices:", err);
+      setPrices({});
+    }
+  };
+
   useEffect(() => {
-    if (favorites.length === 0) fetchFavorites();
+    fetchFavorites();
   }, []);
+
+  useEffect(() => {
+    if (favorites.length > 0) {
+      fetchPrices();
+    }
+  }, [favorites]);
 
   const handleClick = async (targetUrl: string) => {
     try {
@@ -30,20 +72,10 @@ const FavoriteCoins = () => {
     }
   };
 
-  type Coin = {
-    id: string;
-    symbol: string;
-    name: string;
-    image: string;
-    current_price: number;
-    price_change_percentage_24h: number;
-  };
-
   const getCoinData = useMemo(() => {
-    if (!coinList) return () => null;
-    const coinMap = new Map<string, Coin>(coinList.map((c: Coin) => [c.id, c]));
-    return (coinId: string) => coinMap.get(coinId) || null;
-  }, [coinList]);
+    if (!favorites.length || !prices) return () => null;
+    return (coinId: string) => prices[coinId] || null;
+  }, [favorites, prices]);
 
   if (!favorites.length) {
     return (

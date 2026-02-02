@@ -29,7 +29,7 @@ const Oinli = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-md">
-          {cacheD.map((coin: any) => {
+          {cacheD?.map((coin: any) => {
             const isFav = favorites.includes(coin.id);
             const isToggling = togglingId === coin.id;
 

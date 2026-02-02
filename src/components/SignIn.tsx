@@ -11,7 +11,7 @@ const SignIn = () => (
         By continuing you are setting an account and agree to our privacy
         policy
       </p>
-      <UserAuthForm />
+      <UserAuthForm mode="signin" />
       <p className="px-8 text-center text-sm text-zinc-700">
         New to Flow?
         <Link
