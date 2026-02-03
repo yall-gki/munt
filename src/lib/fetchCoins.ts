@@ -3,7 +3,14 @@ import { getRedis } from "./redis"; // Ensure correct path
 
 const API_BASE = "https://munt-api.onrender.com"; // Your FastAPI backend
 
-export async function fetchCoins(ids: string[]): Promise<any[]> {
+type FetchCoinsOptions = {
+  bypassCache?: boolean;
+};
+
+export async function fetchCoins(
+  ids: string[],
+  options: FetchCoinsOptions = {}
+): Promise<any[]> {
   if (!ids || ids.length === 0) {
     throw new Error("No coin IDs provided.");
   }
@@ -12,15 +19,17 @@ export async function fetchCoins(ids: string[]): Promise<any[]> {
   const cacheKey = `coinsData-${sortedIds.join(",")}`;
   console.log(`Coin IDs: ${sortedIds}, cacheKey: ${cacheKey}`);
 
-  // Try Redis cache
-  try {
-    const cachedData = await getRedis().get(cacheKey);
-    if (typeof cachedData === "string" && cachedData.length > 0) {
-      console.log("Returning coins data from Redis cache");
-      return JSON.parse(cachedData);
+  if (!options.bypassCache) {
+    // Try Redis cache
+    try {
+      const cachedData = await getRedis().get(cacheKey);
+      if (typeof cachedData === "string" && cachedData.length > 0) {
+        console.log("Returning coins data from Redis cache");
+        return JSON.parse(cachedData);
+      }
+    } catch (redisError) {
+      console.error("Redis GET failed:", redisError);
     }
-  } catch (redisError) {
-    console.error("Redis GET failed:", redisError);
   }
 
   let allCoins: any[] = [];
@@ -54,13 +63,15 @@ export async function fetchCoins(ids: string[]): Promise<any[]> {
     throw new Error("No data returned from FastAPI backend.");
   }
 
-  // Cache fetched data
-  try {
-    await getRedis().set(cacheKey, JSON.stringify(allCoins));
-    await getRedis().expire(cacheKey, 3600); // TTL = 1 hour
-    console.log("Coins data cached in Redis");
-  } catch (redisSetError) {
-    console.error("Redis SET/EXPIRE failed:", redisSetError);
+  if (!options.bypassCache) {
+    // Cache fetched data
+    try {
+      await getRedis().set(cacheKey, JSON.stringify(allCoins));
+      await getRedis().expire(cacheKey, 3600); // TTL = 1 hour
+      console.log("Coins data cached in Redis");
+    } catch (redisSetError) {
+      console.error("Redis SET/EXPIRE failed:", redisSetError);
+    }
   }
 
   return allCoins;

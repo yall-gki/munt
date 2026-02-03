@@ -6,79 +6,128 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { token, email } = verifyEmailSchema.parse(body);
+    const body = await req.json().catch(() => ({}));
+    const parsed = verifyEmailSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Validation error", details: parsed.error.errors },
+        { status: 400 }
+      );
+    }
+
+    const token = parsed.data.token;
+    const rawEmail = parsed.data.email.trim();
+    const email = rawEmail.toLowerCase();
 
     // Find verification token
-    const verificationToken = await db.verificationToken.findUnique({
-      where: {
-        identifier_token: {
-          identifier: email,
-          token,
-        },
-      },
-    });
-
-    if (!verificationToken) {
-      return NextResponse.json(
-        { error: "Invalid verification token" },
-        { status: 400 }
-      );
-    }
-
-    // Check if token is expired
-    if (verificationToken.expires < new Date()) {
-      await db.verificationToken.delete({
-        where: {
-          identifier_token: {
-            identifier: email,
-            token,
-          },
-        },
-      });
-      return NextResponse.json(
-        { error: "Verification token has expired" },
-        { status: 400 }
-      );
-    }
-
-    // Find and update user
-    const user = await db.user.findUnique({
-      where: { email },
+    const user = await db.user.findFirst({
+      where: { email: { equals: email, mode: "insensitive" } },
     });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Mark email as verified
-    await db.user.update({
-      where: { id: user.id },
-      data: { emailVerified: new Date() },
-    });
+    if (user.emailVerified) {
+      await db.verificationToken.deleteMany({
+        where: {
+          identifier: { in: [email, rawEmail] },
+          type: { in: ["EMAIL_VERIFY", "EMAIL_OTP"] },
+        },
+      });
+      return NextResponse.json(
+        { message: "Email already verified", alreadyVerified: true },
+        { status: 200 }
+      );
+    }
 
-    // Delete used token
-    await db.verificationToken.delete({
+    const verificationToken = await db.verificationToken.findUnique({
       where: {
-        identifier_token: {
+        identifier_token_type: {
           identifier: email,
           token,
+          type: "EMAIL_VERIFY",
         },
       },
     });
+
+    const fallbackToken =
+      !verificationToken && rawEmail !== email
+        ? await db.verificationToken.findUnique({
+            where: {
+              identifier_token_type: {
+                identifier: rawEmail,
+                token,
+                type: "EMAIL_VERIFY",
+              },
+            },
+          })
+        : null;
+
+    const activeToken = verificationToken ?? fallbackToken;
+
+    if (!activeToken) {
+      return NextResponse.json(
+        { error: "Invalid verification token", errorCode: "VERIFY_INVALID" },
+        { status: 400 }
+      );
+    }
+
+    // Check if token is expired
+    if (activeToken.expires < new Date()) {
+      await db.verificationToken.deleteMany({
+        where: {
+          identifier: { in: [email, rawEmail] },
+          type: "EMAIL_VERIFY",
+        },
+      });
+      return NextResponse.json(
+        { error: "Verification token has expired", errorCode: "VERIFY_EXPIRED" },
+        { status: 400 }
+      );
+    }
+
+    try {
+      await db.$transaction(async (tx) => {
+        const deleted = await tx.verificationToken.deleteMany({
+          where: {
+            identifier: activeToken.identifier,
+            token: activeToken.token,
+            type: "EMAIL_VERIFY",
+          },
+        });
+
+        if (deleted.count === 0) {
+          throw new Error("VERIFY_USED");
+        }
+
+        await tx.user.update({
+          where: { id: user.id },
+          data: { emailVerified: new Date() },
+        });
+
+        await tx.verificationToken.deleteMany({
+          where: { identifier: { in: [email, rawEmail] }, type: "EMAIL_OTP" },
+        });
+      });
+    } catch (transactionError: any) {
+      if (transactionError?.message === "VERIFY_USED") {
+        return NextResponse.json(
+          {
+            error: "Verification link has already been used.",
+            errorCode: "VERIFY_USED",
+          },
+          { status: 400 }
+        );
+      }
+      throw transactionError;
+    }
 
     return NextResponse.json(
       { message: "Email verified successfully" },
       { status: 200 }
     );
   } catch (error: any) {
-    if (error.name === "ZodError") {
-      return NextResponse.json(
-        { error: "Validation error", details: error.errors },
-        { status: 400 }
-      );
-    }
-
     console.error("Email verification error:", error);
     return NextResponse.json(
       { error: "Failed to verify email" },

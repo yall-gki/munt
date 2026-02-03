@@ -27,13 +27,13 @@ export default function VerifyEmailBanner() {
       hasShownToast.current = true;
       toast({
         title: "Verify your email",
-        description: "Please check your inbox and click the verification link.",
+        description: "Check your inbox for the verification code or link.",
       });
     } catch {
       hasShownToast.current = true;
       toast({
         title: "Verify your email",
-        description: "Please check your inbox and click the verification link.",
+        description: "Check your inbox for the verification code or link.",
       });
     }
   }, [isUnverified, toast]);

@@ -52,7 +52,7 @@ const coinColors: Record<string, string> = {
   ethereum: "#3C3C3D",
   binancecoin: "#F0B90B",
   cardano: "#0033AD",
-  xrp: "#23292F",
+  ripple: "#23292F",
   polkadot: "#E6007A",
   dogecoin: "#C2A633",
   default: "#3B82F6",

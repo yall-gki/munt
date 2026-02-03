@@ -2,7 +2,7 @@
 import React from "react";
 import { FC } from "react";
 import CloseModal from "@/components/CloseModal";
-import SignUp from "@/components/SignIn";
+import SignUp from "@/components/SignUp";
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 

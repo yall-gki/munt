@@ -1,22 +1,23 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-1.1.x", "rhel-openssl-3.0.x"]
+  provider = "prisma-client"
+  output   = "../lib/prisma"
 }
+
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
-  shadowDatabaseUrl = env("DATABASE_shadow_URL")
+ 
+
 }
 
 model User {
-  id               String             @id @default(cuid())
+  id               String   @id @default(cuid())
   name             String?
-  email            String?            @unique
+  email            String   @unique
   emailVerified    DateTime?
-  username         String?            @unique
+  username         String?  @unique
   image            String?
-  password         String?
+  password         String
   accounts         Account[]
   backtests        Backtest[]
   balances         Balance[]
@@ -26,7 +27,9 @@ model User {
   trades           Trade[]
   coins            UserCoin[]
   wallets          Wallet[]
+  walletTrades     WalletTrade[]
 }
+
 
 model Account {
   id                String  @id @default(cuid())
@@ -56,10 +59,15 @@ model Session {
 
 model VerificationToken {
   identifier String
-  token      String   @unique
+  token      String
   expires    DateTime
+  type       VerificationTokenType @default(EMAIL_VERIFY)
+  attempts   Int                   @default(0)
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @updatedAt
 
-  @@unique([identifier, token])
+  @@unique([identifier, token, type])
+  @@index([identifier, type])
 }
 
 model UserCoin {
@@ -144,6 +152,8 @@ model Coin {
   strategies       Strategy[]
   trades           Trade[]
   userCoins        UserCoin[]
+  walletTradesFrom WalletTrade[]     @relation("WalletTradeFrom")
+  walletTradesTo   WalletTrade[]     @relation("WalletTradeTo")
 }
 
 model Balance {
@@ -171,6 +181,26 @@ model PortfolioHistory {
   @@unique([userId, coinId, date])
 }
 
+model WalletTrade {
+  id         String            @id @default(cuid())
+  userId     String
+  fromCoinId String
+  toCoinId   String
+  fromAmount Float
+  toAmount   Float
+  fromPrice  Float
+  toPrice    Float
+  status     WalletTradeStatus @default(COMPLETED)
+  executedAt DateTime          @default(now())
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fromCoin   Coin              @relation("WalletTradeFrom", fields: [fromCoinId], references: [id])
+  toCoin     Coin              @relation("WalletTradeTo", fields: [toCoinId], references: [id])
+
+  @@index([userId, executedAt])
+  @@index([fromCoinId])
+  @@index([toCoinId])
+}
+
 enum StrategyType {
   DCAa
   GRID
@@ -187,4 +217,15 @@ enum TradeStatus {
   OPEN
   CLOSED
   CANCELLED
+}
+
+enum VerificationTokenType {
+  EMAIL_VERIFY
+  PASSWORD_RESET
+  EMAIL_OTP
+}
+
+enum WalletTradeStatus {
+  COMPLETED
+  FAILED
 }

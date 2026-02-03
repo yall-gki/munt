@@ -8,11 +8,20 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { email } = forgotPasswordSchema.parse(body);
+    const body = await req.json().catch(() => ({}));
+    const parsed = forgotPasswordSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid email address" },
+        { status: 400 }
+      );
+    }
 
-    const user = await db.user.findUnique({
-      where: { email },
+    const rawEmail = parsed.data.email.trim();
+    const normalizedEmail = rawEmail.toLowerCase();
+
+    const user = await db.user.findFirst({
+      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
     });
 
     // Don't reveal if user exists or not (security best practice)
@@ -31,25 +40,30 @@ export async function POST(req: NextRequest) {
     // Delete any existing reset tokens for this email
     await db.verificationToken.deleteMany({
       where: {
-        identifier: email,
+        identifier: { in: [normalizedEmail, rawEmail] },
+        type: "PASSWORD_RESET",
       },
     });
 
     // Create new reset token
     await db.verificationToken.create({
       data: {
-        identifier: email,
+        identifier: normalizedEmail,
         token,
         expires,
+        type: "PASSWORD_RESET",
       },
     });
 
     // Send reset email
-    await sendEmail({
-      to: email,
+    const emailResult = await sendEmail({
+      to: normalizedEmail,
       subject: "Reset your password",
-      html: getPasswordResetHtml(token, email),
+      html: getPasswordResetHtml(token, normalizedEmail),
     });
+    if (!emailResult.success) {
+      throw new Error("Failed to send reset email");
+    }
 
     return NextResponse.json(
       { message: "If an account exists, a password reset link has been sent." },

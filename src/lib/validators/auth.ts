@@ -41,8 +41,19 @@ export const verifyEmailSchema = z.object({
   email: z.string().email("Invalid email address"),
 });
 
+export const requestOtpSchema = z.object({
+  email: z.string().email("Invalid email address"),
+});
+
+export const verifyOtpSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  code: z.string().regex(/^\d{6}$/, "OTP must be 6 digits"),
+});
+
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type SignInInput = z.infer<typeof signInSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
+export type RequestOtpInput = z.infer<typeof requestOtpSchema>;
+export type VerifyOtpInput = z.infer<typeof verifyOtpSchema>;

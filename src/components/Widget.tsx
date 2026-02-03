@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { Lock, Coins, ArrowLeftRight, Loader2, Repeat } from "lucide-react";
+import { Lock, Coins, ArrowLeftRight, Loader2, Repeat, ArrowDownUp } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -64,24 +64,30 @@ const useAuth = () => {
   return isAuth;
 };
 
-export const TradingInput = () => {
+type TradingInputProps = {
+  onTradeComplete?: () => void;
+};
+
+export const TradingInput: React.FC<TradingInputProps> = ({ onTradeComplete }) => {
   const isAuth = useAuth();
   const [fromCoin, setFromCoin] = useState("bitcoin");
   const [toCoin, setToCoin] = useState("ethereum");
-  const [amount, setAmount] = useState(1);
+  const [amountInput, setAmountInput] = useState("1");
   const [isTrading, setIsTrading] = useState(false);
   const [prices, setPrices] = useState<Record<string, number>>({});
   const [balances, setBalances] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const refreshData = async () => {
     setLoading(true);
     try {
       const [priceRes, balanceRes] = await Promise.all([
-        axios.get("https://munt-api-production.up.railway.app/all-prices"),
+        axios.get("https://munt-api.onrender.com/all-prices"),
         axios.get("/api/balance/value"),
       ]);
       setPrices(priceRes.data);
+      setLastUpdated(new Date());
 
       const sorted = balanceRes.data.breakdown.sort((a: any, b: any) => {
         const priceA = priceRes.data[a.id.toLowerCase()] || 0;
@@ -91,35 +97,84 @@ export const TradingInput = () => {
 
       setBalances(sorted);
     } catch {
-      toast.error("Failed to fetch data.");
+      toast.error("Failed to fetch balances or prices.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (isAuth) refreshData();
+    if (!isAuth) return;
+    refreshData();
+    const interval = setInterval(refreshData, 30000);
+    return () => clearInterval(interval);
   }, [isAuth]);
 
-  const getEstimate = () => {
-    const fromPrice = prices[fromCoin];
-    const toPrice = prices[toCoin];
-    if (!fromPrice || !toPrice || fromCoin === toCoin) return "0.000000";
-    return ((amount * fromPrice) / toPrice).toFixed(6);
+  const amountNum = Number(amountInput);
+  const fromPrice = prices[fromCoin];
+  const toPrice = prices[toCoin];
+  const fromBalance = balances.find((b) => b.id === fromCoin);
+  const availableAmount = Number(fromBalance?.amount || 0);
+  const fromSymbol =
+    coins.find((c) => c.id === fromCoin)?.symbol ?? fromCoin.toUpperCase();
+  const toSymbol =
+    coins.find((c) => c.id === toCoin)?.symbol ?? toCoin.toUpperCase();
+  const hasPrices = Number.isFinite(fromPrice) && Number.isFinite(toPrice) && fromPrice > 0 && toPrice > 0;
+  const isValidAmount = Number.isFinite(amountNum) && amountNum > 0;
+  const isSameAsset = fromCoin === toCoin;
+  const isInsufficient = isValidAmount && amountNum > availableAmount;
+  const estimatedToAmount =
+    isValidAmount && hasPrices && !isSameAsset
+      ? ((amountNum * fromPrice) / toPrice).toFixed(6)
+      : "0.000000";
+
+  const rateLabel = useMemo(() => {
+    if (!hasPrices || isSameAsset) return null;
+    const rate = fromPrice / toPrice;
+    if (!Number.isFinite(rate)) return null;
+    return `1 ${fromSymbol} ≈ ${rate.toFixed(6)} ${toSymbol}`;
+  }, [fromCoin, toCoin, fromPrice, toPrice, hasPrices, isSameAsset]);
+
+  const canTrade =
+    isAuth &&
+    !loading &&
+    !isTrading &&
+    isValidAmount &&
+    hasPrices &&
+    !isSameAsset &&
+    !isInsufficient;
+
+  const handleSwap = () => {
+    setFromCoin(toCoin);
+    setToCoin(fromCoin);
   };
 
   const handleTrade = async () => {
-    if (amount <= 0 || fromCoin === toCoin) {
-      toast.error("Invalid trade input");
+    if (!canTrade) {
+      if (isSameAsset) {
+        toast.error("Choose two different assets.");
+      } else if (isInsufficient) {
+        toast.error("Insufficient balance.");
+      } else {
+        toast.error("Invalid trade input");
+      }
       return;
     }
+
     setIsTrading(true);
     try {
-      const res = await axios.post("/api/trade", { fromCoin, toCoin, amount });
+      const res = await axios.post("/api/trade", {
+        fromCoin,
+        toCoin,
+        amount: amountNum,
+      });
       if (res.data.success) {
-        toast.success(`Traded ${amount} ${fromCoin.toUpperCase()}!`);
-        setAmount(0);
+        toast.success(
+          `Traded ${amountNum} ${fromSymbol} for ${Number(res.data.traded.toAmount).toFixed(6)} ${toSymbol}`
+        );
+        setAmountInput("0");
         await refreshData();
+        onTradeComplete?.();
       } else {
         toast.error(res.data.error || "Trade failed");
       }
@@ -142,18 +197,24 @@ export const TradingInput = () => {
       {!isAuth && <Overlay />}
       <div
         className={cn(
-          "bg-zinc-900 p-4 mt-4 rounded-xl shadow text-white",
+          "bg-zinc-900 p-4 mt-4 rounded-xl shadow text-white border border-zinc-800",
           !isAuth && "blur-sm pointer-events-none"
         )}
       >
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-bold flex items-center gap-2">
-            <ArrowLeftRight className="w-5 h-5" /> Trade
+            <ArrowLeftRight className="w-5 h-5" /> Convert
           </h2>
-          <button onClick={refreshData}>
-            <Repeat className="w-5 h-5 text-zinc-400 hover:text-white" />
-          </button>
+          <div className="flex items-center gap-2 text-xs text-zinc-400">
+            {lastUpdated && (
+              <span>Updated {lastUpdated.toLocaleTimeString()}</span>
+            )}
+            <button onClick={refreshData} className="p-1">
+              <Repeat className={cn("w-4 h-4", loading && "animate-spin")} />
+            </button>
+          </div>
         </div>
+
         <div className="flex flex-col gap-3">
           <div className="flex gap-2">
             <select
@@ -167,14 +228,46 @@ export const TradingInput = () => {
                 </option>
               ))}
             </select>
-            <input
-              type="number"
-              className="bg-zinc-800 px-3 py-2 rounded-md flex-1"
-              placeholder="Amount"
-              value={amount}
-              onChange={(e) => setAmount(Number(e.target.value))}
-            />
+            <div className="relative flex-1">
+              <input
+                type="text"
+                inputMode="decimal"
+                className="bg-zinc-800 px-3 py-2 rounded-md w-full"
+                placeholder="Amount"
+                value={amountInput}
+                onChange={(e) => {
+                  const next = e.target.value.replace(/[^0-9.]/g, "");
+                  if (!/^\d*\.?\d*$/.test(next)) return;
+                  setAmountInput(next);
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setAmountInput(String(availableAmount || 0))}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-blue-400"
+              >
+                Max
+              </button>
+            </div>
           </div>
+          <div className="flex items-center justify-between text-xs text-zinc-400">
+            <span>Available: {availableAmount.toFixed(6)}</span>
+            {isInsufficient && (
+              <span className="text-rose-400">Insufficient balance</span>
+            )}
+          </div>
+
+          <div className="flex items-center justify-center">
+            <button
+              type="button"
+              onClick={handleSwap}
+              className="p-2 rounded-full bg-zinc-800 hover:bg-zinc-700"
+              aria-label="Swap assets"
+            >
+              <ArrowDownUp className="w-4 h-4" />
+            </button>
+          </div>
+
           <div className="flex gap-2">
             <select
               className="bg-zinc-800 px-3 py-2 rounded-md flex-1"
@@ -188,13 +281,23 @@ export const TradingInput = () => {
               ))}
             </select>
             <div className="bg-zinc-800 px-3 py-2 rounded-md text-sm text-right flex-1">
-              ≈ {getEstimate()} {toCoin.toUpperCase()}
+              ≈ {estimatedToAmount} {toSymbol}
             </div>
           </div>
+
+          {rateLabel && (
+            <div className="text-xs text-zinc-400">Rate: {rateLabel}</div>
+          )}
+
           <button
             onClick={handleTrade}
-            disabled={isTrading}
-            className="mt-2 bg-green-600 hover:bg-green-500 px-4 py-2 rounded-md flex items-center justify-center gap-2"
+            disabled={!canTrade}
+            className={cn(
+              "mt-2 px-4 py-2 rounded-md flex items-center justify-center gap-2 font-semibold",
+              canTrade
+                ? "bg-emerald-500 hover:bg-emerald-400 text-black"
+                : "bg-zinc-700 text-zinc-400 cursor-not-allowed"
+            )}
           >
             {isTrading && <Loader2 className="h-4 w-4 animate-spin" />}
             {isTrading ? "Trading..." : "Execute Trade"}
@@ -202,8 +305,7 @@ export const TradingInput = () => {
         </div>
       </div>
 
-      {/* Portfolio */}
-      <div className="mt-6 bg-zinc-900 p-4 rounded-xl shadow text-white h-64 overflow-y-auto">
+      <div className="mt-6 bg-zinc-900 p-4 rounded-xl shadow text-white h-64 overflow-y-auto border border-zinc-800">
         <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
           <Coins className="w-5 h-5" /> Portfolio
         </h2>
@@ -221,11 +323,9 @@ export const TradingInput = () => {
                 <span className="font-semibold bg-zinc-800 px-3 py-1 rounded-full">
                   {coin.symbol}
                 </span>
-                <span className="text-green-400 font-mono">
+                <span className="text-emerald-400 font-mono">
                   {parseFloat(coin.amount).toFixed(6)} | $
-                  {(coin.amount * (prices[coin.id.toLowerCase()] || 0)).toFixed(
-                    2
-                  )}
+                  {(coin.amount * (prices[coin.id.toLowerCase()] || 0)).toFixed(2)}
                 </span>
               </li>
             ))}

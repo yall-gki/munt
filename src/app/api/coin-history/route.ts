@@ -6,7 +6,7 @@ const ids = [
   "ethereum",
   "binancecoin",
   "cardano",
-  "xrp",
+  "ripple",
   "polkadot",
   "uniswap",
   "chainlink",

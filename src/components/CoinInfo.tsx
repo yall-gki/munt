@@ -4,10 +4,16 @@ import { useEffect, useState } from "react";
 import { Icons } from "./Icons";
 import { useFavoriteCoinsStore } from "@/lib/store";
 import Image from "next/image";
-import {TradingInput} from "@/components/Widget";
+import { TradingInput } from "@/components/Widget";
 
 
-const CoinInfo = ({ data }: any) => {
+const CoinInfo = ({
+  data,
+  onTradeComplete,
+}: {
+  data: any;
+  onTradeComplete?: () => void;
+}) => {
   const { favorites, fetchFavorites, toggleFavorite } = useFavoriteCoinsStore();
   const [color, setColor] = useState("text-slate-500");
   const [change24, setChange] = useState<number>(0);
@@ -15,7 +21,7 @@ const CoinInfo = ({ data }: any) => {
 
   useEffect(() => {
     fetchFavorites();
-  }, []);
+  }, [fetchFavorites]);
 
   const isFavorite = favorites.includes(data?.id);
 
@@ -81,7 +87,7 @@ const CoinInfo = ({ data }: any) => {
           (1d)
         </h3>
       </div>
-      <TradingInput />
+      <TradingInput onTradeComplete={onTradeComplete} />
     </>
   );
 };

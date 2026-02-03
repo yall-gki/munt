@@ -7,20 +7,46 @@ export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { token, email, password } = resetPasswordSchema.parse(body);
+    const body = await req.json().catch(() => ({}));
+    const parsed = resetPasswordSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Validation error", details: parsed.error.errors },
+        { status: 400 }
+      );
+    }
+
+    const rawEmail = parsed.data.email.trim();
+    const email = rawEmail.toLowerCase();
+    const { token, password } = parsed.data;
 
     // Find verification token
     const verificationToken = await db.verificationToken.findUnique({
       where: {
-        identifier_token: {
+        identifier_token_type: {
           identifier: email,
           token,
+          type: "PASSWORD_RESET",
         },
       },
     });
 
-    if (!verificationToken) {
+    const fallbackToken =
+      !verificationToken && rawEmail !== email
+        ? await db.verificationToken.findUnique({
+            where: {
+              identifier_token_type: {
+                identifier: rawEmail,
+                token,
+                type: "PASSWORD_RESET",
+              },
+            },
+          })
+        : null;
+
+    const activeToken = verificationToken ?? fallbackToken;
+
+    if (!activeToken) {
       return NextResponse.json(
         { error: "Invalid or expired reset token" },
         { status: 400 }
@@ -28,13 +54,11 @@ export async function POST(req: NextRequest) {
     }
 
     // Check if token is expired
-    if (verificationToken.expires < new Date()) {
-      await db.verificationToken.delete({
+    if (activeToken.expires < new Date()) {
+      await db.verificationToken.deleteMany({
         where: {
-          identifier_token: {
-            identifier: email,
-            token,
-          },
+          identifier: { in: [email, rawEmail] },
+          type: "PASSWORD_RESET",
         },
       });
       return NextResponse.json(
@@ -44,8 +68,8 @@ export async function POST(req: NextRequest) {
     }
 
     // Find user
-    const user = await db.user.findUnique({
-      where: { email },
+    const user = await db.user.findFirst({
+      where: { email: { equals: email, mode: "insensitive" } },
     });
 
     if (!user) {
@@ -62,12 +86,11 @@ export async function POST(req: NextRequest) {
     });
 
     // Delete used token
-    await db.verificationToken.delete({
+    await db.verificationToken.deleteMany({
       where: {
-        identifier_token: {
-          identifier: email,
-          token,
-        },
+        identifier: { in: [email, rawEmail] },
+        token,
+        type: "PASSWORD_RESET",
       },
     });
 
@@ -76,13 +99,6 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error: any) {
-    if (error.name === "ZodError") {
-      return NextResponse.json(
-        { error: "Validation error", details: error.errors },
-        { status: 400 }
-      );
-    }
-
     console.error("Reset password error:", error);
     return NextResponse.json(
       { error: "Failed to reset password" },

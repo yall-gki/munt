@@ -7,21 +7,14 @@ export function useCoinsData(ids: string[]) {
     queryFn: async () => {
       if (!ids || ids.length === 0) throw new Error("No IDs");
 
-      const res = await axios.get("https://munt-api.onrender.com/all-prices", {
-        timeout: 10000,
-      });
+      const res = await axios.get("/api/coin-history", { timeout: 10000 });
 
       if (res.status !== 200 || !res.data) {
         throw new Error("Failed to fetch coins data from backend");
       }
 
-      // Filter only requested IDs
-      const filtered = ids.map((id) => ({
-        id,
-        current_price: res.data[id] ?? 0,
-      }));
-
-      return filtered;
+      const data = Array.isArray(res.data) ? res.data : [];
+      return data.filter((coin: any) => ids.includes(coin.id));
     },
     enabled: ids.length > 0,
     staleTime: 1000 * 60 * 5, // 5 minutes

@@ -1,4 +1,5 @@
 "use client";
+
 import { cn } from "@/lib/utils";
 import { FC, useState } from "react";
 import { Button } from "./ui/Button";
@@ -9,22 +10,33 @@ import { useToast } from "@/hooks/use-toast";
 import { LucideDisc } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signInSchema, signUpSchema, type SignInInput, type SignUpInput } from "@/lib/validators/auth";
+import {
+  signInSchema,
+  signUpSchema,
+  type SignInInput,
+  type SignUpInput,
+} from "@/lib/validators/auth";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
   mode?: "signin" | "signup";
 }
 
-const UserAuthForm: FC<UserAuthFormProps> = ({ className, mode = "signin", ...props }) => {
+const UserAuthForm: FC<UserAuthFormProps> = ({
+  className,
+  mode = "signin",
+  ...props
+}) => {
   const [isLoading, setIsLoading] = useState<string | null>(null);
-  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [showEmailForm, setShowEmailForm] = useState(mode === "signup");
   const { toast } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const isSignUp = mode === "signup";
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/";
 
   const {
     register,
@@ -37,8 +49,8 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, mode = "signin", ...pr
   const handleOAuthLogin = async (provider: string) => {
     setIsLoading(provider);
     try {
-      await signIn(provider);
-    } catch (err) {
+      await signIn(provider, { callbackUrl });
+    } catch {
       toast({
         title: "There was a problem",
         description: `There was an error logging in with ${provider}`,
@@ -55,49 +67,63 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, mode = "signin", ...pr
       if (isSignUp) {
         const signUpData = data as SignUpInput;
         await axios.post("/api/auth/register", signUpData);
-        // Auto sign-in so user can skip verification
-        const result = await signIn("credentials", {
-          email: signUpData.email,
-          password: signUpData.password,
-          redirect: false,
-        });
-        if (result?.error) {
-          toast({
-            title: "Account created",
-            description: "Please sign in with your email and password.",
-          });
-          setShowEmailForm(false);
-          return;
-        }
+
         toast({
           title: "Please verify your email",
-          description: "Check your inbox for the verification link. You can use the app in the meantime.",
+          description: "Check your inbox for the verification code or link.",
         });
-        router.push("/");
+
+        setShowEmailForm(false);
+        router.push(`/verify-email?email=${encodeURIComponent(signUpData.email)}`);
         router.refresh();
       } else {
         const signInData = data as SignInInput;
+
         const result = await signIn("credentials", {
           email: signInData.email,
           password: signInData.password,
           redirect: false,
+          callbackUrl,
         });
 
         if (result?.error) {
-          toast({
-            title: "Error",
-            description: "Invalid email or password",
-            variant: "destructive",
-          });
+          if (result.error === "EMAIL_NOT_VERIFIED") {
+            await axios.post("/api/auth/resend-verification", {
+              email: signInData.email,
+            });
+
+            toast({
+              title: "Verify your email",
+              description: "We sent a verification code to your email.",
+            });
+
+            router.push(
+              `/verify-email?email=${encodeURIComponent(signInData.email)}`
+            );
+            router.refresh();
+          } else {
+            toast({
+              title: "Error",
+              description: "Invalid email or password",
+              variant: "destructive",
+            });
+          }
         } else {
-          router.push("/");
-          router.refresh();
+          const targetUrl = result?.url ?? callbackUrl;
+          if (targetUrl.startsWith("http")) {
+            window.location.assign(targetUrl);
+          } else {
+            router.replace(targetUrl);
+            router.refresh();
+          }
         }
       }
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.response?.data?.error || `Failed to ${isSignUp ? "sign up" : "sign in"}`,
+        description:
+          error.response?.data?.error ||
+          `Failed to ${isSignUp ? "sign up" : "sign in"}`,
         variant: "destructive",
       });
     } finally {
@@ -117,9 +143,7 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, mode = "signin", ...pr
               size="sm"
               className="w-full"
             >
-              {isLoading === "google" ? null : (
-                <Icons.google className="h-4 w-4 mr-2" />
-              )}
+              {isLoading === "google" ? null : <Icons.google className="h-4 w-4 mr-2" />}
               Google
             </Button>
 
@@ -130,9 +154,7 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, mode = "signin", ...pr
               size="sm"
               className="w-full bg-[#5865F2] hover:bg-[#4752C4]"
             >
-              {isLoading === "discord" ? null : (
-                <LucideDisc className="h-4 w-4 mr-2" />
-              )}
+              {isLoading === "discord" ? null : <LucideDisc className="h-4 w-4 mr-2" />}
               Discord
             </Button>
           </div>
@@ -167,9 +189,7 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, mode = "signin", ...pr
               placeholder="Email"
               disabled={!!isLoading}
             />
-            {errors.email && (
-              <p className="text-sm text-red-500">{errors.email.message}</p>
-            )}
+            {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
           </div>
 
           <div className="space-y-2">
@@ -179,9 +199,7 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, mode = "signin", ...pr
               placeholder="Password"
               disabled={!!isLoading}
             />
-            {errors.password && (
-              <p className="text-sm text-red-500">{errors.password.message}</p>
-            )}
+            {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
           </div>
 
           {isSignUp && (
@@ -232,7 +250,7 @@ const UserAuthForm: FC<UserAuthFormProps> = ({ className, mode = "signin", ...pr
               onClick={() => setShowEmailForm(false)}
               disabled={!!isLoading}
             >
-              Back
+              {isSignUp ? "Use Google or Discord" : "Back"}
             </Button>
             <Button
               type="submit"

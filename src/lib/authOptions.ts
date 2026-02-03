@@ -1,24 +1,15 @@
 import { db } from "@/lib/db";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { nanoid } from "nanoid";
-import { NextAuthOptions, getServerSession } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
-import GitHubProvider from "next-auth/providers/github";
-import TwitterProvider from "next-auth/providers/twitter";
-import DiscordProvider from "next-auth/providers/discord";
 import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import DiscordProvider from "next-auth/providers/discord";
 import { verifyPassword } from "@/lib/password";
-import { ids as DEFAULT_COIN_IDS } from "@/lib/ids"; // shared list of coin IDs
+import { NextAuthOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
-  session: {
-    strategy: "database", // ← change this from "jwt"
-    maxAge: 30 * 24 * 60 * 60, // optional: 30 days
-  },
-  pages: {
-    signIn: "/sign-in",
-  },
+  session: { strategy: "database", maxAge: 30 * 24 * 60 * 60 },
+  pages: { signIn: "/sign-in" },
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -27,39 +18,37 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
+        console.log("Authorize called with:", credentials?.email);
+        if (!credentials?.email || !credentials?.password) return null;
 
-        const user = await db.user.findUnique({
-          where: { email: credentials.email },
+        const normalizedEmail = credentials.email.trim().toLowerCase();
+        const user = await db.user.findFirst({
+          where: { email: { equals: normalizedEmail, mode: "insensitive" } },
         });
-
         if (!user || !user.password) {
+          console.log("Authorize failed: user not found or no password");
           return null;
         }
-
-        const isValid = await verifyPassword(
-          credentials.password,
-          user.password
-        );
-
+      
+        const isValid = await verifyPassword(credentials.password, user.password);
         if (!isValid) {
+          console.log("Authorize failed: invalid password");
           return null;
         }
-
-        return {
-          id: user.id,
-          email: user.email!,
-          name: user.name,
-          username: user.username,
-        };
-      },
+      
+        if (!(user.emailVerified instanceof Date)) {
+          console.log("Authorize failed: email not verified");
+          throw new Error("EMAIL_NOT_VERIFIED");
+        }
+      
+        console.log("Authorize successful for user:", user.id);
+        return user;
+      }
+      ,
     }),
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      httpOptions: { timeout: 5000 },
     }),
     DiscordProvider({
       clientId: process.env.DISCORD_CLIENT_ID!,
@@ -67,23 +56,52 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      console.log("SignIn callback:", { user, account });
+    
+      if (account?.provider !== "credentials") {
+        if (!user?.email) return false;
+    
+        const existingUser = await db.user.findUnique({ where: { email: user.email } });
+        if (existingUser) {
+          const providerAccountId = account.providerAccountId || account.id;
+          if (!providerAccountId) {
+            console.log("Missing providerAccountId, cannot link account");
+            return false;
+          }
+          await db.account.upsert({
+            where: { provider_providerAccountId: { provider: account.provider, providerAccountId } },
+            create: {
+              userId: existingUser.id,
+              provider: account.provider,
+              providerAccountId,
+              type: account.type,
+              access_token: account.access_token,
+              refresh_token: account.refresh_token,
+              expires_at: account.expires_at,
+              scope: account.scope,
+            },
+            update: {},
+          });
+          user.id = existingUser.id;
+        }
+        if (!user.emailVerified) {
+          await db.user.update({ where: { id: user.id }, data: { emailVerified: new Date() } });
+        }
+      }
+      return true;
+    }
+    ,
     async session({ session, user }) {
       if (user) {
         session.user.id = user.id;
-        if ("username" in user) {
-          session.user.username = (user as any).username;
-        }
-        if ("emailVerified" in user) {
-          session.user.emailVerified = (user as any).emailVerified;
-        }
+        session.user.username = user.username;
+        session.user.emailVerified = user.emailVerified;
       }
       return session;
     },
     async jwt({ token, user }) {
-      // with database sessions, you can usually simplify JWT callback
-      if (user) {
-        token.id = user.id;
-      }
+      if (user) token.id = user.id;
       return token;
     },
     redirect() {
@@ -91,4 +109,3 @@ export const authOptions: NextAuthOptions = {
     },
   },
 };
-

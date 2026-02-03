@@ -64,7 +64,7 @@ const Coin: FC<CoinProps> = ({
       />
 
       <Link
-        href={`/dashboard/${name.toLowerCase()}/${symbol.toUpperCase()}`}
+        href={`/dashboard/${id}/${symbol.toUpperCase()}`}
         prefetch={false}
         className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6"
       >

@@ -4,6 +4,7 @@ import { hashPassword } from "@/lib/password";
 import { signUpSchema } from "@/lib/validators/auth";
 import { nanoid } from "nanoid";
 import { sendEmail, getEmailVerificationHtml } from "@/lib/email";
+import { generateOtp, hashOtp } from "@/lib/otp";
 
 export const dynamic = "force-dynamic";
 
@@ -11,10 +12,11 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const validatedData = signUpSchema.parse(body);
+    const normalizedEmail = validatedData.email.trim().toLowerCase();
 
     // Check if user already exists
-    const existingUser = await db.user.findUnique({
-      where: { email: validatedData.email },
+    const existingUser = await db.user.findFirst({
+      where: { email: { equals: normalizedEmail, mode: "insensitive" } },
     });
 
     if (existingUser) {
@@ -41,36 +43,63 @@ export async function POST(req: NextRequest) {
     // Hash password
     const hashedPassword = await hashPassword(validatedData.password);
 
-    // Generate verification token
+    // Generate verification link token + OTP
     const token = nanoid(32);
     const expires = new Date();
     expires.setHours(expires.getHours() + 24); // 24 hours
+    const otpCode = generateOtp(6);
+    const otpToken = hashOtp(otpCode);
+    const otpExpires = new Date();
+    const otpTtl = parseInt(process.env.OTP_TTL_MINUTES || "10");
+    otpExpires.setMinutes(otpExpires.getMinutes() + otpTtl);
 
     // Create user
     const user = await db.user.create({
       data: {
-        email: validatedData.email,
+        email: normalizedEmail,
         password: hashedPassword,
         name: validatedData.name,
         username: validatedData.username || nanoid(10),
       },
     });
 
-    // Create verification token
-    await db.verificationToken.create({
-      data: {
-        identifier: validatedData.email,
-        token,
-        expires,
+    // Create verification tokens (link + OTP)
+    await db.verificationToken.deleteMany({
+      where: {
+        identifier: normalizedEmail,
+        type: { in: ["EMAIL_VERIFY", "EMAIL_OTP"] },
       },
+    });
+    await db.verificationToken.createMany({
+      data: [
+        {
+          identifier: normalizedEmail,
+          token,
+          expires,
+          type: "EMAIL_VERIFY",
+        },
+        {
+          identifier: normalizedEmail,
+          token: otpToken,
+          expires: otpExpires,
+          type: "EMAIL_OTP",
+        },
+      ],
     });
 
     // Send verification email
-    await sendEmail({
-      to: validatedData.email,
+    const emailResult = await sendEmail({
+      to: normalizedEmail,
       subject: "Verify your email",
-      html: getEmailVerificationHtml(token, validatedData.email),
+      html: getEmailVerificationHtml({
+        email: normalizedEmail,
+        token,
+        otpCode,
+      }),
     });
+    if (!emailResult.success) {
+      throw new Error("Failed to send verification email");
+    }
 
     return NextResponse.json(
       {
