@@ -2,16 +2,16 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { forgotPasswordSchema, type ForgotPasswordInput } from "@/lib/validators/auth";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
-import { buttonVariants } from "@/components/ui/Button";
-import { cn } from "@/lib/utils";
+import { forgotPasswordSchema, type ForgotPasswordInput } from "../../../lib/validators/auth";
+import { Input } from "../../../components/ui/Input";
+import { Button } from "../../../components/ui/Button";
+import { buttonVariants } from "../../../components/ui/Button";
+import { cn } from "../../../lib/utils";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "../../../hooks/use-toast";
 import axios from "axios";
-import { Icons } from "@/components/Icons";
+import { Icons } from "../../../components/Icons";
 
 export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
