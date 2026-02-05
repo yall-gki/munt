@@ -1,5 +1,8 @@
-export const addToFavorites = async (req: any) => {
-  const { coinId } = req;
+type AddToFavoritesRequest = {
+  coinId: string;
+};
+
+export const addToFavorites = async ({ coinId }: AddToFavoritesRequest) => {
   const response = await fetch("/api/coins/add-fav", {
     method: "POST",
     headers: {

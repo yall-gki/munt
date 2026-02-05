@@ -7,11 +7,20 @@ import Image from "next/image";
 import { TradingInput } from "@/components/Widget";
 
 
+type CoinInfoData = {
+  id: string;
+  name: string;
+  symbol: string;
+  image: string;
+  current_price: number;
+  price_change_percentage_24h?: number | null;
+};
+
 const CoinInfo = ({
   data,
   onTradeComplete,
 }: {
-  data: any;
+  data: CoinInfoData;
   onTradeComplete?: () => void;
 }) => {
   const { favorites, fetchFavorites, toggleFavorite } = useFavoriteCoinsStore();
@@ -32,8 +41,8 @@ const CoinInfo = ({
   };
 
   useEffect(() => {
-    if (data?.price_change_percentage_24h !== undefined) {
-      const curr = data.price_change_percentage_24h;
+    const curr = data?.price_change_percentage_24h;
+    if (typeof curr === "number") {
       setColor(curr < 0 ? "text-red-500" : "text-blue-400");
       setChange(Number(Math.abs(curr).toFixed(2)));
     }

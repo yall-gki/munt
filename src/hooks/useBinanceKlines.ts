@@ -6,6 +6,8 @@ type BinanceKlinesResult = {
   line: LineData[];
 };
 
+type BinanceKline = [number, string, string, string, string, ...unknown[]];
+
 async function fetchBinanceKlines(
   symbol: string,
   interval: string
@@ -13,13 +15,13 @@ async function fetchBinanceKlines(
   const response = await fetch(
     `https://api.binance.com/api/v3/klines?symbol=${symbol.toUpperCase()}USDT&interval=${interval}&limit=500`
   );
-  const rawData = await response.json();
+  const rawData = (await response.json()) as BinanceKline[];
 
   if (!Array.isArray(rawData)) {
     throw new Error("Binance data unavailable");
   }
 
-  const candles: CandlestickData[] = rawData.map((item: any) => ({
+  const candles: CandlestickData[] = rawData.map((item) => ({
     time: item[0] / 1000,
     open: parseFloat(item[1]),
     high: parseFloat(item[2]),

@@ -159,7 +159,7 @@ const CoinLineChart: React.FC<{ symbol: string; coinId: string }> = ({
 
         return {
           label: "MACD",
-          data: padLeft(macd.map((m) => m.MACD), closeValues.length),
+          data: padLeft(macd.map((m) => m.MACD ?? 0), closeValues.length),
           borderColor: "#22d3ee",
           borderWidth: 1,
           pointRadius: 0,

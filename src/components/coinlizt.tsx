@@ -5,14 +5,23 @@ import { useCoinsData } from "@/hooks/useCoinData";
 import { ids } from "@/lib/ids";
 import { useFavoriteCoinsStore } from "@/lib/store";
 import { Star } from "lucide-react";
-import CloseModal from "./CloseModal";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+
+type CoinListItem = {
+  id: string;
+  name: string;
+  symbol: string;
+  image: string;
+  current_price: number;
+};
 
 const Oinli = () => {
   const { data: cacheD } = useCoinsData(ids);
   const { favorites, toggleFavorite } = useFavoriteCoinsStore();
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const coins = Array.isArray(cacheD) ? (cacheD as CoinListItem[]) : [];
+  const hasData = Array.isArray(cacheD);
 
   const handleToggle = async (coinId: string) => {
     setTogglingId(coinId);
@@ -23,13 +32,13 @@ const Oinli = () => {
 
   return (
     <div className="relative w-full p-4 pt-6 flex flex-col min-h-full items-center  text-white ">
-      {!cacheD ? (
+      {!hasData ? (
         <div className="flex justify-center items-center h-32">
           <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-md">
-          {cacheD?.map((coin: any) => {
+          {coins.map((coin) => {
             const isFav = favorites.includes(coin.id);
             const isToggling = togglingId === coin.id;
 

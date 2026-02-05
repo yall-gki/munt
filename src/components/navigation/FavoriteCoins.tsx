@@ -18,6 +18,15 @@ type Coin = {
 
 type DisplayMode = "favorites" | "portfolio" | "empty";
 
+type BalanceBreakdownItem = {
+  id: string;
+  usdValue: number;
+};
+
+type BalanceValueResponse = {
+  breakdown?: BalanceBreakdownItem[];
+};
+
 const FavoriteCoins = () => {
   const { favorites, fetchFavorites } = useFavoriteCoinsStore();
   const [coins, setCoins] = useState<Coin[]>([]);
@@ -43,11 +52,14 @@ const FavoriteCoins = () => {
         if (favorites.length === 0) {
           const balanceRes = await fetch("/api/balance/value");
           if (balanceRes.ok) {
-            const balanceData = await balanceRes.json();
-            const topIds = (balanceData?.breakdown ?? [])
-              .sort((a: any, b: any) => b.usdValue - a.usdValue)
+            const balanceData: BalanceValueResponse = await balanceRes.json();
+            const breakdown = Array.isArray(balanceData.breakdown)
+              ? balanceData.breakdown
+              : [];
+            const topIds = [...breakdown]
+              .sort((a, b) => b.usdValue - a.usdValue)
               .slice(0, 8)
-              .map((item: any) => item.id);
+              .map((item) => item.id);
             if (topIds.length > 0) {
               targetIds = topIds;
               nextMode = "portfolio";
