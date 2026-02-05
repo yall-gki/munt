@@ -35,10 +35,7 @@ export const authOptions: NextAuthOptions = {
 
         if (!user || !user.password) return null;
 
-        const valid = await verifyPassword(
-          credentials.password,
-          user.password
-        );
+        const valid = await verifyPassword(credentials.password, user.password);
         if (!valid || !user.emailVerified) return null;
 
         return {
@@ -47,7 +44,7 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           image: user.image ?? undefined,
           username: user.username ?? undefined,
-          emailVerified: user.emailVerified ?? undefined,
+          emailVerified: user.emailVerified?.toISOString() ?? undefined,
         };
       },
     }),
@@ -76,9 +73,6 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
 
-  /**
-   * ✅ DB-safe place to mark OAuth users as verified
-   */
   events: {
     async createUser({ user }) {
       await db.user.update({
@@ -92,10 +86,10 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.username = (user as any).username ?? null;
-        token.emailVerified = user.emailVerified
-          ? new Date(user.emailVerified).toISOString()
-          : null;
+        token.username = (user as any)?.username ?? null;
+        // Narrow type: cast to { emailVerified?: string | null }
+        const u = user as { emailVerified?: string | null };
+        token.emailVerified = u.emailVerified ?? null;
       }
       return token;
     },
