@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Prisma } from "@prisma/client";
-import { getAuthSession } from "@/lib/auth";
-import { db } from "@/lib/db";
-import { fetchCoins } from "@/lib/fetchCoins";
+import { Prisma } from "../../../../lib/prisma/client";
+import { getAuthSession } from "../../../lib/auth";
+import { db } from "../../../lib/db";
+import { fetchCoins } from "../../../lib/fetchCoins";
 
 export async function POST(req: NextRequest) {
   const session = await getAuthSession();
