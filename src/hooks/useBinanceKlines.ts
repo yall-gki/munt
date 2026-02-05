@@ -1,12 +1,14 @@
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
-import type { CandlestickData, LineData } from "lightweight-charts";
+import type { CandlestickData, LineData, UTCTimestamp } from "lightweight-charts";
 
 type BinanceKlinesResult = {
-  candles: CandlestickData[];
-  line: LineData[];
+  candles: CandlestickData<UTCTimestamp>[];
+  line: LineData<UTCTimestamp>[];
 };
 
-type BinanceKline = [number, string, string, string, string, ...unknown[]];
+type BinanceKline = [number, string, string, string, string, ...any[]];
 
 async function fetchBinanceKlines(
   symbol: string,
@@ -21,15 +23,15 @@ async function fetchBinanceKlines(
     throw new Error("Binance data unavailable");
   }
 
-  const candles: CandlestickData[] = rawData.map((item) => ({
-    time: item[0] / 1000,
+  const candles: CandlestickData<UTCTimestamp>[] = rawData.map((item) => ({
+    time: (item[0] / 1000) as UTCTimestamp, // <-- type-safe cast
     open: parseFloat(item[1]),
     high: parseFloat(item[2]),
     low: parseFloat(item[3]),
     close: parseFloat(item[4]),
   }));
 
-  const line: LineData[] = candles.map((item) => ({
+  const line: LineData<UTCTimestamp>[] = candles.map((item) => ({
     time: item.time,
     value: item.close,
   }));
@@ -42,7 +44,7 @@ export function useBinanceKlines(symbol: string, interval: string) {
     queryKey: ["binanceKlines", symbol, interval],
     queryFn: () => fetchBinanceKlines(symbol, interval),
     enabled: !!symbol && !!interval,
-    staleTime: 1000 * 30,
+    staleTime: 1000 * 30, // 30 seconds
     refetchOnWindowFocus: false,
   });
 }
