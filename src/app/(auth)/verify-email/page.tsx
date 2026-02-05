@@ -1,15 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/Button";
-import { buttonVariants } from "@/components/ui/Button";
-import { cn } from "@/lib/utils";
+import { Button } from "../../../components/ui/Button";
+import { buttonVariants } from "../../../components/ui/Button";
+import { cn } from "../../../lib/utils";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "../../../hooks/use-toast";
 import axios from "axios";
-import { Icons } from "@/components/Icons";
-import { Input } from "@/components/ui/Input";
+import { Icons } from "../../../components/Icons";
+import { Input } from "../../../components/ui/Input";
 
 export default function VerifyEmailPage() {
   const [isLoading, setIsLoading] = useState(true);
