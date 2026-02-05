@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import {
   CandlestickSeries,
   LineSeries,
@@ -20,22 +20,32 @@ interface CandlestickChartProps {
   chartType: ChartType;
 }
 
-const CandlestickChart: React.FC<CandlestickChartProps> = ({
+const CandlestickChartView: React.FC<CandlestickChartProps> = ({
   symbol,
   interval,
   chartType,
 }) => {
-  const chartContainerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick" | "Line"> | null>(null);
+
   const { data, isLoading, error } = useBinanceKlines(symbol, interval);
-  const candles = (data?.candles ?? []) as CandlestickData[];
-  const line = (data?.line ?? []) as LineData[];
 
+  // ✅ memoized to keep hook deps stable
+  const candles = useMemo<CandlestickData[]>(() => {
+    return (data?.candles ?? []) as CandlestickData[];
+  }, [data]);
+
+  const line = useMemo<LineData[]>(() => {
+    return (data?.line ?? []) as LineData[];
+  }, [data]);
+
+  // init chart once
   useEffect(() => {
-    if (!chartContainerRef.current) return;
+    if (!containerRef.current) return;
 
-    const container = chartContainerRef.current;
+    const container = containerRef.current;
+
     const chart = createChart(container, {
       width: container.clientWidth,
       height: container.clientHeight,
@@ -47,15 +57,23 @@ const CandlestickChart: React.FC<CandlestickChartProps> = ({
         vertLines: { color: "rgba(148, 163, 184, 0.08)" },
         horzLines: { color: "rgba(148, 163, 184, 0.08)" },
       },
-      rightPriceScale: { borderColor: "rgba(148, 163, 184, 0.2)" },
+      rightPriceScale: {
+        borderColor: "rgba(148, 163, 184, 0.2)",
+      },
       timeScale: {
         borderColor: "rgba(148, 163, 184, 0.2)",
         timeVisible: true,
         secondsVisible: false,
       },
       crosshair: {
-        horzLine: { color: "rgba(148, 163, 184, 0.25)", labelBackgroundColor: "#111827" },
-        vertLine: { color: "rgba(148, 163, 184, 0.25)", labelBackgroundColor: "#111827" },
+        horzLine: {
+          color: "rgba(148, 163, 184, 0.25)",
+          labelBackgroundColor: "#111827",
+        },
+        vertLine: {
+          color: "rgba(148, 163, 184, 0.25)",
+          labelBackgroundColor: "#111827",
+        },
       },
     });
 
@@ -63,8 +81,9 @@ const CandlestickChart: React.FC<CandlestickChartProps> = ({
 
     const resizeObserver = new ResizeObserver((entries) => {
       for (const entry of entries) {
-        if (entry.contentRect.width && entry.contentRect.height) {
-          chart.resize(entry.contentRect.width, entry.contentRect.height);
+        const { width, height } = entry.contentRect;
+        if (width && height) {
+          chart.resize(width, height);
         }
       }
     });
@@ -79,6 +98,7 @@ const CandlestickChart: React.FC<CandlestickChartProps> = ({
     };
   }, []);
 
+  // update series when data or type changes
   useEffect(() => {
     if (!chartRef.current) return;
 
@@ -87,20 +107,22 @@ const CandlestickChart: React.FC<CandlestickChartProps> = ({
     }
 
     if (chartType === "line") {
-      seriesRef.current = chartRef.current.addSeries(LineSeries, {
+      const series = chartRef.current.addSeries(LineSeries, {
         color: "#3b82f6",
         lineWidth: 2,
       });
-      seriesRef.current.setData(line);
+      series.setData(line);
+      seriesRef.current = series;
     } else {
-      seriesRef.current = chartRef.current.addSeries(CandlestickSeries, {
+      const series = chartRef.current.addSeries(CandlestickSeries, {
         upColor: "#22c55e",
         downColor: "#ef4444",
         borderVisible: false,
         wickUpColor: "#22c55e",
         wickDownColor: "#ef4444",
       });
-      seriesRef.current.setData(candles);
+      series.setData(candles);
+      seriesRef.current = series;
     }
 
     chartRef.current.timeScale().fitContent();
@@ -108,13 +130,15 @@ const CandlestickChart: React.FC<CandlestickChartProps> = ({
 
   return (
     <div className="relative h-full w-full">
-      <div ref={chartContainerRef} className="h-full w-full" />
+      <div ref={containerRef} className="h-full w-full" />
+
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-sm text-zinc-300">
           Loading chart...
         </div>
       )}
-      {error && !isLoading && (
+
+      {!!error && !isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-sm text-zinc-300">
           Market data unavailable for this pair.
         </div>
@@ -123,4 +147,4 @@ const CandlestickChart: React.FC<CandlestickChartProps> = ({
   );
 };
 
-export default CandlestickChart;
+export default CandlestickChartView;
