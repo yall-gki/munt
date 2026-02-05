@@ -4,17 +4,19 @@ import { Loader2 } from "lucide-react";
 import * as React from "react";
 
 const buttonVariants = cva(
-  "active:scale-95 inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-slate-400 focus:ring-offset-2 disabled:opacity-50 dark:focus:ring-slate-400 disabled:pointer-events-none dark:focus:ring-offset-slate-900",
+  "active:scale-95 inline-flex items-center justify-center rounded-md text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 disabled:opacity-50 dark:focus:ring-blue-400 disabled:pointer-events-none dark:focus:ring-offset-slate-900",
   {
     variants: {
       variant: {
-        default: "bg-zinc-900 text-zinc-100 hover:bg-zinc-800",
-        destructive: "text-white hover:bg-red-600 dark:hover:bg-red-600",
+        default:
+          "bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.35)]",
+        destructive:
+          "bg-red-600 text-white hover:bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)]",
         outline:
-          "bg-zinc-100 text-zinc-900 hover:bg-zinc-200 outline outline-1 outline-zinc-300",
-        subtle: "hover:bg-zinc-200 bg-zinc-100 text-zinc-900",
+          "bg-transparent text-blue-200 hover:bg-blue-500/10 border border-blue-500/40",
+        subtle: "hover:bg-blue-500/15 bg-blue-500/10 text-blue-100",
         ghost:
-          "bg-transparent hover:bg-zinc-100 text-zinc-800 data-[state=open]:bg-transparent data-[state=open]:bg-transparent",
+          "bg-transparent hover:bg-blue-500/10 text-blue-200 data-[state=open]:bg-transparent data-[state=open]:bg-transparent",
         link: "bg-transparent dark:bg-transparent underline-offset-4 hover:underline text-slate-900 dark:text-slate-100 hover:bg-transparent dark:hover:bg-transparent",
       },
       size: {

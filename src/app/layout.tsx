@@ -1,7 +1,7 @@
-import FavoriteCoins from "@/components/FavoriteCoins";
-import NavbarWrapper from "@/components/NavbarWrapper";
+import FavoriteCoins from "@/components/navigation/FavoriteCoins";
+import NavbarWrapper from "@/components/navigation/NavbarWrapper";
 import Providers from "@/components/Providers";
-import VerifyEmailBanner from "@/components/VerifyEmailBanner";
+import VerifyEmailBanner from "@/components/auth/VerifyEmailBanner";
 import { Toaster } from "@/components/ui/Toaster";
 import { cn } from "@/lib/utils";
 import "@/styles/globals.css";
@@ -23,10 +23,8 @@ const inter = Inter({
 
 export default async function RootLayout({
   children,
-  authModal,
 }: {
   children: React.ReactNode;
-  authModal: React.ReactNode;
 }) {
   const navbar = await NavbarWrapper(); // ✅ PRE-resolve async component
 
@@ -45,7 +43,6 @@ export default async function RootLayout({
           {navbar}
           <VerifyEmailBanner />
           <FavoriteCoins />
-          {authModal}
           <main className="w-full bg-zinc-950 h-[calc(92vh-8rem)]">
             {children}
           </main>

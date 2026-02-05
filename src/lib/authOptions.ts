@@ -4,108 +4,111 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
 import { verifyPassword } from "@/lib/password";
-import { NextAuthOptions } from "next-auth";
+import type { NextAuthOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
-  session: { strategy: "database", maxAge: 30 * 24 * 60 * 60 },
-  pages: { signIn: "/sign-in" },
+
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
+  },
+
+  pages: {
+    signIn: "/login",
+  },
+
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
+        email: { type: "email" },
+        password: { type: "password" },
       },
-      async authorize(credentials) {
-        console.log("Authorize called with:", credentials?.email);
-        if (!credentials?.email || !credentials?.password) return null;
 
-        const normalizedEmail = credentials.email.trim().toLowerCase();
-        const user = await db.user.findFirst({
-          where: { email: { equals: normalizedEmail, mode: "insensitive" } },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials.password) return null;
+
+        const user = await db.user.findUnique({
+          where: { email: credentials.email.toLowerCase() },
         });
-        if (!user || !user.password) {
-          console.log("Authorize failed: user not found or no password");
-          return null;
-        }
-      
-        const isValid = await verifyPassword(credentials.password, user.password);
-        if (!isValid) {
-          console.log("Authorize failed: invalid password");
-          return null;
-        }
-      
-        if (!(user.emailVerified instanceof Date)) {
-          console.log("Authorize failed: email not verified");
-          throw new Error("EMAIL_NOT_VERIFIED");
-        }
-      
-        console.log("Authorize successful for user:", user.id);
-        return user;
-      }
-      ,
+
+        if (!user || !user.password) return null;
+
+        const valid = await verifyPassword(
+          credentials.password,
+          user.password
+        );
+        if (!valid || !user.emailVerified) return null;
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.image ?? undefined,
+          username: user.username ?? undefined,
+          emailVerified: user.emailVerified ?? undefined,
+        };
+      },
     }),
+
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
+      profile(profile) {
+        if (!profile.email) {
+          throw new Error("Google account has no email");
+        }
+
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email.toLowerCase(),
+          image: profile.picture,
+        };
+      },
     }),
+
     DiscordProvider({
       clientId: process.env.DISCORD_CLIENT_ID!,
       clientSecret: process.env.DISCORD_CLIENT_SECRET!,
     }),
   ],
-  callbacks: {
-    async signIn({ user, account }) {
-      console.log("SignIn callback:", { user, account });
-    
-      if (account?.provider !== "credentials") {
-        if (!user?.email) return false;
-    
-        const existingUser = await db.user.findUnique({ where: { email: user.email } });
-        if (existingUser) {
-          const providerAccountId = account.providerAccountId || account.id;
-          if (!providerAccountId) {
-            console.log("Missing providerAccountId, cannot link account");
-            return false;
-          }
-          await db.account.upsert({
-            where: { provider_providerAccountId: { provider: account.provider, providerAccountId } },
-            create: {
-              userId: existingUser.id,
-              provider: account.provider,
-              providerAccountId,
-              type: account.type,
-              access_token: account.access_token,
-              refresh_token: account.refresh_token,
-              expires_at: account.expires_at,
-              scope: account.scope,
-            },
-            update: {},
-          });
-          user.id = existingUser.id;
-        }
-        if (!user.emailVerified) {
-          await db.user.update({ where: { id: user.id }, data: { emailVerified: new Date() } });
-        }
-      }
-      return true;
-    }
-    ,
-    async session({ session, user }) {
-      if (user) {
-        session.user.id = user.id;
-        session.user.username = user.username;
-        session.user.emailVerified = user.emailVerified;
-      }
-      return session;
+
+  /**
+   * ✅ DB-safe place to mark OAuth users as verified
+   */
+  events: {
+    async createUser({ user }) {
+      await db.user.update({
+        where: { id: user.id },
+        data: { emailVerified: new Date() },
+      });
     },
+  },
+
+  callbacks: {
     async jwt({ token, user }) {
-      if (user) token.id = user.id;
+      if (user) {
+        token.id = user.id;
+        token.username = (user as any).username ?? null;
+        token.emailVerified = user.emailVerified
+          ? new Date(user.emailVerified).toISOString()
+          : null;
+      }
       return token;
     },
-    redirect() {
-      return "/";
+
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.username = (token as any)?.username ?? null;
+        session.user.emailVerified = token.emailVerified
+          ? new Date(token.emailVerified as string)
+          : null;
+      }
+      return session;
     },
   },
 };

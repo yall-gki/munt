@@ -1,8 +1,10 @@
-generator client {
-  provider = "prisma-client"
-  output   = "../lib/prisma"
-}
 
+generator client {
+  provider        = "prisma-client"
+  output          = "../lib/prisma"  // your current output
+
+      // ensures TS output is compatible
+}
 
 datasource db {
   provider = "postgresql"
@@ -17,7 +19,7 @@ model User {
   emailVerified    DateTime?
   username         String?  @unique
   image            String?
-  password         String
+  password         String?
   accounts         Account[]
   backtests        Backtest[]
   balances         Balance[]

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { coinCatalog } from "@/lib/coinCatalog";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +26,19 @@ export async function POST(_req: NextRequest) {
     }
 
     // Fetch all available coins
-    const coins = await db.coin.findMany();
+    let coins = await db.coin.findMany();
+
+    // Seed default coins if none exist
+    if (!coins.length && coinCatalog.length > 0) {
+      await db.coin.createMany({
+        data: coinCatalog.map((coin) => ({
+          ...coin,
+          image: coin.image ?? null,
+        })),
+        skipDuplicates: true,
+      });
+      coins = await db.coin.findMany();
+    }
 
     if (!coins.length) {
       return NextResponse.json(

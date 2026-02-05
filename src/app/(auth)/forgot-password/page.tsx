@@ -50,7 +50,7 @@ export default function ForgotPasswordPage() {
     <div className="absolute inset-0">
       <div className="h-full max-w-2xl mx-auto flex flex-col items-center justify-center gap-20">
         <Link
-          href="/sign-in"
+          href="/login"
           className={cn(
             buttonVariants({ variant: "ghost" }),
             "self-start -mt-20 text-zinc-300 hover:text-white"
@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
                 </p>
               </div>
               <Link
-                href="/sign-in"
+                href="/login"
                 className={cn(buttonVariants({ variant: "default" }), "w-full")}
               >
                 Back to Sign In

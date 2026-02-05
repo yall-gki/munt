@@ -38,10 +38,21 @@ const COINGECKO_KEY = "coingecko:market_data";
 
 export async function GET() {
   try {
+    const redis = (() => {
+      try {
+        return getRedis();
+      } catch {
+        return null;
+      }
+    })();
+
     // Check Redis cache
-    const cached = await getRedis().get(COINGECKO_KEY);
-    if (cached) {
-      return NextResponse.json(cached);
+    if (redis) {
+      const cached = await redis.get(COINGECKO_KEY);
+      if (cached) {
+        const parsed = typeof cached === "string" ? JSON.parse(cached) : cached;
+        return NextResponse.json(parsed);
+      }
     }
 
     // Fetch fresh data from CoinGecko
@@ -70,7 +81,9 @@ export async function GET() {
     const data = await res.json();
 
     // Cache for 5 minutes (300 seconds)
-    await getRedis().set(COINGECKO_KEY, data, { ex: 300 });
+    if (redis) {
+      await redis.set(COINGECKO_KEY, JSON.stringify(data), { ex: 300 });
+    }
     console.log(data);
 
     return NextResponse.json(data);

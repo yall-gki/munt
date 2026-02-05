@@ -14,6 +14,10 @@ export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
   const fromCoin = typeof body.fromCoin === "string" ? body.fromCoin : "";
   const toCoin = typeof body.toCoin === "string" ? body.toCoin : "";
+  const strategyId =
+    typeof body.strategyId === "string" ? body.strategyId : undefined;
+  const contextCoinId =
+    typeof body.contextCoinId === "string" ? body.contextCoinId : undefined;
   const amountNum = Number(body.amount);
 
   if (!fromCoin || !toCoin || !Number.isFinite(amountNum) || amountNum <= 0) {
@@ -31,6 +35,17 @@ export async function POST(req: NextRequest) {
   if (fromCoin === toCoin) {
     return NextResponse.json(
       { error: "Cannot trade same asset" },
+      { status: 400 }
+    );
+  }
+
+  const coinRecords = await db.coin.findMany({
+    where: { id: { in: [fromCoin, toCoin] } },
+    select: { id: true },
+  });
+  if (coinRecords.length !== 2) {
+    return NextResponse.json(
+      { error: "Unsupported asset selection" },
       { status: 400 }
     );
   }
@@ -58,10 +73,36 @@ export async function POST(req: NextRequest) {
   const toAmount = new Prisma.Decimal(tradeAmount)
     .mul(fromPrice)
     .div(toPrice)
+    .toDecimalPlaces(8, Prisma.Decimal.ROUND_DOWN)
     .toNumber();
+
+  if (!Number.isFinite(toAmount) || toAmount <= 0) {
+    return NextResponse.json(
+      { error: "Invalid trade pricing" },
+      { status: 502 }
+    );
+  }
 
   try {
     const result = await db.$transaction(async (tx) => {
+      let strategyTradeId: string | null = null;
+      if (strategyId) {
+        const strategy = await tx.strategy.findUnique({
+          where: { id: strategyId },
+          select: { id: true, userId: true, coinId: true },
+        });
+        if (!strategy || strategy.userId !== session.user.id) {
+          throw new Error("INVALID_STRATEGY");
+        }
+        if (
+          strategy.coinId &&
+          strategy.coinId !== fromCoin &&
+          strategy.coinId !== toCoin
+        ) {
+          throw new Error("STRATEGY_COIN_MISMATCH");
+        }
+      }
+
       const decrement = await tx.balance.updateMany({
         where: {
           userId: session.user.id,
@@ -103,7 +144,40 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      return { upserted, trade };
+      if (strategyId) {
+        const strategy = await tx.strategy.findUnique({
+          where: { id: strategyId },
+          select: { id: true, coinId: true },
+        });
+
+        const strategyCoinId =
+          contextCoinId && [fromCoin, toCoin].includes(contextCoinId)
+            ? contextCoinId
+            : strategy?.coinId || toCoin;
+
+        const isSell = strategyCoinId === fromCoin;
+        const signedAmount = isSell ? -tradeAmount : toAmount;
+        const entryPrice = strategyCoinId === fromCoin ? fromPrice : toPrice;
+
+        const strategyTrade = await tx.trade.create({
+          data: {
+            userId: session.user.id,
+            strategyId,
+            coinId: strategyCoinId,
+            mode: "REAL",
+            entryPrice,
+            exitPrice: entryPrice,
+            amount: signedAmount,
+            profitLoss: 0,
+            status: "CLOSED",
+            closedAt: new Date(),
+          },
+        });
+
+        strategyTradeId = strategyTrade.id;
+      }
+
+      return { upserted, trade, strategyTradeId };
     });
 
     return NextResponse.json({
@@ -116,12 +190,25 @@ export async function POST(req: NextRequest) {
         fromPrice,
         toPrice,
         tradeId: result.trade.id,
+        strategyTradeId: result.strategyTradeId,
       },
     });
   } catch (error: any) {
     if (error?.message === "INSUFFICIENT_FUNDS") {
       return NextResponse.json(
         { error: "Insufficient balance" },
+        { status: 400 }
+      );
+    }
+    if (error?.message === "INVALID_STRATEGY") {
+      return NextResponse.json(
+        { error: "Invalid strategy selection" },
+        { status: 400 }
+      );
+    }
+    if (error?.message === "STRATEGY_COIN_MISMATCH") {
+      return NextResponse.json(
+        { error: "Strategy coin does not match this trade" },
         { status: 400 }
       );
     }

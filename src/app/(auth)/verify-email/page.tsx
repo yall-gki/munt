@@ -54,7 +54,7 @@ export default function VerifyEmailPage() {
           description: "Email verified successfully!",
         });
         setTimeout(() => {
-          router.push("/sign-in");
+          router.push("/login");
         }, 2000);
       } catch (err: any) {
         setError(err.response?.data?.error || "Failed to verify email");
@@ -86,7 +86,7 @@ export default function VerifyEmailPage() {
         description: "Email verified successfully!",
       });
       setTimeout(() => {
-        router.push("/sign-in");
+        router.push("/login");
       }, 2000);
     } catch (err: any) {
       const apiError = err.response?.data;
@@ -133,7 +133,7 @@ export default function VerifyEmailPage() {
     <div className="absolute inset-0">
       <div className="h-full max-w-2xl mx-auto flex flex-col items-center justify-center gap-20">
         <Link
-          href="/sign-in"
+          href="/login"
           className={cn(
             buttonVariants({ variant: "ghost" }),
             "self-start -mt-20"
@@ -219,7 +219,7 @@ export default function VerifyEmailPage() {
                 </p>
               </div>
               <Link
-                href="/sign-in"
+                href="/login"
                 className={cn(buttonVariants({ variant: "default" }), "w-full")}
               >
                 Back to Sign In

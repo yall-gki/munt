@@ -1,11 +1,11 @@
 export const addToFavorites = async (req: any) => {
-  const { userId, coinId } = req;
-  const response = await fetch("/api/add-fav", {
+  const { coinId } = req;
+  const response = await fetch("/api/coins/add-fav", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ userId, coinId }),
+    body: JSON.stringify({ coinId }),
   });
 
   const data = await response.json();

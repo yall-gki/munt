@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
       id: b.coinId,
       name: b.coin.name,
       symbol: b.coin.symbol,
+      image: b.coin.image,
       amount,
       usdValue,
       formattedUsdValue: formatter.format(usdValue),

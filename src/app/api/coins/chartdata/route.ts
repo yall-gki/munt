@@ -3,6 +3,11 @@ import { fetchCharts } from "@/lib/fetchCharts";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
+  const symbol = searchParams.get("symbol") || undefined;
+  const interval = searchParams.get("interval") || undefined;
+  const daysParam = searchParams.get("days");
+  const days = daysParam ? Number(daysParam) : undefined;
+
   console.log(`🔎 Fetching chart data for coin ID: ${id}`);
   if (!id || typeof id !== "string") {
     return new Response(
@@ -15,7 +20,11 @@ export async function GET(request: Request) {
   }
 
   try {
-    const chartData = await fetchCharts(id);
+    const chartData = await fetchCharts(id, {
+      symbol,
+      interval,
+      days: Number.isFinite(days) ? days : undefined,
+    });
     console.log(`✅ Fetched chart data for coin ID: ${id}`);
     return new Response(JSON.stringify(chartData), {
       status: 200,

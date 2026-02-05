@@ -6,6 +6,7 @@ import { Lock, Coins, ArrowLeftRight, Loader2, Repeat, ArrowDownUp } from "lucid
 import axios from "axios";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useStrategyStore } from "@/lib/strategyStore";
 
 const coins = [
   { id: "bitcoin", symbol: "BTC" },
@@ -42,7 +43,7 @@ const coins = [
 
 const Overlay = () => (
   <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center rounded-md z-10">
-    <Link href="/sign-in" className="text-white hover:text-zinc-300">
+    <Link href="/login" className="text-white hover:text-zinc-300">
       <Lock className="h-8 w-8" />
     </Link>
   </div>
@@ -66,9 +67,13 @@ const useAuth = () => {
 
 type TradingInputProps = {
   onTradeComplete?: () => void;
+  contextCoinId?: string;
 };
 
-export const TradingInput: React.FC<TradingInputProps> = ({ onTradeComplete }) => {
+export const TradingInput: React.FC<TradingInputProps> = ({
+  onTradeComplete,
+  contextCoinId,
+}) => {
   const isAuth = useAuth();
   const [fromCoin, setFromCoin] = useState("bitcoin");
   const [toCoin, setToCoin] = useState("ethereum");
@@ -78,6 +83,8 @@ export const TradingInput: React.FC<TradingInputProps> = ({ onTradeComplete }) =
   const [balances, setBalances] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const { strategies, selectedStrategyId, selectStrategy } =
+    useStrategyStore();
 
   const refreshData = async () => {
     setLoading(true);
@@ -167,6 +174,8 @@ export const TradingInput: React.FC<TradingInputProps> = ({ onTradeComplete }) =
         fromCoin,
         toCoin,
         amount: amountNum,
+        strategyId: selectedStrategyId || undefined,
+        contextCoinId: contextCoinId || undefined,
       });
       if (res.data.success) {
         toast.success(
@@ -289,13 +298,35 @@ export const TradingInput: React.FC<TradingInputProps> = ({ onTradeComplete }) =
             <div className="text-xs text-zinc-400">Rate: {rateLabel}</div>
           )}
 
+          {strategies.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <span className="text-xs text-zinc-400">
+                Strategy (optional)
+              </span>
+              <select
+                className="bg-zinc-800 px-3 py-2 rounded-md"
+                value={selectedStrategyId ?? ""}
+                onChange={(e) =>
+                  selectStrategy(e.target.value ? e.target.value : null)
+                }
+              >
+                <option value="">No strategy</option>
+                {strategies.map((strategy) => (
+                  <option key={strategy.id} value={strategy.id}>
+                    {strategy.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <button
             onClick={handleTrade}
             disabled={!canTrade}
             className={cn(
               "mt-2 px-4 py-2 rounded-md flex items-center justify-center gap-2 font-semibold",
               canTrade
-                ? "bg-emerald-500 hover:bg-emerald-400 text-black"
+                ? "bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_12px_rgba(59,130,246,0.35)]"
                 : "bg-zinc-700 text-zinc-400 cursor-not-allowed"
             )}
           >
@@ -323,7 +354,7 @@ export const TradingInput: React.FC<TradingInputProps> = ({ onTradeComplete }) =
                 <span className="font-semibold bg-zinc-800 px-3 py-1 rounded-full">
                   {coin.symbol}
                 </span>
-                <span className="text-emerald-400 font-mono">
+                <span className="text-blue-300 font-mono">
                   {parseFloat(coin.amount).toFixed(6)} | $
                   {(coin.amount * (prices[coin.id.toLowerCase()] || 0)).toFixed(2)}
                 </span>

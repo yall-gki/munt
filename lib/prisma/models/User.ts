@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums.js"
-import type * as Prisma from "../internal/prismaNamespace.js"
+import type * as $Enums from "../enums"
+import type * as Prisma from "../internal/prismaNamespace"
 
 /**
  * Model User
@@ -166,7 +166,7 @@ export type UserGroupByOutputType = {
   emailVerified: Date | null
   username: string | null
   image: string | null
-  password: string
+  password: string | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -197,7 +197,7 @@ export type UserWhereInput = {
   emailVerified?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   username?: Prisma.StringNullableFilter<"User"> | string | null
   image?: Prisma.StringNullableFilter<"User"> | string | null
-  password?: Prisma.StringFilter<"User"> | string
+  password?: Prisma.StringNullableFilter<"User"> | string | null
   accounts?: Prisma.AccountListRelationFilter
   backtests?: Prisma.BacktestListRelationFilter
   balances?: Prisma.BalanceListRelationFilter
@@ -217,7 +217,7 @@ export type UserOrderByWithRelationInput = {
   emailVerified?: Prisma.SortOrderInput | Prisma.SortOrder
   username?: Prisma.SortOrderInput | Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
-  password?: Prisma.SortOrder
+  password?: Prisma.SortOrderInput | Prisma.SortOrder
   accounts?: Prisma.AccountOrderByRelationAggregateInput
   backtests?: Prisma.BacktestOrderByRelationAggregateInput
   balances?: Prisma.BalanceOrderByRelationAggregateInput
@@ -240,7 +240,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringNullableFilter<"User"> | string | null
   emailVerified?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   image?: Prisma.StringNullableFilter<"User"> | string | null
-  password?: Prisma.StringFilter<"User"> | string
+  password?: Prisma.StringNullableFilter<"User"> | string | null
   accounts?: Prisma.AccountListRelationFilter
   backtests?: Prisma.BacktestListRelationFilter
   balances?: Prisma.BalanceListRelationFilter
@@ -260,7 +260,7 @@ export type UserOrderByWithAggregationInput = {
   emailVerified?: Prisma.SortOrderInput | Prisma.SortOrder
   username?: Prisma.SortOrderInput | Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
-  password?: Prisma.SortOrder
+  password?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -276,7 +276,7 @@ export type UserScalarWhereWithAggregatesInput = {
   emailVerified?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   username?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   image?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
-  password?: Prisma.StringWithAggregatesFilter<"User"> | string
+  password?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
@@ -286,7 +286,7 @@ export type UserCreateInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
@@ -306,7 +306,7 @@ export type UserUncheckedCreateInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
@@ -326,7 +326,7 @@ export type UserUpdateInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
@@ -346,7 +346,7 @@ export type UserUncheckedUpdateInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
@@ -366,7 +366,7 @@ export type UserCreateManyInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -376,7 +376,7 @@ export type UserUpdateManyMutationInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -386,7 +386,7 @@ export type UserUncheckedUpdateManyInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -583,7 +583,7 @@ export type UserCreateWithoutAccountsInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryCreateNestedManyWithoutUserInput
@@ -602,7 +602,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedCreateNestedManyWithoutUserInput
@@ -637,7 +637,7 @@ export type UserUpdateWithoutAccountsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUpdateManyWithoutUserNestedInput
@@ -656,7 +656,7 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedUpdateManyWithoutUserNestedInput
@@ -675,7 +675,7 @@ export type UserCreateWithoutSessionsInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
@@ -694,7 +694,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
@@ -729,7 +729,7 @@ export type UserUpdateWithoutSessionsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
@@ -748,7 +748,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
@@ -767,7 +767,7 @@ export type UserCreateWithoutCoinsInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
@@ -786,7 +786,7 @@ export type UserUncheckedCreateWithoutCoinsInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
@@ -821,7 +821,7 @@ export type UserUpdateWithoutCoinsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
@@ -840,7 +840,7 @@ export type UserUncheckedUpdateWithoutCoinsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
@@ -859,7 +859,7 @@ export type UserCreateWithoutStrategiesInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
@@ -878,7 +878,7 @@ export type UserUncheckedCreateWithoutStrategiesInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
@@ -913,7 +913,7 @@ export type UserUpdateWithoutStrategiesInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
@@ -932,7 +932,7 @@ export type UserUncheckedUpdateWithoutStrategiesInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
@@ -951,7 +951,7 @@ export type UserCreateWithoutTradesInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
@@ -970,7 +970,7 @@ export type UserUncheckedCreateWithoutTradesInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
@@ -1005,7 +1005,7 @@ export type UserUpdateWithoutTradesInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
@@ -1024,7 +1024,7 @@ export type UserUncheckedUpdateWithoutTradesInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
@@ -1043,7 +1043,7 @@ export type UserCreateWithoutWalletsInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
@@ -1062,7 +1062,7 @@ export type UserUncheckedCreateWithoutWalletsInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
@@ -1097,7 +1097,7 @@ export type UserUpdateWithoutWalletsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
@@ -1116,7 +1116,7 @@ export type UserUncheckedUpdateWithoutWalletsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
@@ -1135,7 +1135,7 @@ export type UserCreateWithoutBacktestsInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryCreateNestedManyWithoutUserInput
@@ -1154,7 +1154,7 @@ export type UserUncheckedCreateWithoutBacktestsInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedCreateNestedManyWithoutUserInput
@@ -1189,7 +1189,7 @@ export type UserUpdateWithoutBacktestsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUpdateManyWithoutUserNestedInput
@@ -1208,7 +1208,7 @@ export type UserUncheckedUpdateWithoutBacktestsInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedUpdateManyWithoutUserNestedInput
@@ -1227,7 +1227,7 @@ export type UserCreateWithoutBalancesInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryCreateNestedManyWithoutUserInput
@@ -1246,7 +1246,7 @@ export type UserUncheckedCreateWithoutBalancesInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedCreateNestedManyWithoutUserInput
@@ -1281,7 +1281,7 @@ export type UserUpdateWithoutBalancesInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUpdateManyWithoutUserNestedInput
@@ -1300,7 +1300,7 @@ export type UserUncheckedUpdateWithoutBalancesInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedUpdateManyWithoutUserNestedInput
@@ -1319,7 +1319,7 @@ export type UserCreateWithoutPortfolioHistoryInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
@@ -1338,7 +1338,7 @@ export type UserUncheckedCreateWithoutPortfolioHistoryInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
@@ -1373,7 +1373,7 @@ export type UserUpdateWithoutPortfolioHistoryInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
@@ -1392,7 +1392,7 @@ export type UserUncheckedUpdateWithoutPortfolioHistoryInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
@@ -1411,7 +1411,7 @@ export type UserCreateWithoutWalletTradesInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
@@ -1430,7 +1430,7 @@ export type UserUncheckedCreateWithoutWalletTradesInput = {
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
-  password: string
+  password?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
@@ -1465,7 +1465,7 @@ export type UserUpdateWithoutWalletTradesInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
@@ -1484,7 +1484,7 @@ export type UserUncheckedUpdateWithoutWalletTradesInput = {
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  password?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
@@ -1697,7 +1697,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     emailVerified: Date | null
     username: string | null
     image: string | null
-    password: string
+    password: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }

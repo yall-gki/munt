@@ -19,10 +19,18 @@ export async function fetchCoins(
   const cacheKey = `coinsData-${sortedIds.join(",")}`;
   console.log(`Coin IDs: ${sortedIds}, cacheKey: ${cacheKey}`);
 
-  if (!options.bypassCache) {
+  const redis = (() => {
+    try {
+      return getRedis();
+    } catch {
+      return null;
+    }
+  })();
+
+  if (!options.bypassCache && redis) {
     // Try Redis cache
     try {
-      const cachedData = await getRedis().get(cacheKey);
+      const cachedData = await redis.get(cacheKey);
       if (typeof cachedData === "string" && cachedData.length > 0) {
         console.log("Returning coins data from Redis cache");
         return JSON.parse(cachedData);
@@ -63,11 +71,11 @@ export async function fetchCoins(
     throw new Error("No data returned from FastAPI backend.");
   }
 
-  if (!options.bypassCache) {
+  if (!options.bypassCache && redis) {
     // Cache fetched data
     try {
-      await getRedis().set(cacheKey, JSON.stringify(allCoins));
-      await getRedis().expire(cacheKey, 3600); // TTL = 1 hour
+      await redis.set(cacheKey, JSON.stringify(allCoins));
+      await redis.expire(cacheKey, 3600); // TTL = 1 hour
       console.log("Coins data cached in Redis");
     } catch (redisSetError) {
       console.error("Redis SET/EXPIRE failed:", redisSetError);

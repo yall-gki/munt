@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { FC, memo, useMemo, useState } from "react";
 import Image from "next/image";
-import MiniSparkline from "@/components/MiniSparkLine";
+import MiniSparkline from "@/components/charts/MiniSparkLine";
 import { useFavoriteCoinsStore } from "@/lib/store";
 import { Star, Loader2 } from "lucide-react";
 
@@ -34,7 +34,7 @@ const Coin: FC<CoinProps> = ({
 
   const isFavorited = favorites.includes(id);
   const isNegative = useMemo(() => change24h < 0, [change24h]);
-  const changeColor = isNegative ? "text-red-500" : "text-green-400";
+  const changeColor = isNegative ? "text-red-500" : "text-blue-400";
 
   const formattedPrice = `$${price?.toLocaleString("en-US") || "0.00"}`;
   const formattedChange = `${change24h?.toFixed(2) || "0.00"}%`;

@@ -5,6 +5,7 @@ interface FavoriteCoinsStore {
   line: boolean;
   candle: boolean;
   trades: boolean;
+  setFavorites: (ids: string[]) => void;
   fetchFavorites: () => Promise<void>;
   toggleFavorite: (coinId: string) => Promise<void>;
   toggleState: (
@@ -22,6 +23,7 @@ export const useFavoriteCoinsStore = create<FavoriteCoinsStore>((set, get) => ({
   line: true,
   candle: true,
   trades: true,
+  setFavorites: (ids) => set({ favorites: ids }),
 
   fetchFavorites: async () => {
     try {

@@ -34,7 +34,7 @@ const CoinInfo = ({
   useEffect(() => {
     if (data?.price_change_percentage_24h !== undefined) {
       const curr = data.price_change_percentage_24h;
-      setColor(curr < 0 ? "text-red-500" : "text-green-500");
+      setColor(curr < 0 ? "text-red-500" : "text-blue-400");
       setChange(Number(Math.abs(curr).toFixed(2)));
     }
   }, [data]);
@@ -87,7 +87,7 @@ const CoinInfo = ({
           (1d)
         </h3>
       </div>
-      <TradingInput onTradeComplete={onTradeComplete} />
+      <TradingInput onTradeComplete={onTradeComplete} contextCoinId={data?.id} />
     </>
   );
 };

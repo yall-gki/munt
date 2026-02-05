@@ -61,7 +61,7 @@ export default function ResetPasswordPage() {
         description: "Password reset successfully. You can now sign in.",
       });
       setTimeout(() => {
-        router.push("/sign-in");
+        router.push("/login");
       }, 2000);
     } catch (error: any) {
       toast({
@@ -79,7 +79,7 @@ export default function ResetPasswordPage() {
       <div className="absolute inset-0">
         <div className="h-full max-w-2xl mx-auto flex flex-col items-center justify-center gap-20">
           <Link
-            href="/sign-in"
+            href="/login"
             className={cn(
               buttonVariants({ variant: "ghost" }),
               "self-start -mt-20"
@@ -115,7 +115,7 @@ export default function ResetPasswordPage() {
     <div className="absolute inset-0">
       <div className="h-full max-w-2xl mx-auto flex flex-col items-center justify-center gap-20">
         <Link
-          href="/sign-in"
+          href="/login"
           className={cn(
             buttonVariants({ variant: "ghost" }),
             "self-start -mt-20"
