@@ -3,5 +3,5 @@ import Navbar from "./Navbar";
 
 export default async function NavbarWrapper() {
   const session = await getAuthSession();
-  return await Navbar({ session });
+  return await Navbar( );
 }
