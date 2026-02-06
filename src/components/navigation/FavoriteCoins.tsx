@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Plus } from "lucide-react";
 import { useFavoriteCoinsStore } from "@/lib/store";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -132,12 +131,7 @@ const FavoriteCoins = () => {
   if (!coins.length && !loading) {
     return (
       <div className="relative h-28 w-full flex flex-col items-center justify-center text-center bg-zinc-950 border-t border-zinc-800">
-        <button
-          onClick={() => handleClick("/add-coin")}
-          className="mt-1 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-full transition-all shadow-[0_0_16px_rgba(59,130,246,0.4)]"
-        >
-          <Plus className="w-4 h-4 inline mr-1" /> Add Coins
-        </button>
+        <p className="text-xs text-zinc-400">No favorites yet.</p>
       </div>
     );
   }
@@ -185,12 +179,6 @@ const FavoriteCoins = () => {
           );
         })}
 
-        <button
-          onClick={() => handleClick("/add-coin")}
-          className="relative w-12 h-12 flex items-center justify-center rounded-full bg-blue-500 text-black hover:scale-110 transition-all shadow-[0_0_16px_rgba(59,130,246,0.5)] z-10"
-        >
-          <Plus className="w-6 h-6" />
-        </button>
       </div>
     </div>
   );
