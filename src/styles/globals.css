@@ -118,3 +118,4 @@ canva{
     @apply text-foreground;
   }
 }
+input{ box-shadow: none !important;}

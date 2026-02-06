@@ -35,7 +35,11 @@ export const authOptions: NextAuthOptions = {
 
         if (!user || !user.password) return null;
 
-        const valid = await verifyPassword(credentials.password, user.password);
+        const valid = await verifyPassword(
+          credentials.password,
+          user.password
+        );
+
         if (!valid || !user.emailVerified) return null;
 
         return {
@@ -44,7 +48,7 @@ export const authOptions: NextAuthOptions = {
           name: user.name,
           image: user.image ?? undefined,
           username: user.username ?? undefined,
-          emailVerified: user.emailVerified?.toISOString() ?? undefined,
+          emailVerified: user.emailVerified?.toISOString(),
         };
       },
     }),
@@ -53,32 +57,27 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       allowDangerousEmailAccountLinking: true,
-      profile(profile) {
-        if (!profile.email) {
-          throw new Error("Google account has no email");
-        }
-
-        return {
-          id: profile.sub,
-          name: profile.name,
-          email: profile.email.toLowerCase(),
-          image: profile.picture,
-        };
-      },
     }),
 
     DiscordProvider({
       clientId: process.env.DISCORD_CLIENT_ID!,
       clientSecret: process.env.DISCORD_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
 
   events: {
-    async createUser({ user }) {
-      await db.user.update({
-        where: { id: user.id },
-        data: { emailVerified: new Date() },
-      });
+    async signIn({ user, account }) {
+      // Auto-verify OAuth users only
+      if (
+        account?.provider !== "credentials" &&
+        !(user as any).emailVerified
+      ) {
+        await db.user.update({
+          where: { id: user.id },
+          data: { emailVerified: new Date() },
+        });
+      }
     },
   },
 
@@ -86,10 +85,9 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.username = (user as any)?.username ?? null;
-        // Narrow type: cast to { emailVerified?: string | null }
-        const u = user as { emailVerified?: string | null };
-        token.emailVerified = u.emailVerified ?? null;
+        token.username = (user as any).username ?? null;
+        token.emailVerified =
+          (user as any).emailVerified ?? null;
       }
       return token;
     },
@@ -97,7 +95,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.username = (token as any)?.username ?? null;
+        session.user.username = token.username as string | null;
         session.user.emailVerified = token.emailVerified
           ? new Date(token.emailVerified as string)
           : null;

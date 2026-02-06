@@ -30,7 +30,7 @@ const Page: FC = () => {
 
   return (
     <div className="fixed inset-0 bg-zinc-900/20 z-50">
-      <div className="container flex items-center h-full max-w-lg max-sm:max-w-sm mx-auto px-4">
+      <div className="container flex items-center  h-full max-w-lg max-sm:max-w-sm mx-auto px-4">
         <div
           ref={modalRef}
           className="relative bg-white w-full h-fit py-20 px-4 max-sm:px-3 max-sm:py-12 rounded-lg"

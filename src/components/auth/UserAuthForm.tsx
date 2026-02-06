@@ -22,9 +22,15 @@ import Link from "next/link";
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
   mode?: "signin" | "signup";
-  /** IMPORTANT: pass modal close handler */
   onSuccess?: () => void;
 }
+
+const inputBase =
+  "h-11 rounded-xl bg-zinc-900/60 text-white border border-zinc-700 px-4 text-sm " +
+  "placeholder:text-zinc-500 " +
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 " +
+  "focus-visible:border-blue-500 " +
+  "transition-all duration-200";
 
 const UserAuthForm: FC<UserAuthFormProps> = ({
   className,
@@ -66,38 +72,33 @@ const UserAuthForm: FC<UserAuthFormProps> = ({
 
   const onSubmitEmail = async (data: SignInInput | SignUpInput) => {
     setIsLoading("email");
-  
+
     try {
-      /* -------- SIGN UP -------- */
       if (isSignUp) {
         const signUpData = data as SignUpInput;
-  
+
         await axios.post("/api/auth/register", signUpData);
-  
+
         toast({
           title: "Verify your email",
           description: "We sent you a verification code.",
         });
-  
+
         router.push(
           `/verify-email?email=${encodeURIComponent(signUpData.email)}`
         );
         return;
       }
-  
-      /* -------- SIGN IN -------- */
+
       const signInData = data as SignInInput;
-  
+
       const result = await signIn("credentials", {
         email: signInData.email,
         password: signInData.password,
         redirect: false,
       });
-  
+
       if (result?.error) {
-        // CredentialsSignin covers:
-        // - wrong password
-        // - email not verified
         toast({
           title: "Sign in failed",
           description: "Invalid credentials or email not verified.",
@@ -106,14 +107,10 @@ const UserAuthForm: FC<UserAuthFormProps> = ({
         return;
       }
 
-      // ✅ success
       await getSession();
       toast({ title: "Welcome back 👋" });
-  
-      // close modal if provided
+
       onSuccess?.();
-  
-      // ONE navigation only
       router.replace(callbackUrl);
       router.refresh();
     } catch (error: any) {
@@ -128,7 +125,6 @@ const UserAuthForm: FC<UserAuthFormProps> = ({
       setIsLoading(null);
     }
   };
-  
 
   return (
     <div className={cn("flex flex-col gap-4 w-full", className)} {...props}>
@@ -161,7 +157,7 @@ const UserAuthForm: FC<UserAuthFormProps> = ({
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+              <span className="w-full border-t border-zinc-700" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">
@@ -174,32 +170,52 @@ const UserAuthForm: FC<UserAuthFormProps> = ({
             onClick={() => setShowEmailForm(true)}
             variant="outline"
             size="sm"
-            className="w-full"
+            className="w-full bg-zinc-800 hover:bg-zinc-700"
           >
             {isSignUp ? "Sign up with Email" : "Sign in with Email"}
           </Button>
         </>
       ) : (
         <form onSubmit={handleSubmit(onSubmitEmail)} className="space-y-4">
-          <Input
-            {...register("email")}
-            type="email"
-            placeholder="Email"
-            disabled={!!isLoading}
-          />
-          {errors.email && (
-            <p className="text-sm text-red-500">{errors.email.message}</p>
-          )}
+          {/* Email */}
+          <div>
+            <Input
+              {...register("email")}
+              type="email"
+              placeholder="Email address"
+              disabled={!!isLoading}
+              className={cn(
+                inputBase,
+                errors.email &&
+                  "border-red-500 focus-visible:ring-red-500/30"
+              )}
+            />
+            {errors.email && (
+              <p className="text-xs text-red-500/90 ml-1 mt-1">
+                {errors.email.message}
+              </p>
+            )}
+          </div>
 
-          <Input
-            {...register("password")}
-            type="password"
-            placeholder="Password"
-            disabled={!!isLoading}
-          />
-          {errors.password && (
-            <p className="text-sm text-red-500">{errors.password.message}</p>
-          )}
+          {/* Password */}
+          <div>
+            <Input
+              {...register("password")}
+              type="password"
+              placeholder="Password"
+              disabled={!!isLoading}
+              className={cn(
+                inputBase,
+                errors.password &&
+                  "border-red-500 focus-visible:ring-red-500/30"
+              )}
+            />
+            {errors.password && (
+              <p className="text-xs text-red-500/90 ml-1 mt-1">
+                {errors.password.message}
+              </p>
+            )}
+          </div>
 
           {isSignUp && (
             <>
@@ -207,11 +223,13 @@ const UserAuthForm: FC<UserAuthFormProps> = ({
                 {...register("name")}
                 placeholder="Name (optional)"
                 disabled={!!isLoading}
+                className={inputBase}
               />
               <Input
                 {...register("username")}
                 placeholder="Username (optional)"
                 disabled={!!isLoading}
+                className={inputBase}
               />
             </>
           )}
@@ -229,7 +247,7 @@ const UserAuthForm: FC<UserAuthFormProps> = ({
             <Button
               type="button"
               variant="outline"
-              className="flex-1"
+              className="flex-1 bg-zinc-800 hover:bg-zinc-700"
               onClick={() => setShowEmailForm(false)}
             >
               Back
