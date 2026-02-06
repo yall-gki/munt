@@ -169,7 +169,7 @@ const TradeHistory: React.FC<TradeHistoryProps> = ({ symbol, isOpen, onClose }) 
                 return (
                   <li
                     key={`${trade.time}-${index}`}
-                    className="text-xs h-8 px-2 border-b border-zinc-800 flex justify-between font-medium"
+                    className="text-xs h-8 px-2 border-b items-center border-zinc-800 flex justify-between font-medium"
                   >
                     <span className={cn(color, "w-1/3 tabular-nums")}>
                       {priceFormatter.format(trade.price)}
