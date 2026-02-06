@@ -1,20 +1,21 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, use } from "react";
 import CoinInfo from "@/components/CoinInfo";
 import CoinLineChart from "@/components/charts/CoinLineChart";
-import TradeHistory from "@/components/tradeHi";
 import ExecutedTradesLog from "@/components/ExecutedTradesLog";
+import TradeHistory from "@/components/tradeHi";
+import CryptoNews from "@/components/CryptoNews"; // <- import the news component
 import { useCoinsData } from "@/hooks/useCoinData";
 import { ids } from "@/lib/ids";
 import { Loader2 } from "lucide-react";
-import { use } from "react";
 
 const Page: React.FC<{ params: Promise<{ coin: string; symbol: string }> }> = ({
   params,
 }) => {
   const { coin, symbol } = use(params);
   const [tradeRefreshKey, setTradeRefreshKey] = useState(0);
+  const [isTradeOpen, setIsTradeOpen] = useState(false);
 
   const { data: coinList, isError } = useCoinsData(ids);
   const coinData = useMemo(() => {
@@ -41,8 +42,10 @@ const Page: React.FC<{ params: Promise<{ coin: string; symbol: string }> }> = ({
   }
 
   return (
-    <div className="min-h-full bg-black text-white px-4 py-6">
+    <div className="min-h-full bg-black text-white px-4 py-6 relative">
+      {/* Main grid */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-[320px_1fr_320px] gap-6">
+        {/* Left: Coin info + executed trades */}
         <div className="space-y-6">
           <CoinInfo
             data={coinData}
@@ -51,14 +54,31 @@ const Page: React.FC<{ params: Promise<{ coin: string; symbol: string }> }> = ({
           <ExecutedTradesLog coinId={coinData.id} refreshKey={tradeRefreshKey} />
         </div>
 
+        {/* Center: Chart */}
         <div className="space-y-6">
           <CoinLineChart symbol={symbol} coinId={coinData.id} />
         </div>
 
+        {/* Right: Crypto news */}
         <div className="space-y-6">
-          <TradeHistory symbol={coinData.symbol} />
+          <CryptoNews coinId={coinData.id} />
         </div>
       </div>
+
+      {/* TradeHistory toggle button */}
+      <button
+        onClick={() => setIsTradeOpen((prev) => !prev)}
+        className="fixed top-1/2 right-0 z-50 flex items-center justify-center h-32 w-10 bg-zinc-900/90 text-white rounded-l-md text-xs tracking-widest transform -translate-y-1/2 hover:bg-zinc-800/95"
+      >
+        <span className="rotate-90">Trades</span>
+      </button>
+
+      {/* TradeHistory panel */}
+      <TradeHistory
+        symbol={symbol}
+        isOpen={isTradeOpen}
+        onClose={() => setIsTradeOpen(false)}
+      />
     </div>
   );
 };

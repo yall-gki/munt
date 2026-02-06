@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, WifiOff } from "lucide-react";
+import { ChevronLeft, WifiOff } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -21,10 +21,15 @@ interface TradeItem {
   side: TradeSide;
 }
 
-const TradeHistory: React.FC<{ symbol: string }> = ({ symbol }) => {
+interface TradeHistoryProps {
+  symbol: string;
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const TradeHistory: React.FC<TradeHistoryProps> = ({ symbol, isOpen, onClose }) => {
   const [trades, setTrades] = useState<TradeItem[]>([]);
   const queueRef = useRef<TradeItem[]>([]);
-  const [isOpen, setIsOpen] = useState(true);
   const [status, setStatus] = useState<"connecting" | "open" | "error" | "closed">(
     "connecting"
   );
@@ -103,89 +108,90 @@ const TradeHistory: React.FC<{ symbol: string }> = ({ symbol }) => {
   }, []);
 
   return (
-    <div className="w-full bg-zinc-900 rounded-xl text-white overflow-hidden border border-zinc-800">
-      <button
-        onClick={() => setIsOpen((prev) => !prev)}
-        className="w-full px-4 py-3 flex items-center justify-between bg-zinc-800/70 border-b border-zinc-700"
-      >
-        <span className="font-semibold text-sm">Binance Live Trades</span>
-        <div className="flex items-center gap-2">
-          <span
-            className={cn(
-              "h-2 w-2 rounded-full",
-              status === "open"
-                ? "bg-emerald-400"
-                : status === "connecting"
-                ? "bg-amber-400"
-                : "bg-red-400"
-            )}
-          />
-          <motion.div
-            animate={{ rotate: isOpen ? 180 : 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <ChevronDown className="w-5 h-5" />
-          </motion.div>
-        </div>
-      </button>
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ x: "100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "100%" }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className="fixed top-0 right-0 h-full w-[380px] bg-zinc-900 border-l border-zinc-800 z-50 flex flex-col overflow-hidden"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 bg-zinc-800/90">
+            <span className="font-semibold text-sm text-white">Binance Live Trades</span>
+            <button
+              onClick={onClose}
+              className="text-zinc-400 hover:text-white"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </button>
+          </div>
 
-      <AnimatePresence initial={false}>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-          >
-            <div className="p-3 max-h-[340px] overflow-y-auto">
-              <ul className="w-full">
-                <li className="text-xs text-zinc-500 h-8 px-2 border-b border-zinc-700 flex justify-between font-semibold uppercase tracking-wide">
-                  <span className="w-1/3">Price (USDT)</span>
-                  <span className="w-1/3 text-center">Amount</span>
-                  <span className="w-1/3 text-right">Time</span>
+          {/* Status dot */}
+          <div className="flex items-center px-4 py-2 gap-2">
+            <span
+              className={cn(
+                "h-2 w-2 rounded-full",
+                status === "open"
+                  ? "bg-emerald-400"
+                  : status === "connecting"
+                  ? "bg-amber-400"
+                  : "bg-red-400"
+              )}
+            />
+            <span className="text-xs text-zinc-400 uppercase">{status}</span>
+          </div>
+
+          {/* Trades list */}
+          <div className="flex-1 p-3 overflow-y-auto">
+            <ul className="w-full">
+              <li className="text-xs text-zinc-500 h-8 px-2 border-b border-zinc-700 flex justify-between font-semibold uppercase tracking-wide">
+                <span className="w-1/3">Price (USDT)</span>
+                <span className="w-1/3 text-center">Amount</span>
+                <span className="w-1/3 text-right">Time</span>
+              </li>
+
+              {error && (
+                <li className="py-6 text-sm text-zinc-400 flex items-center justify-center gap-2">
+                  <WifiOff className="h-4 w-4" /> {error}
                 </li>
+              )}
 
-                {error && (
-                  <li className="py-6 text-sm text-zinc-400 flex items-center justify-center gap-2">
-                    <WifiOff className="h-4 w-4" /> {error}
+              {!error && trades.length === 0 && (
+                <li className="py-6 text-sm text-zinc-400 text-center">
+                  Waiting for trades...
+                </li>
+              )}
+
+              {trades.map((trade, index) => {
+                const color = trade.side === "buy" ? "text-emerald-400" : "text-rose-400";
+                return (
+                  <li
+                    key={`${trade.time}-${index}`}
+                    className="text-xs h-8 px-2 border-b border-zinc-800 flex justify-between font-medium"
+                  >
+                    <span className={cn(color, "w-1/3 tabular-nums")}>
+                      {priceFormatter.format(trade.price)}
+                    </span>
+                    <span className={cn(color, "w-1/3 text-center tabular-nums")}>
+                      {qtyFormatter.format(trade.quantity)}
+                    </span>
+                    <span className={cn(color, "w-1/3 text-right tabular-nums")}>
+                      {new Date(trade.time).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                      })}
+                    </span>
                   </li>
-                )}
-
-                {!error && trades.length === 0 && (
-                  <li className="py-6 text-sm text-zinc-400 text-center">
-                    Waiting for trades...
-                  </li>
-                )}
-
-                {trades.map((trade, index) => {
-                  const color = trade.side === "buy" ? "text-emerald-400" : "text-rose-400";
-                  return (
-                    <li
-                      key={`${trade.time}-${index}`}
-                      className="text-xs h-8 px-2 border-b border-zinc-800 flex justify-between font-medium"
-                    >
-                      <span className={cn(color, "w-1/3 tabular-nums")}> 
-                        {priceFormatter.format(trade.price)}
-                      </span>
-                      <span className={cn(color, "w-1/3 text-center tabular-nums")}>
-                        {qtyFormatter.format(trade.quantity)}
-                      </span>
-                      <span className={cn(color, "w-1/3 text-right tabular-nums")}>
-                        {new Date(trade.time).toLocaleTimeString("en-US", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          second: "2-digit",
-                        })}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+                );
+              })}
+            </ul>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
