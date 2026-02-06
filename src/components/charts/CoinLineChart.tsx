@@ -228,10 +228,10 @@ const CoinLineChart: React.FC<{ symbol: string; coinId: string }> = ({
         data: closeValues,
         borderColor: "#38bdf8",
         backgroundColor: "rgba(56, 189, 248, 0.08)",
-        borderWidth: 2,
+        borderWidth: 1,
         pointRadius: 0,
         tension: 0.35,
-        fill: true,
+        fill: false,
       },
       ...(Array.isArray(indicatorDataset)
         ? indicatorDataset
