@@ -65,7 +65,7 @@ const Page: React.FC<{ params: Promise<{ coin: string; symbol: string }> }> = ({
       {/* TradeHistory toggle button */}
       <button
         onClick={() => setIsTradeOpen((prev) => !prev)}
-        className="fixed top-1/2 right-0 z-50 flex items-center justify-center h-32 w-10 bg-zinc-900/90 text-white rounded-l-md text-xs tracking-widest bg-zinc-100  text-zinc-900 transform -translate-y-1/2 hover:bg-zinc-200/95"
+        className="fixed top-1/2 right-0 z-50 flex items-center justify-center h-32 w-10 bg-zinc-100/90  rounded-l-md text-xs tracking-widest  text-zinc-900 transform -translate-y-1/2 hover:bg-zinc-200/95"
       >
         <span className="rotate-90">Trades</span>
       </button>
