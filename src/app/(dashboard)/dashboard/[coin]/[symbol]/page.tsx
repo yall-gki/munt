@@ -5,10 +5,10 @@ import CoinInfo from "@/components/CoinInfo";
 import CoinLineChart from "@/components/charts/CoinLineChart";
 import ExecutedTradesLog from "@/components/ExecutedTradesLog";
 import TradeHistory from "@/components/tradeHi";
-import CryptoNews from "@/components/CryptoNews"; // <- import the news component
 import { useCoinsData } from "@/hooks/useCoinData";
 import { ids } from "@/lib/ids";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronLeft } from "lucide-react";
+import { motion } from "framer-motion";
 
 const Page: React.FC<{ params: Promise<{ coin: string; symbol: string }> }> = ({
   params,
@@ -45,7 +45,6 @@ const Page: React.FC<{ params: Promise<{ coin: string; symbol: string }> }> = ({
     <div className="min-h-full bg-black text-white px-4 py-6 relative">
       {/* Main grid */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-[320px_1fr_320px] gap-6">
-        {/* Left: Coin info + executed trades */}
         <div className="space-y-6">
           <CoinInfo
             data={coinData}
@@ -54,14 +53,12 @@ const Page: React.FC<{ params: Promise<{ coin: string; symbol: string }> }> = ({
           <ExecutedTradesLog coinId={coinData.id} refreshKey={tradeRefreshKey} />
         </div>
 
-        {/* Center: Chart */}
         <div className="space-y-6">
           <CoinLineChart symbol={symbol} coinId={coinData.id} />
         </div>
 
-        {/* Right: Crypto news */}
         <div className="space-y-6">
-          <CryptoNews coinId={coinData.id} />
+          {/* placeholder for small side panel */}
         </div>
       </div>
 
