@@ -111,11 +111,14 @@ export const TradingInput: React.FC<TradingInputProps> = ({
   };
 
   useEffect(() => {
-    if (!isAuth) return;
+    if (isAuth !== true) return;
+  
     refreshData();
     const interval = setInterval(refreshData, 30000);
+  
     return () => clearInterval(interval);
   }, [isAuth]);
+  
 
   const amountNum = Number(amountInput);
   const fromPrice = prices[fromCoin];
