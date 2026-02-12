@@ -144,6 +144,15 @@ export async function POST(req: NextRequest) {
         },
       });
 
+      await tx.notification.create({
+        data: {
+          userId: session.user.id,
+          type: "USER_ACTION",
+          message: `Trade executed: ${fromCoin} → ${toCoin}`,
+          link: "/wallet",
+        },
+      });
+
       if (strategyId) {
         const strategy = await tx.strategy.findUnique({
           where: { id: strategyId },

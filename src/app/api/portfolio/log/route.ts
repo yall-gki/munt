@@ -44,11 +44,13 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Price fetch failed" }, { status: 500 });
   }
 
-  // ✅ Step 4: Iterate through users and upsert portfolio history
+  // ✅ Step 4: Iterate through users and upsert portfolio history + snapshots
   for (const user of users) {
     console.log(`➡️ User ${user.id}`);
 
     const balances = await db.balance.findMany({ where: { userId: user.id } });
+    const perCoinValue: Record<string, number> = {};
+    let portfolioValue = 0;
 
     for (const b of balances) {
       const price = allPrices[b.coinId] ?? 0;
@@ -59,6 +61,8 @@ export async function GET(req: NextRequest) {
       }
 
       const usdValue = b.amount * price;
+      perCoinValue[b.coinId] = usdValue;
+      portfolioValue += usdValue;
       console.log(`💵 ${b.coinId}: ${b.amount} × ${price} = ${usdValue}`);
 
       try {
@@ -81,6 +85,113 @@ export async function GET(req: NextRequest) {
         console.log(`✅ Upserted ${user.id} | ${b.coinId}`);
       } catch (upsertErr: any) {
         console.error("🔥 Upsert failed:", upsertErr.message || upsertErr);
+      }
+    }
+
+    const [latestSnapshot, realizedAgg] = await Promise.all([
+      db.snapshot.findFirst({
+        where: { userId: user.id },
+        orderBy: { date: "desc" },
+      }),
+      db.trade.aggregate({
+        where: {
+          userId: user.id,
+          closedAt: {
+            gte: today,
+            lt: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+          },
+        },
+        _sum: { profitLoss: true },
+      }),
+    ]);
+
+    const realizedPL = Number(realizedAgg._sum.profitLoss ?? 0);
+    const unrealizedPL = latestSnapshot
+      ? portfolioValue - latestSnapshot.portfolioValue
+      : 0;
+
+    try {
+      await db.snapshot.upsert({
+        where: {
+          userId_date: {
+            userId: user.id,
+            date: today,
+          },
+        },
+        update: {
+          portfolioValue,
+          perCoinValue,
+          realizedPL,
+          unrealizedPL,
+        },
+        create: {
+          userId: user.id,
+          date: today,
+          portfolioValue,
+          perCoinValue,
+          realizedPL,
+          unrealizedPL,
+        },
+      });
+      console.log(`📸 Snapshot saved for ${user.id}`);
+    } catch (snapshotErr: any) {
+      console.error("🔥 Snapshot upsert failed:", snapshotErr.message || snapshotErr);
+    }
+
+    // Alerts: daily ROI + rebalancing drift
+    if (latestSnapshot && latestSnapshot.portfolioValue > 0) {
+      const dailyRoi =
+        ((portfolioValue - latestSnapshot.portfolioValue) /
+          latestSnapshot.portfolioValue) *
+        100;
+      if (Math.abs(dailyRoi) >= 5) {
+        const exists = await db.notification.findFirst({
+          where: {
+            userId: user.id,
+            type: "ROI_ALERT",
+            createdAt: { gte: today },
+          },
+        });
+        if (!exists) {
+          await db.notification.create({
+            data: {
+              userId: user.id,
+              type: "ROI_ALERT",
+              message: `Daily ROI ${dailyRoi >= 0 ? "up" : "down"} ${dailyRoi.toFixed(
+                2
+              )}%`,
+              link: "/wallet",
+            },
+          });
+        }
+      }
+    }
+
+    const coinKeys = Object.keys(perCoinValue);
+    if (coinKeys.length > 1 && portfolioValue > 0) {
+      const target = 1 / coinKeys.length;
+      const maxDeviation = coinKeys.reduce((max, coinId) => {
+        const actual = perCoinValue[coinId] / portfolioValue;
+        return Math.max(max, Math.abs(actual - target));
+      }, 0);
+      if (maxDeviation >= 0.1) {
+        const exists = await db.notification.findFirst({
+          where: {
+            userId: user.id,
+            type: "REBALANCE_ALERT",
+            createdAt: { gte: today },
+          },
+        });
+        if (!exists) {
+          await db.notification.create({
+            data: {
+              userId: user.id,
+              type: "REBALANCE_ALERT",
+              message: "Portfolio drifted from target allocations. Consider rebalancing.",
+              link: "/wallet",
+            },
+          });
+        }
       }
     }
   }

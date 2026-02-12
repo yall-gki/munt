@@ -4,12 +4,11 @@ import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import Image from "next/image";
 import { ChevronDown, Wallet, Sparkles, Activity, Layers, Loader2 } from "lucide-react";
-import { Doughnut, Line, Bar } from "react-chartjs-2";
+import { Line, Bar } from "react-chartjs-2";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
   Chart as ChartJS,
-  ArcElement,
   BarElement,
   Tooltip,
   CategoryScale,
@@ -21,7 +20,6 @@ import {
 import ExecutedTradesLog from "@/components/ExecutedTradesLog";
 
 ChartJS.register(
-  ArcElement,
   BarElement,
   Tooltip,
   CategoryScale,
@@ -41,9 +39,26 @@ type CoinBalance = {
   percentage: number;
 };
 
-type HistoryPoint = {
+type Snapshot = {
+  id: string;
+  date: string;
+  portfolioValue: number;
+  perCoinValue: Record<string, number>;
+  realizedPL: number;
+  unrealizedPL: number;
+};
+
+type SnapshotSeriesPoint = {
   date: string;
   value: number;
+};
+
+type SnapshotSeries = {
+  portfolio: SnapshotSeriesPoint[];
+  dailyRoi: SnapshotSeriesPoint[];
+  weeklyRoi: SnapshotSeriesPoint[];
+  monthlyRoi: SnapshotSeriesPoint[];
+  cumulativeRoi: SnapshotSeriesPoint[];
 };
 
 type WalletData = {
@@ -87,23 +102,46 @@ const chartPalette = [
   "#94A3B8",
 ];
 
-const chartAccent = "#38BDF8";
-const chartAccentFill = "rgba(56, 189, 248, 0.18)";
 const chartBorderColor = "rgba(15, 23, 42, 0.8)";
 const chartGridColor = "rgba(148, 163, 184, 0.12)";
 const chartTickColor = "#94A3B8";
 
-const chartModes = ["Doughnut", "Line", "Area"] as const;
-type ChartMode = (typeof chartModes)[number];
+type CategoryKey =
+  | "roi"
+  | "pnl"
+  | "rebalancing"
+  | "dca"
+  | "staking"
+  | "whatif";
 
 export default function Page() {
   const router = useRouter();
   const [data, setData] = useState<WalletData | null>(null);
   const [collapsed, setCollapsed] = useState(true);
   const [isSmallScreen, setIsSmallScreen] = useState(false);
-  const [mode, setMode] = useState<ChartMode>("Doughnut");
-  const [selectedCoin, setSelectedCoin] = useState<string>("");
-  const [history, setHistory] = useState<HistoryPoint[]>([]);
+  const [activeCategory, setActiveCategory] = useState<CategoryKey>("roi");
+  const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
+  const [snapshotSeries, setSnapshotSeries] = useState<SnapshotSeries | null>(
+    null
+  );
+  const [snapshotLoading, setSnapshotLoading] = useState(true);
+  const [dcaCoinId, setDcaCoinId] = useState("");
+  const [dcaAmount, setDcaAmount] = useState(50);
+  const [dcaInterval, setDcaInterval] = useState(7);
+  const [dcaDays, setDcaDays] = useState(90);
+  const [dcaPriceSeries, setDcaPriceSeries] = useState<
+    { time: number; close: number }[]
+  >([]);
+  const [dcaLoading, setDcaLoading] = useState(false);
+  const [whatIfCoinId, setWhatIfCoinId] = useState("");
+  const [whatIfInitial, setWhatIfInitial] = useState(1000);
+  const [whatIfDays, setWhatIfDays] = useState(180);
+  const [whatIfPriceSeries, setWhatIfPriceSeries] = useState<
+    { time: number; close: number }[]
+  >([]);
+  const [whatIfLoading, setWhatIfLoading] = useState(false);
+  const [stakingApr, setStakingApr] = useState(6);
+  const [stakingDays, setStakingDays] = useState(180);
   const [isGenerating, setIsGenerating] = useState(false);
   const [strategyPerformance, setStrategyPerformance] = useState<StrategyPerformance[]>([]);
   const [strategyTrades, setStrategyTrades] = useState<StrategyTrade[]>([]);
@@ -146,7 +184,9 @@ export default function Page() {
       setData(res.data);
 
       if (res.data.breakdown.length) {
-        setSelectedCoin(res.data.breakdown[0].id);
+        const first = res.data.breakdown[0].id;
+        setDcaCoinId((prev) => (prev ? prev : first));
+        setWhatIfCoinId((prev) => (prev ? prev : first));
       }
     } catch (error) {
       console.error("Failed to generate balances", error);
@@ -161,11 +201,6 @@ export default function Page() {
     maximumFractionDigits: 2,
   });
 
-  const gainLoss =
-    history?.length >= 2
-      ? ((history.at(-1)!.value - history[0].value) / history[0].value) * 100
-      : 0;
-
   useEffect(() => {
     if (isAuthorized !== true) return;
     axios
@@ -176,7 +211,9 @@ export default function Page() {
         console.log(res.data);
 
         if (res.data.breakdown.length) {
-          setSelectedCoin(res.data.breakdown[0].id);
+          const first = res.data.breakdown[0].id;
+          setDcaCoinId((prev) => (prev ? prev : first));
+          setWhatIfCoinId((prev) => (prev ? prev : first));
         }
       })
       .catch((error) => {
@@ -207,11 +244,24 @@ export default function Page() {
   }, [isAuthorized]);
 
   useEffect(() => {
-    if (isAuthorized !== true || !selectedCoin) return;
-    axios
-      .get(`/api/portfolio/history/${selectedCoin}`)
-      .then((res) => setHistory(res.data));
-  }, [isAuthorized, selectedCoin]);
+    if (isAuthorized !== true) return;
+    const fetchSnapshots = async () => {
+      setSnapshotLoading(true);
+      try {
+        const res = await axios.get("/api/snapshots?limit=120");
+        setSnapshots(res.data?.snapshots ?? []);
+        setSnapshotSeries(res.data?.series ?? null);
+      } catch (error) {
+        console.error("Failed to load snapshots", error);
+        setSnapshots([]);
+        setSnapshotSeries(null);
+      } finally {
+        setSnapshotLoading(false);
+      }
+    };
+    fetchSnapshots();
+  }, [isAuthorized]);
+
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)");
@@ -225,45 +275,254 @@ export default function Page() {
   const chartColorsUsed = coins.map(
     (_coin, index) => chartPalette[index % chartPalette.length]
   );
-  const usdValues = coins.map((c) => c.usdValue || 0);
   const coinLabels = coins.map((c) => c.symbol.toUpperCase());
-  const allZero = usdValues.every((v) => v === 0);
-  const displayValues = allZero
-    ? usdValues.map((v, i) => (i === 0 ? 0.00001 : 0))
-    : usdValues;
 
-  const doughnutData = {
-    labels: coinLabels,
-    datasets: [
-      {
-        data: displayValues,
-        backgroundColor: chartColorsUsed,
-        borderWidth: 3,
-        borderColor: chartBorderColor,
-        hoverBorderColor: chartAccent,
-        hoverOffset: 12,
-        spacing: 2,
-      },
-    ],
-  };
+  const latestSnapshot = snapshots[snapshots.length - 1] ?? null;
+  const prevSnapshot =
+    snapshots.length > 1 ? snapshots[snapshots.length - 2] : null;
 
-  const lineData = {
-    labels: history.map((h) => new Date(h.date).toLocaleDateString("en-US")),
-    datasets: [
-      {
-        data: history.map((h) => h.value),
-        backgroundColor:
-          mode === "Area" ? chartAccentFill : "transparent",
-        borderColor: chartAccent,
-        pointBackgroundColor: chartAccent,
-        pointRadius: 2,
-        pointHoverRadius: 4,
-        borderWidth: 2,
-        tension: 0.4,
-        fill: mode === "Area",
-      },
-    ],
-  };
+  useEffect(() => {
+    if (!dcaCoinId && coins.length > 0) {
+      setDcaCoinId(coins[0].id);
+    }
+    if (!whatIfCoinId && coins.length > 0) {
+      setWhatIfCoinId(coins[0].id);
+    }
+  }, [coins, dcaCoinId, whatIfCoinId]);
+
+  useEffect(() => {
+    if (!dcaCoinId) return;
+    const coin = coins.find((c) => c.id === dcaCoinId);
+    if (!coin) return;
+    const fetchDca = async () => {
+      setDcaLoading(true);
+      try {
+        const res = await axios.get(
+          `/api/coins/chartdata?id=${dcaCoinId}&symbol=${coin.symbol}&interval=1d&days=${dcaDays}`
+        );
+        setDcaPriceSeries(res.data ?? []);
+      } catch (error) {
+        console.error("Failed to load DCA chart data", error);
+        setDcaPriceSeries([]);
+      } finally {
+        setDcaLoading(false);
+      }
+    };
+    fetchDca();
+  }, [dcaCoinId, dcaDays, coins]);
+
+  useEffect(() => {
+    if (!whatIfCoinId) return;
+    const coin = coins.find((c) => c.id === whatIfCoinId);
+    if (!coin) return;
+    const fetchWhatIf = async () => {
+      setWhatIfLoading(true);
+      try {
+        const res = await axios.get(
+          `/api/coins/chartdata?id=${whatIfCoinId}&symbol=${coin.symbol}&interval=1d&days=${whatIfDays}`
+        );
+        setWhatIfPriceSeries(res.data ?? []);
+      } catch (error) {
+        console.error("Failed to load simulation chart data", error);
+        setWhatIfPriceSeries([]);
+      } finally {
+        setWhatIfLoading(false);
+      }
+    };
+    fetchWhatIf();
+  }, [whatIfCoinId, whatIfDays, coins]);
+
+  const roiData = useMemo(() => {
+    if (!snapshotSeries) return null;
+    const labels = snapshotSeries.dailyRoi.map((point) =>
+      new Date(point.date).toLocaleDateString("en-US")
+    );
+    return {
+      labels,
+      datasets: [
+        {
+          label: "Daily",
+          data: snapshotSeries.dailyRoi.map((p) => p.value),
+          borderColor: "#38BDF8",
+          backgroundColor: "rgba(56, 189, 248, 0.1)",
+          borderWidth: 2,
+          tension: 0.35,
+          pointRadius: 0,
+        },
+        {
+          label: "Weekly",
+          data: snapshotSeries.weeklyRoi.map((p) => p.value),
+          borderColor: "#A78BFA",
+          backgroundColor: "rgba(167, 139, 250, 0.08)",
+          borderWidth: 2,
+          tension: 0.35,
+          pointRadius: 0,
+        },
+        {
+          label: "Monthly",
+          data: snapshotSeries.monthlyRoi.map((p) => p.value),
+          borderColor: "#34D399",
+          backgroundColor: "rgba(52, 211, 153, 0.08)",
+          borderWidth: 2,
+          tension: 0.35,
+          pointRadius: 0,
+        },
+        {
+          label: "Cumulative",
+          data: snapshotSeries.cumulativeRoi.map((p) => p.value),
+          borderColor: "#FBBF24",
+          backgroundColor: "rgba(251, 191, 36, 0.08)",
+          borderWidth: 2,
+          tension: 0.35,
+          pointRadius: 0,
+        },
+      ],
+    };
+  }, [snapshotSeries]);
+
+  const pnlData = useMemo(() => {
+    const latest = latestSnapshot?.perCoinValue ?? {};
+    const previous = prevSnapshot?.perCoinValue ?? {};
+    const deltas = coins.map(
+      (coin) => (latest[coin.id] ?? 0) - (previous[coin.id] ?? 0)
+    );
+    const colors = deltas.map((v) =>
+      v >= 0 ? "rgba(34, 211, 153, 0.7)" : "rgba(248, 113, 113, 0.7)"
+    );
+    return {
+      labels: coinLabels,
+      datasets: [
+        {
+          label: "Daily P/L",
+          data: deltas,
+          backgroundColor: colors,
+          borderRadius: 6,
+        },
+      ],
+    };
+  }, [coins, coinLabels, latestSnapshot, prevSnapshot]);
+
+  const rebalanceData = useMemo(() => {
+    const total = latestSnapshot?.portfolioValue ?? 0;
+    const actual = coins.map((coin) =>
+      total > 0 ? ((latestSnapshot?.perCoinValue?.[coin.id] ?? 0) / total) * 100 : 0
+    );
+    const target = coins.length > 0 ? 100 / coins.length : 0;
+    return {
+      labels: coinLabels,
+      datasets: [
+        {
+          label: "Actual %",
+          data: actual,
+          backgroundColor: "rgba(56, 189, 248, 0.6)",
+          borderRadius: 6,
+        },
+        {
+          label: "Target %",
+          data: coins.map(() => target),
+          backgroundColor: "rgba(148, 163, 184, 0.4)",
+          borderRadius: 6,
+        },
+      ],
+    };
+  }, [coins, coinLabels, latestSnapshot]);
+
+  const dcaChartData = useMemo(() => {
+    if (dcaPriceSeries.length === 0) return null;
+    let totalCoins = 0;
+    let invested = 0;
+    const interval = Math.max(1, dcaInterval);
+    const series = dcaPriceSeries.map((point, idx) => {
+      if (idx % interval === 0) {
+        invested += dcaAmount;
+        totalCoins += dcaAmount / point.close;
+      }
+      return {
+        date: new Date(point.time * 1000).toISOString(),
+        value: totalCoins * point.close,
+        invested,
+      };
+    });
+    return {
+      labels: series.map((p) => new Date(p.date).toLocaleDateString("en-US")),
+      datasets: [
+        {
+          label: "Portfolio Value",
+          data: series.map((p) => p.value),
+          borderColor: "#38BDF8",
+          backgroundColor: "rgba(56, 189, 248, 0.1)",
+          borderWidth: 2,
+          tension: 0.35,
+          pointRadius: 0,
+        },
+        {
+          label: "Invested",
+          data: series.map((p) => p.invested),
+          borderColor: "#94A3B8",
+          backgroundColor: "rgba(148, 163, 184, 0.08)",
+          borderWidth: 2,
+          tension: 0.35,
+          pointRadius: 0,
+        },
+      ],
+    };
+  }, [dcaPriceSeries, dcaAmount, dcaInterval]);
+
+  const whatIfChartData = useMemo(() => {
+    if (whatIfPriceSeries.length === 0) return null;
+    const initialPrice = whatIfPriceSeries[0]?.close ?? 0;
+    if (!initialPrice) return null;
+    const coinsBought = whatIfInitial / initialPrice;
+    const series = whatIfPriceSeries.map((point) => ({
+      date: new Date(point.time * 1000).toISOString(),
+      value: coinsBought * point.close,
+    }));
+    return {
+      labels: series.map((p) => new Date(p.date).toLocaleDateString("en-US")),
+      datasets: [
+        {
+          label: "Simulated Value",
+          data: series.map((p) => p.value),
+          borderColor: "#F472B6",
+          backgroundColor: "rgba(244, 114, 182, 0.12)",
+          borderWidth: 2,
+          tension: 0.35,
+          pointRadius: 0,
+        },
+      ],
+    };
+  }, [whatIfPriceSeries, whatIfInitial]);
+
+  const stakingSeries = useMemo(() => {
+    const base = latestSnapshot?.portfolioValue ?? 0;
+    if (!base || stakingDays <= 0) return [];
+    const dailyRate = stakingApr / 100 / 365;
+    let value = base;
+    return Array.from({ length: stakingDays }, (_, idx) => {
+      value = value * (1 + dailyRate);
+      const date = new Date();
+      date.setDate(date.getDate() + idx);
+      return { date: date.toISOString(), value };
+    });
+  }, [latestSnapshot, stakingApr, stakingDays]);
+
+  const stakingChartData = useMemo(() => {
+    if (stakingSeries.length === 0) return null;
+    return {
+      labels: stakingSeries.map((p) => new Date(p.date).toLocaleDateString("en-US")),
+      datasets: [
+        {
+          label: "Projected Value",
+          data: stakingSeries.map((p) => p.value),
+          borderColor: "#22D3EE",
+          backgroundColor: "rgba(34, 211, 238, 0.12)",
+          borderWidth: 2,
+          tension: 0.35,
+          pointRadius: 0,
+        },
+      ],
+    };
+  }, [stakingSeries]);
 
   const barData = {
     labels: coinLabels,
@@ -290,6 +549,265 @@ export default function Page() {
     }
     return map;
   }, [strategyTrades]);
+
+  const categories = [
+    { key: "roi", label: "ROI Charts", description: "Daily, weekly, monthly, cumulative" },
+    { key: "pnl", label: "P/L Breakdown", description: "Per-coin daily profit & loss" },
+    { key: "rebalancing", label: "Rebalancing", description: "Actual vs target allocations" },
+    { key: "dca", label: "DCA Simulation", description: "Recurring buys over time" },
+    { key: "staking", label: "Staking/Yield", description: "Yield projection on holdings" },
+    { key: "whatif", label: "What-if Simulation", description: "Historical single-buy scenario" },
+  ] as const;
+
+  const chartLineOptions = {
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true, labels: { color: chartTickColor } },
+      tooltip: {
+        callbacks: {
+          label: (ctx: any) => `${ctx.dataset.label}: ${ctx.raw.toFixed(2)}%`,
+        },
+      },
+    },
+    scales: {
+      x: { ticks: { color: chartTickColor }, grid: { color: chartGridColor } },
+      y: { ticks: { color: chartTickColor }, grid: { color: chartGridColor } },
+    },
+  };
+
+  const chartValueOptions = {
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true, labels: { color: chartTickColor } },
+      tooltip: {
+        callbacks: {
+          label: (ctx: any) => currencyFormatter.format(ctx.raw as number),
+        },
+      },
+    },
+    scales: {
+      x: { ticks: { color: chartTickColor }, grid: { color: chartGridColor } },
+      y: { ticks: { color: chartTickColor }, grid: { color: chartGridColor } },
+    },
+  };
+
+  const chartPercentOptions = {
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true, labels: { color: chartTickColor } },
+      tooltip: {
+        callbacks: {
+          label: (ctx: any) => `${ctx.raw.toFixed(2)}%`,
+        },
+      },
+    },
+    scales: {
+      x: { ticks: { color: chartTickColor }, grid: { color: chartGridColor } },
+      y: { ticks: { color: chartTickColor }, grid: { color: chartGridColor } },
+    },
+  };
+
+  const categoryViews: Record<CategoryKey, JSX.Element> = {
+    roi: (
+      <div className="h-full">
+        {snapshotLoading ? (
+          <div className="h-full flex items-center justify-center text-sm text-zinc-400">
+            Loading ROI data...
+          </div>
+        ) : !roiData ? (
+          <div className="h-full flex items-center justify-center text-sm text-zinc-400">
+            No ROI data available.
+          </div>
+        ) : (
+          <Line data={roiData} options={chartLineOptions} />
+        )}
+      </div>
+    ),
+    pnl: (
+      <div className="h-full">
+        <Bar data={pnlData} options={chartValueOptions} />
+      </div>
+    ),
+    rebalancing: (
+      <div className="h-full space-y-3">
+        <div className="text-xs text-zinc-400">
+          Targets default to equal weight. Adjust in strategy settings for custom
+          allocations.
+        </div>
+        <div className="h-[260px]">
+          <Bar data={rebalanceData} options={chartPercentOptions} />
+        </div>
+      </div>
+    ),
+    dca: (
+      <div className="h-full space-y-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+          <div className="space-y-1">
+            <label className="text-zinc-400">Coin</label>
+            <select
+              value={dcaCoinId}
+              onChange={(e) => setDcaCoinId(e.target.value)}
+              className="w-full bg-zinc-900 border border-zinc-700 rounded-md px-2 py-1"
+            >
+              {coins.map((coin) => (
+                <option key={coin.id} value={coin.id}>
+                  {coin.symbol.toUpperCase()}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-1">
+            <label className="text-zinc-400">Amount (USD)</label>
+            <input
+              type="number"
+              min="1"
+              value={dcaAmount}
+              onChange={(e) => setDcaAmount(Number(e.target.value))}
+              className="w-full bg-zinc-900 border border-zinc-700 rounded-md px-2 py-1"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-zinc-400">Interval (days)</label>
+            <input
+              type="number"
+              min="1"
+              value={dcaInterval}
+              onChange={(e) => setDcaInterval(Number(e.target.value))}
+              className="w-full bg-zinc-900 border border-zinc-700 rounded-md px-2 py-1"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-zinc-400">Lookback (days)</label>
+            <input
+              type="number"
+              min="7"
+              value={dcaDays}
+              onChange={(e) => setDcaDays(Number(e.target.value))}
+              className="w-full bg-zinc-900 border border-zinc-700 rounded-md px-2 py-1"
+            />
+          </div>
+        </div>
+        <div className="h-[260px]">
+          {dcaLoading ? (
+            <div className="h-full flex items-center justify-center text-sm text-zinc-400">
+              Loading DCA simulation...
+            </div>
+          ) : !dcaChartData ? (
+            <div className="h-full flex items-center justify-center text-sm text-zinc-400">
+              DCA data not available.
+            </div>
+          ) : (
+            <Line data={dcaChartData} options={chartValueOptions} />
+          )}
+        </div>
+      </div>
+    ),
+    staking: (
+      <div className="h-full space-y-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-xs">
+          <div className="space-y-1">
+            <label className="text-zinc-400">APR (%)</label>
+            <input
+              type="number"
+              min="0"
+              step="0.1"
+              value={stakingApr}
+              onChange={(e) => setStakingApr(Number(e.target.value))}
+              className="w-full bg-zinc-900 border border-zinc-700 rounded-md px-2 py-1"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-zinc-400">Projection (days)</label>
+            <input
+              type="number"
+              min="30"
+              value={stakingDays}
+              onChange={(e) => setStakingDays(Number(e.target.value))}
+              className="w-full bg-zinc-900 border border-zinc-700 rounded-md px-2 py-1"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-zinc-400">Base Value</label>
+            <div className="px-2 py-1 rounded-md bg-zinc-900 border border-zinc-700">
+              {currencyFormatter.format(latestSnapshot?.portfolioValue || 0)}
+            </div>
+          </div>
+        </div>
+        <div className="h-[260px]">
+          {!stakingChartData ? (
+            <div className="h-full flex items-center justify-center text-sm text-zinc-400">
+              Staking projection unavailable.
+            </div>
+          ) : (
+            <Line data={stakingChartData} options={chartValueOptions} />
+          )}
+        </div>
+      </div>
+    ),
+    whatif: (
+      <div className="h-full space-y-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+          <div className="space-y-1">
+            <label className="text-zinc-400">Coin</label>
+            <select
+              value={whatIfCoinId}
+              onChange={(e) => setWhatIfCoinId(e.target.value)}
+              className="w-full bg-zinc-900 border border-zinc-700 rounded-md px-2 py-1"
+            >
+              {coins.map((coin) => (
+                <option key={coin.id} value={coin.id}>
+                  {coin.symbol.toUpperCase()}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-1">
+            <label className="text-zinc-400">Initial (USD)</label>
+            <input
+              type="number"
+              min="1"
+              value={whatIfInitial}
+              onChange={(e) => setWhatIfInitial(Number(e.target.value))}
+              className="w-full bg-zinc-900 border border-zinc-700 rounded-md px-2 py-1"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-zinc-400">Lookback (days)</label>
+            <input
+              type="number"
+              min="30"
+              value={whatIfDays}
+              onChange={(e) => setWhatIfDays(Number(e.target.value))}
+              className="w-full bg-zinc-900 border border-zinc-700 rounded-md px-2 py-1"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-zinc-400">Current Value</label>
+            <div className="px-2 py-1 rounded-md bg-zinc-900 border border-zinc-700">
+              {whatIfChartData?.datasets?.[0]?.data?.length
+                ? currencyFormatter.format(
+                    whatIfChartData.datasets[0].data.slice(-1)[0] as number
+                  )
+                : "--"}
+            </div>
+          </div>
+        </div>
+        <div className="h-[260px]">
+          {whatIfLoading ? (
+            <div className="h-full flex items-center justify-center text-sm text-zinc-400">
+              Loading simulation...
+            </div>
+          ) : !whatIfChartData ? (
+            <div className="h-full flex items-center justify-center text-sm text-zinc-400">
+              Simulation data unavailable.
+            </div>
+          ) : (
+            <Line data={whatIfChartData} options={chartValueOptions} />
+          )}
+        </div>
+      </div>
+    ),
+  };
 
   if (isAuthorized !== true || !data) {
     return (
@@ -363,108 +881,47 @@ export default function Page() {
               </div>
             </div>
 
-            <div className="w-full flex flex-wrap gap-3 items-center">
-              {chartModes.map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setMode(m)}
-                  className={`px-3 py-1 text-sm font-medium rounded-full transition ${
-                    mode === m
-                      ? "bg-blue-500 text-black shadow-[0_0_12px_rgba(59,130,246,0.45)]"
-                      : "bg-zinc-800 hover:bg-zinc-700"
-                  }`}
-                >
-                  {m}
-                </button>
-              ))}
-              {(mode === "Line" || mode === "Area") && (
-                <select
-                  value={selectedCoin}
-                  onChange={(e) => setSelectedCoin(e.target.value)}
-                  className="px-3 py-1 bg-zinc-800 rounded-lg text-white"
-                >
-                  {coins.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.symbol.toUpperCase()}
-                    </option>
-                  ))}
-                </select>
-              )}
-              {history.length > 1 && (mode === "Line" || mode === "Area") && (
-                <span
-                  className={`text-sm ml-auto font-semibold ${
-                    gainLoss >= 0 ? "text-blue-300" : "text-rose-300"
-                  }`}
-                >
-                  {gainLoss >= 0 ? "+" : ""}
-                  {gainLoss.toFixed(2)}%
-                </span>
-              )}
-            </div>
+            <div className="w-full space-y-4">
+              <div className="flex gap-2 overflow-x-auto pb-2 snap-x snap-mandatory">
+                {categories.map((cat) => (
+                  <button
+                    key={cat.key}
+                    onClick={() => setActiveCategory(cat.key)}
+                    className={`snap-start px-3 py-1 text-sm font-medium rounded-full transition whitespace-nowrap ${
+                      activeCategory === cat.key
+                        ? "bg-blue-500 text-black shadow-[0_0_12px_rgba(59,130,246,0.45)]"
+                        : "bg-zinc-800 hover:bg-zinc-700 text-zinc-200"
+                    }`}
+                  >
+                    {cat.label}
+                  </button>
+                ))}
+              </div>
 
-            <div className="relative w-full md:max-w-2xl h-[300px] mt-12 drop-shadow-[0_0_28px_rgba(56,189,248,0.35)]">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={mode + selectedCoin}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="h-full w-full"
-                >
-                  {mode === "Doughnut" ? (
-                    <Doughnut
-                      data={doughnutData}
-                      options={{
-                        maintainAspectRatio: false,
-                        cutout: "70%",
-                        plugins: {
-                          legend: { display: false },
-                          tooltip: {
-                            enabled: !allZero,
-                            callbacks: {
-                              label: (ctx) =>
-                                currencyFormatter.format(ctx.raw as number),
-                            },
-                          },
-                        },
-                        elements: {
-                          arc: {
-                            borderWidth: 2,
-                            borderColor: chartBorderColor,
-                          },
-                        },
-                      }}
-                    />
-                  ) : (
-                    <Line
-                      data={lineData}
-                      options={{
-                        maintainAspectRatio: false,
-                        plugins: {
-                          legend: { display: false },
-                          tooltip: {
-                            callbacks: {
-                              label: (ctx) =>
-                                currencyFormatter.format(ctx.raw as number),
-                            },
-                          },
-                        },
-                        scales: {
-                          x: {
-                            ticks: { color: chartTickColor },
-                            grid: { color: chartGridColor },
-                          },
-                          y: {
-                            ticks: { color: chartTickColor },
-                            grid: { color: chartGridColor },
-                          },
-                        },
-                      }}
-                    />
-                  )}
-                </motion.div>
-              </AnimatePresence>
+              <div className="w-full rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
+                <div className="mb-3">
+                  <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">
+                    {categories.find((c) => c.key === activeCategory)?.label}
+                  </p>
+                  <p className="text-sm text-zinc-400">
+                    {categories.find((c) => c.key === activeCategory)?.description}
+                  </p>
+                </div>
+                <div className="relative h-[320px]">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeCategory}
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -12 }}
+                      transition={{ duration: 0.25 }}
+                      className="h-full w-full"
+                    >
+                      {categoryViews[activeCategory]}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              </div>
             </div>
           </div>
         </div>

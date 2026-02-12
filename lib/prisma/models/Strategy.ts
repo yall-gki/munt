@@ -54,6 +54,7 @@ export type StrategyCountAggregateOutputType = {
   name: number
   type: number
   settings: number
+  parameters: number
   coinId: number
   timeframe: number
   isActive: number
@@ -93,6 +94,7 @@ export type StrategyCountAggregateInputType = {
   name?: true
   type?: true
   settings?: true
+  parameters?: true
   coinId?: true
   timeframe?: true
   isActive?: true
@@ -179,6 +181,7 @@ export type StrategyGroupByOutputType = {
   name: string
   type: $Enums.StrategyType
   settings: runtime.JsonValue
+  parameters: runtime.JsonValue | null
   coinId: string | null
   timeframe: string | null
   isActive: boolean
@@ -213,6 +216,7 @@ export type StrategyWhereInput = {
   name?: Prisma.StringFilter<"Strategy"> | string
   type?: Prisma.EnumStrategyTypeFilter<"Strategy"> | $Enums.StrategyType
   settings?: Prisma.JsonFilter<"Strategy">
+  parameters?: Prisma.JsonNullableFilter<"Strategy">
   coinId?: Prisma.StringNullableFilter<"Strategy"> | string | null
   timeframe?: Prisma.StringNullableFilter<"Strategy"> | string | null
   isActive?: Prisma.BoolFilter<"Strategy"> | boolean
@@ -230,6 +234,7 @@ export type StrategyOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   settings?: Prisma.SortOrder
+  parameters?: Prisma.SortOrderInput | Prisma.SortOrder
   coinId?: Prisma.SortOrderInput | Prisma.SortOrder
   timeframe?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
@@ -250,6 +255,7 @@ export type StrategyWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Strategy"> | string
   type?: Prisma.EnumStrategyTypeFilter<"Strategy"> | $Enums.StrategyType
   settings?: Prisma.JsonFilter<"Strategy">
+  parameters?: Prisma.JsonNullableFilter<"Strategy">
   coinId?: Prisma.StringNullableFilter<"Strategy"> | string | null
   timeframe?: Prisma.StringNullableFilter<"Strategy"> | string | null
   isActive?: Prisma.BoolFilter<"Strategy"> | boolean
@@ -267,6 +273,7 @@ export type StrategyOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   settings?: Prisma.SortOrder
+  parameters?: Prisma.SortOrderInput | Prisma.SortOrder
   coinId?: Prisma.SortOrderInput | Prisma.SortOrder
   timeframe?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
@@ -286,6 +293,7 @@ export type StrategyScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Strategy"> | string
   type?: Prisma.EnumStrategyTypeWithAggregatesFilter<"Strategy"> | $Enums.StrategyType
   settings?: Prisma.JsonWithAggregatesFilter<"Strategy">
+  parameters?: Prisma.JsonNullableWithAggregatesFilter<"Strategy">
   coinId?: Prisma.StringNullableWithAggregatesFilter<"Strategy"> | string | null
   timeframe?: Prisma.StringNullableWithAggregatesFilter<"Strategy"> | string | null
   isActive?: Prisma.BoolWithAggregatesFilter<"Strategy"> | boolean
@@ -298,6 +306,7 @@ export type StrategyCreateInput = {
   name: string
   type: $Enums.StrategyType
   settings: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   timeframe?: string | null
   isActive?: boolean
   createdAt?: Date | string
@@ -314,6 +323,7 @@ export type StrategyUncheckedCreateInput = {
   name: string
   type: $Enums.StrategyType
   settings: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coinId?: string | null
   timeframe?: string | null
   isActive?: boolean
@@ -328,6 +338,7 @@ export type StrategyUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStrategyTypeFieldUpdateOperationsInput | $Enums.StrategyType
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   timeframe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -344,6 +355,7 @@ export type StrategyUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStrategyTypeFieldUpdateOperationsInput | $Enums.StrategyType
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coinId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeframe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -359,6 +371,7 @@ export type StrategyCreateManyInput = {
   name: string
   type: $Enums.StrategyType
   settings: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coinId?: string | null
   timeframe?: string | null
   isActive?: boolean
@@ -371,6 +384,7 @@ export type StrategyUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStrategyTypeFieldUpdateOperationsInput | $Enums.StrategyType
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   timeframe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -383,6 +397,7 @@ export type StrategyUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStrategyTypeFieldUpdateOperationsInput | $Enums.StrategyType
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coinId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeframe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -406,6 +421,7 @@ export type StrategyCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   type?: Prisma.SortOrder
   settings?: Prisma.SortOrder
+  parameters?: Prisma.SortOrder
   coinId?: Prisma.SortOrder
   timeframe?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
@@ -574,6 +590,7 @@ export type StrategyCreateWithoutUserInput = {
   name: string
   type: $Enums.StrategyType
   settings: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   timeframe?: string | null
   isActive?: boolean
   createdAt?: Date | string
@@ -588,6 +605,7 @@ export type StrategyUncheckedCreateWithoutUserInput = {
   name: string
   type: $Enums.StrategyType
   settings: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coinId?: string | null
   timeframe?: string | null
   isActive?: boolean
@@ -632,6 +650,7 @@ export type StrategyScalarWhereInput = {
   name?: Prisma.StringFilter<"Strategy"> | string
   type?: Prisma.EnumStrategyTypeFilter<"Strategy"> | $Enums.StrategyType
   settings?: Prisma.JsonFilter<"Strategy">
+  parameters?: Prisma.JsonNullableFilter<"Strategy">
   coinId?: Prisma.StringNullableFilter<"Strategy"> | string | null
   timeframe?: Prisma.StringNullableFilter<"Strategy"> | string | null
   isActive?: Prisma.BoolFilter<"Strategy"> | boolean
@@ -644,6 +663,7 @@ export type StrategyCreateWithoutTradesInput = {
   name: string
   type: $Enums.StrategyType
   settings: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   timeframe?: string | null
   isActive?: boolean
   createdAt?: Date | string
@@ -659,6 +679,7 @@ export type StrategyUncheckedCreateWithoutTradesInput = {
   name: string
   type: $Enums.StrategyType
   settings: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coinId?: string | null
   timeframe?: string | null
   isActive?: boolean
@@ -688,6 +709,7 @@ export type StrategyUpdateWithoutTradesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStrategyTypeFieldUpdateOperationsInput | $Enums.StrategyType
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   timeframe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -703,6 +725,7 @@ export type StrategyUncheckedUpdateWithoutTradesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStrategyTypeFieldUpdateOperationsInput | $Enums.StrategyType
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coinId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeframe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -716,6 +739,7 @@ export type StrategyCreateWithoutBacktestsInput = {
   name: string
   type: $Enums.StrategyType
   settings: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   timeframe?: string | null
   isActive?: boolean
   createdAt?: Date | string
@@ -731,6 +755,7 @@ export type StrategyUncheckedCreateWithoutBacktestsInput = {
   name: string
   type: $Enums.StrategyType
   settings: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coinId?: string | null
   timeframe?: string | null
   isActive?: boolean
@@ -760,6 +785,7 @@ export type StrategyUpdateWithoutBacktestsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStrategyTypeFieldUpdateOperationsInput | $Enums.StrategyType
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   timeframe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -775,6 +801,7 @@ export type StrategyUncheckedUpdateWithoutBacktestsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStrategyTypeFieldUpdateOperationsInput | $Enums.StrategyType
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coinId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeframe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -788,6 +815,7 @@ export type StrategyCreateWithoutCoinInput = {
   name: string
   type: $Enums.StrategyType
   settings: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   timeframe?: string | null
   isActive?: boolean
   createdAt?: Date | string
@@ -803,6 +831,7 @@ export type StrategyUncheckedCreateWithoutCoinInput = {
   name: string
   type: $Enums.StrategyType
   settings: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   timeframe?: string | null
   isActive?: boolean
   createdAt?: Date | string
@@ -842,6 +871,7 @@ export type StrategyCreateManyUserInput = {
   name: string
   type: $Enums.StrategyType
   settings: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coinId?: string | null
   timeframe?: string | null
   isActive?: boolean
@@ -854,6 +884,7 @@ export type StrategyUpdateWithoutUserInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStrategyTypeFieldUpdateOperationsInput | $Enums.StrategyType
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   timeframe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -868,6 +899,7 @@ export type StrategyUncheckedUpdateWithoutUserInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStrategyTypeFieldUpdateOperationsInput | $Enums.StrategyType
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coinId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeframe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -882,6 +914,7 @@ export type StrategyUncheckedUpdateManyWithoutUserInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStrategyTypeFieldUpdateOperationsInput | $Enums.StrategyType
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   coinId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   timeframe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -895,6 +928,7 @@ export type StrategyCreateManyCoinInput = {
   name: string
   type: $Enums.StrategyType
   settings: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   timeframe?: string | null
   isActive?: boolean
   createdAt?: Date | string
@@ -906,6 +940,7 @@ export type StrategyUpdateWithoutCoinInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStrategyTypeFieldUpdateOperationsInput | $Enums.StrategyType
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   timeframe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -921,6 +956,7 @@ export type StrategyUncheckedUpdateWithoutCoinInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStrategyTypeFieldUpdateOperationsInput | $Enums.StrategyType
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   timeframe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -935,6 +971,7 @@ export type StrategyUncheckedUpdateManyWithoutCoinInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   type?: Prisma.EnumStrategyTypeFieldUpdateOperationsInput | $Enums.StrategyType
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  parameters?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   timeframe?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -987,6 +1024,7 @@ export type StrategySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   name?: boolean
   type?: boolean
   settings?: boolean
+  parameters?: boolean
   coinId?: boolean
   timeframe?: boolean
   isActive?: boolean
@@ -1005,6 +1043,7 @@ export type StrategySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   name?: boolean
   type?: boolean
   settings?: boolean
+  parameters?: boolean
   coinId?: boolean
   timeframe?: boolean
   isActive?: boolean
@@ -1020,6 +1059,7 @@ export type StrategySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   name?: boolean
   type?: boolean
   settings?: boolean
+  parameters?: boolean
   coinId?: boolean
   timeframe?: boolean
   isActive?: boolean
@@ -1035,6 +1075,7 @@ export type StrategySelectScalar = {
   name?: boolean
   type?: boolean
   settings?: boolean
+  parameters?: boolean
   coinId?: boolean
   timeframe?: boolean
   isActive?: boolean
@@ -1042,7 +1083,7 @@ export type StrategySelectScalar = {
   updatedAt?: boolean
 }
 
-export type StrategyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "name" | "type" | "settings" | "coinId" | "timeframe" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["strategy"]>
+export type StrategyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "name" | "type" | "settings" | "parameters" | "coinId" | "timeframe" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["strategy"]>
 export type StrategyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   backtests?: boolean | Prisma.Strategy$backtestsArgs<ExtArgs>
   coin?: boolean | Prisma.Strategy$coinArgs<ExtArgs>
@@ -1073,6 +1114,7 @@ export type $StrategyPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
     name: string
     type: $Enums.StrategyType
     settings: runtime.JsonValue
+    parameters: runtime.JsonValue | null
     coinId: string | null
     timeframe: string | null
     isActive: boolean
@@ -1510,6 +1552,7 @@ export interface StrategyFieldRefs {
   readonly name: Prisma.FieldRef<"Strategy", 'String'>
   readonly type: Prisma.FieldRef<"Strategy", 'StrategyType'>
   readonly settings: Prisma.FieldRef<"Strategy", 'Json'>
+  readonly parameters: Prisma.FieldRef<"Strategy", 'Json'>
   readonly coinId: Prisma.FieldRef<"Strategy", 'String'>
   readonly timeframe: Prisma.FieldRef<"Strategy", 'String'>
   readonly isActive: Prisma.FieldRef<"Strategy", 'Boolean'>

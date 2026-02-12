@@ -15,16 +15,18 @@ datasource db {
 model User {
   id               String   @id @default(cuid())
   name             String?
-  email            String   @unique
   emailVerified    DateTime?
   username         String?  @unique
   image            String?
-  password         String?
+  password         String? 
+  email            String?   @unique
   accounts         Account[]
   backtests        Backtest[]
   balances         Balance[]
+  notifications    Notification[]
   portfolioHistory PortfolioHistory[]
   sessions         Session[]
+  snapshots        Snapshot[]
   strategies       Strategy[]
   trades           Trade[]
   coins            UserCoin[]
@@ -88,6 +90,7 @@ model Strategy {
   name      String
   type      StrategyType
   settings  Json
+  parameters Json?
   coinId    String?
   timeframe String?
   isActive  Boolean      @default(false)
@@ -203,11 +206,45 @@ model WalletTrade {
   @@index([toCoinId])
 }
 
+model Snapshot {
+  id             String   @id @default(cuid())
+  userId         String
+  date           DateTime
+  portfolioValue Float
+  perCoinValue   Json
+  realizedPL     Float
+  unrealizedPL   Float
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  message   String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId, read])
+}
+
 enum StrategyType {
   DCAa
   GRID
   INDICATOR
   MANUAL
+  HODL
+  DCA
+  SWING
+  REBALANCING
+  STAKING
+  HISTORICAL_SIMULATION
 }
 
 enum TradeMode {

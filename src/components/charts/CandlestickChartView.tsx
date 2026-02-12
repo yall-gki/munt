@@ -5,10 +5,12 @@ import {
   CandlestickSeries,
   LineSeries,
   createChart,
+  createSeriesMarkers,
   type CandlestickData,
   type LineData,
   type IChartApi,
   type ISeriesApi,
+  type SeriesMarker,
 } from "lightweight-charts";
 import { useBinanceKlines } from "@/hooks/useBinanceKlines";
 
@@ -18,16 +20,19 @@ interface CandlestickChartProps {
   symbol: string;
   interval: string;
   chartType: ChartType;
+  markers?: SeriesMarker<any>[];
 }
 
 const CandlestickChartView: React.FC<CandlestickChartProps> = ({
   symbol,
   interval,
   chartType,
+  markers,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick" | "Line"> | null>(null);
+  const markersRef = useRef<any>(null);
 
   const { data, isLoading, error } = useBinanceKlines(symbol, interval);
 
@@ -125,8 +130,20 @@ const CandlestickChartView: React.FC<CandlestickChartProps> = ({
       seriesRef.current = series;
     }
 
+    if (seriesRef.current) {
+      markersRef.current = createSeriesMarkers(
+        seriesRef.current,
+        markers ?? []
+      );
+    }
+
     chartRef.current.timeScale().fitContent();
   }, [chartType, candles, line]);
+
+  useEffect(() => {
+    if (!markersRef.current) return;
+    markersRef.current.setMarkers(markers ?? []);
+  }, [markers, chartType]);
 
   return (
     <div className="relative h-full w-full">

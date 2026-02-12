@@ -104,3 +104,13 @@ export type PortfolioHistory = Prisma.PortfolioHistoryModel
  * 
  */
 export type WalletTrade = Prisma.WalletTradeModel
+/**
+ * Model Snapshot
+ * 
+ */
+export type Snapshot = Prisma.SnapshotModel
+/**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel

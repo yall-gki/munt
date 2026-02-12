@@ -63,7 +63,9 @@ export const ModelName = {
   Coin: 'Coin',
   Balance: 'Balance',
   PortfolioHistory: 'PortfolioHistory',
-  WalletTrade: 'WalletTrade'
+  WalletTrade: 'WalletTrade',
+  Snapshot: 'Snapshot',
+  Notification: 'Notification'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -85,11 +87,11 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 export const UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  email: 'email',
   emailVerified: 'emailVerified',
   username: 'username',
   image: 'image',
-  password: 'password'
+  password: 'password',
+  email: 'email'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -151,6 +153,7 @@ export const StrategyScalarFieldEnum = {
   name: 'name',
   type: 'type',
   settings: 'settings',
+  parameters: 'parameters',
   coinId: 'coinId',
   timeframe: 'timeframe',
   isActive: 'isActive',
@@ -256,6 +259,32 @@ export const WalletTradeScalarFieldEnum = {
 export type WalletTradeScalarFieldEnum = (typeof WalletTradeScalarFieldEnum)[keyof typeof WalletTradeScalarFieldEnum]
 
 
+export const SnapshotScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  date: 'date',
+  portfolioValue: 'portfolioValue',
+  perCoinValue: 'perCoinValue',
+  realizedPL: 'realizedPL',
+  unrealizedPL: 'unrealizedPL'
+} as const
+
+export type SnapshotScalarFieldEnum = (typeof SnapshotScalarFieldEnum)[keyof typeof SnapshotScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  message: 'message',
+  link: 'link',
+  read: 'read',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -269,6 +298,14 @@ export const JsonNullValueInput = {
 } as const
 
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: 'DbNull',
+  JsonNull: 'JsonNull'
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {

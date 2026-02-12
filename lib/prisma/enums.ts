@@ -13,7 +13,13 @@ export const StrategyType = {
   DCAa: 'DCAa',
   GRID: 'GRID',
   INDICATOR: 'INDICATOR',
-  MANUAL: 'MANUAL'
+  MANUAL: 'MANUAL',
+  HODL: 'HODL',
+  DCA: 'DCA',
+  SWING: 'SWING',
+  REBALANCING: 'REBALANCING',
+  STAKING: 'STAKING',
+  HISTORICAL_SIMULATION: 'HISTORICAL_SIMULATION'
 } as const
 
 export type StrategyType = (typeof StrategyType)[keyof typeof StrategyType]

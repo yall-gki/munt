@@ -13,6 +13,8 @@ interface TradeItem {
   toPrice: number;
   status: string;
   executedAt: string;
+  fromCoinId?: string;
+  toCoinId?: string;
   fromCoin: { symbol: string; name: string };
   toCoin: { symbol: string; name: string };
 }
@@ -86,50 +88,67 @@ export default function ExecutedTradesLog({ coinId, refreshKey }: ExecutedTrades
         <div className="text-sm text-zinc-400">No trades yet.</div>
       ) : (
         <div className="space-y-3">
-          <div className="grid grid-cols-6 text-xs uppercase tracking-wide text-zinc-500">
-            <span>Pair</span>
-            <span className="text-right">Sold</span>
-            <span className="text-right">Received</span>
-            <span className="text-right">Rate</span>
-            <span className="text-right">Status</span>
-            <span className="text-right">Time</span>
+          <div className="grid grid-cols-5 text-xs uppercase tracking-wide text-zinc-500">
+            <span>Date</span>
+            <span>Coin</span>
+            <span className="text-right">Amount</span>
+            <span className="text-right">Price USD</span>
+            <span className="text-right">Total USD</span>
           </div>
           {trades.map((trade) => {
-            const rate = trade.fromPrice > 0 && trade.toPrice > 0
-              ? (trade.fromPrice / trade.toPrice).toFixed(6)
-              : "-";
-            const statusLabel = trade.status?.toLowerCase?.() === "failed" ? "Failed" : "Completed";
+            const isCoinContext =
+              coinId &&
+              (trade.fromCoinId === coinId || trade.toCoinId === coinId);
+            const isSell = isCoinContext
+              ? trade.fromCoinId === coinId
+              : true;
+            const sideLabel = isSell ? "Sell" : "Buy";
+            const coinLabel = isCoinContext
+              ? isSell
+                ? trade.fromCoin.symbol.toUpperCase()
+                : trade.toCoin.symbol.toUpperCase()
+              : `${trade.fromCoin.symbol.toUpperCase()} → ${trade.toCoin.symbol.toUpperCase()}`;
+            const amount = isCoinContext
+              ? isSell
+                ? trade.fromAmount
+                : trade.toAmount
+              : trade.fromAmount;
+            const price = isCoinContext
+              ? isSell
+                ? trade.fromPrice
+                : trade.toPrice
+              : trade.fromPrice;
+            const total = amount * price;
+            const sideColor = isSell ? "text-rose-400" : "text-emerald-400";
             return (
               <div
                 key={trade.id}
-                className="grid grid-cols-6 items-center text-sm border-b border-zinc-800 pb-2"
+                className="grid grid-cols-5 items-center text-sm border-b border-zinc-800 pb-2"
               >
-                <div className="font-semibold">
-                  {trade.fromCoin.symbol.toUpperCase()} → {trade.toCoin.symbol.toUpperCase()}
+                <div className="text-xs text-zinc-400">
+                  {timeFormatter.format(new Date(trade.executedAt))}
                 </div>
-                <div className="text-right tabular-nums">
-                  {trade.fromAmount.toFixed(6)}
-                </div>
-                <div className="text-right tabular-nums text-emerald-400">
-                  {trade.toAmount.toFixed(6)}
-                </div>
-                <div className="text-right tabular-nums text-zinc-300">
-                  {rate}
-                </div>
-                <div className="text-right">
+                <div className="flex items-center gap-2 font-semibold">
                   <span
                     className={cn(
-                      "px-2 py-1 rounded-full text-[10px] uppercase tracking-wide",
-                      statusLabel === "Completed"
-                        ? "bg-emerald-500/10 text-emerald-300"
-                        : "bg-rose-500/10 text-rose-300"
+                      "px-2 py-0.5 rounded-full text-[10px] uppercase tracking-wide border",
+                      isSell
+                        ? "border-rose-500/40 text-rose-300"
+                        : "border-emerald-500/40 text-emerald-300"
                     )}
                   >
-                    {statusLabel}
+                    {sideLabel}
                   </span>
+                  <span>{coinLabel}</span>
                 </div>
-                <div className="text-right text-xs text-zinc-400">
-                  {timeFormatter.format(new Date(trade.executedAt))}
+                <div className={cn("text-right tabular-nums", sideColor)}>
+                  {amount.toFixed(6)}
+                </div>
+                <div className="text-right tabular-nums text-zinc-300">
+                  ${price.toFixed(2)}
+                </div>
+                <div className="text-right tabular-nums text-zinc-200">
+                  ${total.toFixed(2)}
                 </div>
               </div>
             );

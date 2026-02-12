@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import axios from "axios";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -76,6 +77,7 @@ const CoinLineChart: React.FC<{ symbol: string; coinId: string }> = ({
   const [timeframe, setTimeframe] = useState(timeframes[3]);
   const [chartType, setChartType] = useState<ChartType>("candles");
   const [isExpanded, setIsExpanded] = useState(false);
+  const [tradeMarkers, setTradeMarkers] = useState<any[]>([]);
 
   const { data: klines } = useBinanceKlines(symbol, timeframe.interval);
 
@@ -258,6 +260,35 @@ const CoinLineChart: React.FC<{ symbol: string; coinId: string }> = ({
     return chartOptions;
   }, [selectedIndicator]);
 
+  useEffect(() => {
+    const fetchMarkers = async () => {
+      try {
+        const res = await axios.get(`/api/strategies/trades?coinId=${coinId}`);
+        const trades = res.data?.trades ?? [];
+        const markers = trades
+          .map((trade: any) => {
+            const time = Math.floor(
+              new Date(trade.executedAt).getTime() / 1000
+            );
+            const isSell = trade.amount < 0;
+            return {
+              time,
+              position: isSell ? "aboveBar" : "belowBar",
+              color: isSell ? "#ef4444" : "#22c55e",
+              shape: isSell ? "arrowDown" : "arrowUp",
+              text: trade.strategy?.name || (isSell ? "Sell" : "Buy"),
+            };
+          })
+          .filter((marker: any) => Number.isFinite(marker.time));
+        setTradeMarkers(markers);
+      } catch (error) {
+        console.error("Failed to load strategy markers", error);
+        setTradeMarkers([]);
+      }
+    };
+    fetchMarkers();
+  }, [coinId]);
+
   return (
     <div className="w-full">
       {isExpanded && (
@@ -393,6 +424,7 @@ const CoinLineChart: React.FC<{ symbol: string; coinId: string }> = ({
             symbol={symbol}
             interval={timeframe.interval}
             chartType={chartType}
+            markers={tradeMarkers}
           />
         </div>
 

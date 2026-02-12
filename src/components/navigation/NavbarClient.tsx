@@ -6,6 +6,7 @@ import { useTransition } from "react";
 import { LayoutGrid } from "lucide-react";
 import { Icons } from "../Icons";
 import UserAccountNav from "./UserAccountNav";
+import NotificationMenu from "./NotificationMenu";
 import { Session } from "next-auth";
 
 type NavbarClientProps = {
@@ -57,9 +58,12 @@ export default function NavbarClient({ session }: NavbarClientProps) {
         </div>
 
         {/* ✅ Right: User or Sign In */}
-        <div className="max-sm:flex max-sm:justify-end max-sm:items-center">
+        <div className="max-sm:flex max-sm:justify-end max-sm:items-center flex items-center gap-3">
           {session?.user ? (
-            <UserAccountNav user={session.user} />
+            <>
+              <NotificationMenu />
+              <UserAccountNav user={session.user} />
+            </>
           ) : (
             <Link
               href="/login"

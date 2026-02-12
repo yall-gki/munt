@@ -27,31 +27,31 @@ export type AggregateUser = {
 export type UserMinAggregateOutputType = {
   id: string | null
   name: string | null
-  email: string | null
   emailVerified: Date | null
   username: string | null
   image: string | null
   password: string | null
+  email: string | null
 }
 
 export type UserMaxAggregateOutputType = {
   id: string | null
   name: string | null
-  email: string | null
   emailVerified: Date | null
   username: string | null
   image: string | null
   password: string | null
+  email: string | null
 }
 
 export type UserCountAggregateOutputType = {
   id: number
   name: number
-  email: number
   emailVerified: number
   username: number
   image: number
   password: number
+  email: number
   _all: number
 }
 
@@ -59,31 +59,31 @@ export type UserCountAggregateOutputType = {
 export type UserMinAggregateInputType = {
   id?: true
   name?: true
-  email?: true
   emailVerified?: true
   username?: true
   image?: true
   password?: true
+  email?: true
 }
 
 export type UserMaxAggregateInputType = {
   id?: true
   name?: true
-  email?: true
   emailVerified?: true
   username?: true
   image?: true
   password?: true
+  email?: true
 }
 
 export type UserCountAggregateInputType = {
   id?: true
   name?: true
-  email?: true
   emailVerified?: true
   username?: true
   image?: true
   password?: true
+  email?: true
   _all?: true
 }
 
@@ -162,11 +162,11 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type UserGroupByOutputType = {
   id: string
   name: string | null
-  email: string
   emailVerified: Date | null
   username: string | null
   image: string | null
   password: string | null
+  email: string | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -193,16 +193,18 @@ export type UserWhereInput = {
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   id?: Prisma.StringFilter<"User"> | string
   name?: Prisma.StringNullableFilter<"User"> | string | null
-  email?: Prisma.StringFilter<"User"> | string
   emailVerified?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   username?: Prisma.StringNullableFilter<"User"> | string | null
   image?: Prisma.StringNullableFilter<"User"> | string | null
   password?: Prisma.StringNullableFilter<"User"> | string | null
+  email?: Prisma.StringNullableFilter<"User"> | string | null
   accounts?: Prisma.AccountListRelationFilter
   backtests?: Prisma.BacktestListRelationFilter
   balances?: Prisma.BalanceListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
   portfolioHistory?: Prisma.PortfolioHistoryListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
+  snapshots?: Prisma.SnapshotListRelationFilter
   strategies?: Prisma.StrategyListRelationFilter
   trades?: Prisma.TradeListRelationFilter
   coins?: Prisma.UserCoinListRelationFilter
@@ -213,16 +215,18 @@ export type UserWhereInput = {
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrderInput | Prisma.SortOrder
-  email?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrderInput | Prisma.SortOrder
   username?: Prisma.SortOrderInput | Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   password?: Prisma.SortOrderInput | Prisma.SortOrder
+  email?: Prisma.SortOrderInput | Prisma.SortOrder
   accounts?: Prisma.AccountOrderByRelationAggregateInput
   backtests?: Prisma.BacktestOrderByRelationAggregateInput
   balances?: Prisma.BalanceOrderByRelationAggregateInput
+  notifications?: Prisma.NotificationOrderByRelationAggregateInput
   portfolioHistory?: Prisma.PortfolioHistoryOrderByRelationAggregateInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
+  snapshots?: Prisma.SnapshotOrderByRelationAggregateInput
   strategies?: Prisma.StrategyOrderByRelationAggregateInput
   trades?: Prisma.TradeOrderByRelationAggregateInput
   coins?: Prisma.UserCoinOrderByRelationAggregateInput
@@ -232,8 +236,8 @@ export type UserOrderByWithRelationInput = {
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: string
-  email?: string
   username?: string
+  email?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
@@ -244,23 +248,25 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   accounts?: Prisma.AccountListRelationFilter
   backtests?: Prisma.BacktestListRelationFilter
   balances?: Prisma.BalanceListRelationFilter
+  notifications?: Prisma.NotificationListRelationFilter
   portfolioHistory?: Prisma.PortfolioHistoryListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
+  snapshots?: Prisma.SnapshotListRelationFilter
   strategies?: Prisma.StrategyListRelationFilter
   trades?: Prisma.TradeListRelationFilter
   coins?: Prisma.UserCoinListRelationFilter
   wallets?: Prisma.WalletListRelationFilter
   walletTrades?: Prisma.WalletTradeListRelationFilter
-}, "id" | "email" | "username">
+}, "id" | "username" | "email">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrderInput | Prisma.SortOrder
-  email?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrderInput | Prisma.SortOrder
   username?: Prisma.SortOrderInput | Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   password?: Prisma.SortOrderInput | Prisma.SortOrder
+  email?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -272,26 +278,28 @@ export type UserScalarWhereWithAggregatesInput = {
   NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"User"> | string
   name?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
-  email?: Prisma.StringWithAggregatesFilter<"User"> | string
   emailVerified?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   username?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   image?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   password?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  email?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinCreateNestedManyWithoutUserInput
@@ -302,16 +310,18 @@ export type UserCreateInput = {
 export type UserUncheckedCreateInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotUncheckedCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyUncheckedCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeUncheckedCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinUncheckedCreateNestedManyWithoutUserInput
@@ -322,16 +332,18 @@ export type UserUncheckedCreateInput = {
 export type UserUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUpdateManyWithoutUserNestedInput
@@ -342,16 +354,18 @@ export type UserUpdateInput = {
 export type UserUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUncheckedUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUncheckedUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUncheckedUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUncheckedUpdateManyWithoutUserNestedInput
@@ -362,61 +376,61 @@ export type UserUncheckedUpdateInput = {
 export type UserCreateManyInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  email?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   username?: Prisma.SortOrder
   image?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  email?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  email?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   username?: Prisma.SortOrder
   image?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  email?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
-  email?: Prisma.SortOrder
   emailVerified?: Prisma.SortOrder
   username?: Prisma.SortOrder
   image?: Prisma.SortOrder
   password?: Prisma.SortOrder
+  email?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -576,18 +590,48 @@ export type UserUpdateOneRequiredWithoutWalletTradesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutWalletTradesInput, Prisma.UserUpdateWithoutWalletTradesInput>, Prisma.UserUncheckedUpdateWithoutWalletTradesInput>
 }
 
+export type UserCreateNestedOneWithoutSnapshotsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSnapshotsInput, Prisma.UserUncheckedCreateWithoutSnapshotsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSnapshotsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutSnapshotsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutSnapshotsInput, Prisma.UserUncheckedCreateWithoutSnapshotsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutSnapshotsInput
+  upsert?: Prisma.UserUpsertWithoutSnapshotsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSnapshotsInput, Prisma.UserUpdateWithoutSnapshotsInput>, Prisma.UserUncheckedUpdateWithoutSnapshotsInput>
+}
+
+export type UserCreateNestedOneWithoutNotificationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutNotificationsInput
+  upsert?: Prisma.UserUpsertWithoutNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationsInput, Prisma.UserUpdateWithoutNotificationsInput>, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
+}
+
 export type UserCreateWithoutAccountsInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinCreateNestedManyWithoutUserInput
@@ -598,15 +642,17 @@ export type UserCreateWithoutAccountsInput = {
 export type UserUncheckedCreateWithoutAccountsInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotUncheckedCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyUncheckedCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeUncheckedCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinUncheckedCreateNestedManyWithoutUserInput
@@ -633,15 +679,17 @@ export type UserUpdateToOneWithWhereWithoutAccountsInput = {
 export type UserUpdateWithoutAccountsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUpdateManyWithoutUserNestedInput
@@ -652,15 +700,17 @@ export type UserUpdateWithoutAccountsInput = {
 export type UserUncheckedUpdateWithoutAccountsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUncheckedUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUncheckedUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUncheckedUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUncheckedUpdateManyWithoutUserNestedInput
@@ -671,15 +721,17 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
 export type UserCreateWithoutSessionsInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinCreateNestedManyWithoutUserInput
@@ -690,15 +742,17 @@ export type UserCreateWithoutSessionsInput = {
 export type UserUncheckedCreateWithoutSessionsInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotUncheckedCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyUncheckedCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeUncheckedCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinUncheckedCreateNestedManyWithoutUserInput
@@ -725,15 +779,17 @@ export type UserUpdateToOneWithWhereWithoutSessionsInput = {
 export type UserUpdateWithoutSessionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUpdateManyWithoutUserNestedInput
@@ -744,15 +800,17 @@ export type UserUpdateWithoutSessionsInput = {
 export type UserUncheckedUpdateWithoutSessionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUncheckedUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUncheckedUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUncheckedUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUncheckedUpdateManyWithoutUserNestedInput
@@ -763,16 +821,18 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
 export type UserCreateWithoutCoinsInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeCreateNestedManyWithoutUserInput
   wallets?: Prisma.WalletCreateNestedManyWithoutUserInput
@@ -782,16 +842,18 @@ export type UserCreateWithoutCoinsInput = {
 export type UserUncheckedCreateWithoutCoinsInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotUncheckedCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyUncheckedCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeUncheckedCreateNestedManyWithoutUserInput
   wallets?: Prisma.WalletUncheckedCreateNestedManyWithoutUserInput
@@ -817,16 +879,18 @@ export type UserUpdateToOneWithWhereWithoutCoinsInput = {
 export type UserUpdateWithoutCoinsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUpdateManyWithoutUserNestedInput
   wallets?: Prisma.WalletUpdateManyWithoutUserNestedInput
@@ -836,16 +900,18 @@ export type UserUpdateWithoutCoinsInput = {
 export type UserUncheckedUpdateWithoutCoinsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUncheckedUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUncheckedUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUncheckedUpdateManyWithoutUserNestedInput
   wallets?: Prisma.WalletUncheckedUpdateManyWithoutUserNestedInput
@@ -855,16 +921,18 @@ export type UserUncheckedUpdateWithoutCoinsInput = {
 export type UserCreateWithoutStrategiesInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinCreateNestedManyWithoutUserInput
   wallets?: Prisma.WalletCreateNestedManyWithoutUserInput
@@ -874,16 +942,18 @@ export type UserCreateWithoutStrategiesInput = {
 export type UserUncheckedCreateWithoutStrategiesInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotUncheckedCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeUncheckedCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinUncheckedCreateNestedManyWithoutUserInput
   wallets?: Prisma.WalletUncheckedCreateNestedManyWithoutUserInput
@@ -909,16 +979,18 @@ export type UserUpdateToOneWithWhereWithoutStrategiesInput = {
 export type UserUpdateWithoutStrategiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUpdateManyWithoutUserNestedInput
   wallets?: Prisma.WalletUpdateManyWithoutUserNestedInput
@@ -928,16 +1000,18 @@ export type UserUpdateWithoutStrategiesInput = {
 export type UserUncheckedUpdateWithoutStrategiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUncheckedUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUncheckedUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUncheckedUpdateManyWithoutUserNestedInput
   wallets?: Prisma.WalletUncheckedUpdateManyWithoutUserNestedInput
@@ -947,16 +1021,18 @@ export type UserUncheckedUpdateWithoutStrategiesInput = {
 export type UserCreateWithoutTradesInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinCreateNestedManyWithoutUserInput
   wallets?: Prisma.WalletCreateNestedManyWithoutUserInput
@@ -966,16 +1042,18 @@ export type UserCreateWithoutTradesInput = {
 export type UserUncheckedCreateWithoutTradesInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotUncheckedCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyUncheckedCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinUncheckedCreateNestedManyWithoutUserInput
   wallets?: Prisma.WalletUncheckedCreateNestedManyWithoutUserInput
@@ -1001,16 +1079,18 @@ export type UserUpdateToOneWithWhereWithoutTradesInput = {
 export type UserUpdateWithoutTradesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUpdateManyWithoutUserNestedInput
   wallets?: Prisma.WalletUpdateManyWithoutUserNestedInput
@@ -1020,16 +1100,18 @@ export type UserUpdateWithoutTradesInput = {
 export type UserUncheckedUpdateWithoutTradesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUncheckedUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUncheckedUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUncheckedUpdateManyWithoutUserNestedInput
   wallets?: Prisma.WalletUncheckedUpdateManyWithoutUserNestedInput
@@ -1039,16 +1121,18 @@ export type UserUncheckedUpdateWithoutTradesInput = {
 export type UserCreateWithoutWalletsInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinCreateNestedManyWithoutUserInput
@@ -1058,16 +1142,18 @@ export type UserCreateWithoutWalletsInput = {
 export type UserUncheckedCreateWithoutWalletsInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotUncheckedCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyUncheckedCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeUncheckedCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinUncheckedCreateNestedManyWithoutUserInput
@@ -1093,16 +1179,18 @@ export type UserUpdateToOneWithWhereWithoutWalletsInput = {
 export type UserUpdateWithoutWalletsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUpdateManyWithoutUserNestedInput
@@ -1112,16 +1200,18 @@ export type UserUpdateWithoutWalletsInput = {
 export type UserUncheckedUpdateWithoutWalletsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUncheckedUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUncheckedUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUncheckedUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUncheckedUpdateManyWithoutUserNestedInput
@@ -1131,15 +1221,17 @@ export type UserUncheckedUpdateWithoutWalletsInput = {
 export type UserCreateWithoutBacktestsInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinCreateNestedManyWithoutUserInput
@@ -1150,15 +1242,17 @@ export type UserCreateWithoutBacktestsInput = {
 export type UserUncheckedCreateWithoutBacktestsInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotUncheckedCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyUncheckedCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeUncheckedCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinUncheckedCreateNestedManyWithoutUserInput
@@ -1185,15 +1279,17 @@ export type UserUpdateToOneWithWhereWithoutBacktestsInput = {
 export type UserUpdateWithoutBacktestsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUpdateManyWithoutUserNestedInput
@@ -1204,15 +1300,17 @@ export type UserUpdateWithoutBacktestsInput = {
 export type UserUncheckedUpdateWithoutBacktestsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUncheckedUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUncheckedUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUncheckedUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUncheckedUpdateManyWithoutUserNestedInput
@@ -1223,15 +1321,17 @@ export type UserUncheckedUpdateWithoutBacktestsInput = {
 export type UserCreateWithoutBalancesInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinCreateNestedManyWithoutUserInput
@@ -1242,15 +1342,17 @@ export type UserCreateWithoutBalancesInput = {
 export type UserUncheckedCreateWithoutBalancesInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotUncheckedCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyUncheckedCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeUncheckedCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinUncheckedCreateNestedManyWithoutUserInput
@@ -1277,15 +1379,17 @@ export type UserUpdateToOneWithWhereWithoutBalancesInput = {
 export type UserUpdateWithoutBalancesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUpdateManyWithoutUserNestedInput
@@ -1296,15 +1400,17 @@ export type UserUpdateWithoutBalancesInput = {
 export type UserUncheckedUpdateWithoutBalancesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUncheckedUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUncheckedUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUncheckedUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUncheckedUpdateManyWithoutUserNestedInput
@@ -1315,15 +1421,17 @@ export type UserUncheckedUpdateWithoutBalancesInput = {
 export type UserCreateWithoutPortfolioHistoryInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinCreateNestedManyWithoutUserInput
@@ -1334,15 +1442,17 @@ export type UserCreateWithoutPortfolioHistoryInput = {
 export type UserUncheckedCreateWithoutPortfolioHistoryInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotUncheckedCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyUncheckedCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeUncheckedCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinUncheckedCreateNestedManyWithoutUserInput
@@ -1369,15 +1479,17 @@ export type UserUpdateToOneWithWhereWithoutPortfolioHistoryInput = {
 export type UserUpdateWithoutPortfolioHistoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUpdateManyWithoutUserNestedInput
@@ -1388,15 +1500,17 @@ export type UserUpdateWithoutPortfolioHistoryInput = {
 export type UserUncheckedUpdateWithoutPortfolioHistoryInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUncheckedUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUncheckedUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUncheckedUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUncheckedUpdateManyWithoutUserNestedInput
@@ -1407,16 +1521,18 @@ export type UserUncheckedUpdateWithoutPortfolioHistoryInput = {
 export type UserCreateWithoutWalletTradesInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinCreateNestedManyWithoutUserInput
@@ -1426,16 +1542,18 @@ export type UserCreateWithoutWalletTradesInput = {
 export type UserUncheckedCreateWithoutWalletTradesInput = {
   id?: string
   name?: string | null
-  email: string
   emailVerified?: Date | string | null
   username?: string | null
   image?: string | null
   password?: string | null
+  email?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
   balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotUncheckedCreateNestedManyWithoutUserInput
   strategies?: Prisma.StrategyUncheckedCreateNestedManyWithoutUserInput
   trades?: Prisma.TradeUncheckedCreateNestedManyWithoutUserInput
   coins?: Prisma.UserCoinUncheckedCreateNestedManyWithoutUserInput
@@ -1461,16 +1579,18 @@ export type UserUpdateToOneWithWhereWithoutWalletTradesInput = {
 export type UserUpdateWithoutWalletTradesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUpdateManyWithoutUserNestedInput
@@ -1480,20 +1600,222 @@ export type UserUpdateWithoutWalletTradesInput = {
 export type UserUncheckedUpdateWithoutWalletTradesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
   balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
+  portfolioHistory?: Prisma.PortfolioHistoryUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUncheckedUpdateManyWithoutUserNestedInput
+  strategies?: Prisma.StrategyUncheckedUpdateManyWithoutUserNestedInput
+  trades?: Prisma.TradeUncheckedUpdateManyWithoutUserNestedInput
+  coins?: Prisma.UserCoinUncheckedUpdateManyWithoutUserNestedInput
+  wallets?: Prisma.WalletUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutSnapshotsInput = {
+  id?: string
+  name?: string | null
+  emailVerified?: Date | string | null
+  username?: string | null
+  image?: string | null
+  password?: string | null
+  email?: string | null
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput
+  portfolioHistory?: Prisma.PortfolioHistoryCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  strategies?: Prisma.StrategyCreateNestedManyWithoutUserInput
+  trades?: Prisma.TradeCreateNestedManyWithoutUserInput
+  coins?: Prisma.UserCoinCreateNestedManyWithoutUserInput
+  wallets?: Prisma.WalletCreateNestedManyWithoutUserInput
+  walletTrades?: Prisma.WalletTradeCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutSnapshotsInput = {
+  id?: string
+  name?: string | null
+  emailVerified?: Date | string | null
+  username?: string | null
+  image?: string | null
+  password?: string | null
+  email?: string | null
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput
+  portfolioHistory?: Prisma.PortfolioHistoryUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  strategies?: Prisma.StrategyUncheckedCreateNestedManyWithoutUserInput
+  trades?: Prisma.TradeUncheckedCreateNestedManyWithoutUserInput
+  coins?: Prisma.UserCoinUncheckedCreateNestedManyWithoutUserInput
+  wallets?: Prisma.WalletUncheckedCreateNestedManyWithoutUserInput
+  walletTrades?: Prisma.WalletTradeUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutSnapshotsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutSnapshotsInput, Prisma.UserUncheckedCreateWithoutSnapshotsInput>
+}
+
+export type UserUpsertWithoutSnapshotsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutSnapshotsInput, Prisma.UserUncheckedUpdateWithoutSnapshotsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutSnapshotsInput, Prisma.UserUncheckedCreateWithoutSnapshotsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutSnapshotsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutSnapshotsInput, Prisma.UserUncheckedUpdateWithoutSnapshotsInput>
+}
+
+export type UserUpdateWithoutSnapshotsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput
+  portfolioHistory?: Prisma.PortfolioHistoryUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  strategies?: Prisma.StrategyUpdateManyWithoutUserNestedInput
+  trades?: Prisma.TradeUpdateManyWithoutUserNestedInput
+  coins?: Prisma.UserCoinUpdateManyWithoutUserNestedInput
+  wallets?: Prisma.WalletUpdateManyWithoutUserNestedInput
+  walletTrades?: Prisma.WalletTradeUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutSnapshotsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput
   portfolioHistory?: Prisma.PortfolioHistoryUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   strategies?: Prisma.StrategyUncheckedUpdateManyWithoutUserNestedInput
   trades?: Prisma.TradeUncheckedUpdateManyWithoutUserNestedInput
   coins?: Prisma.UserCoinUncheckedUpdateManyWithoutUserNestedInput
   wallets?: Prisma.WalletUncheckedUpdateManyWithoutUserNestedInput
+  walletTrades?: Prisma.WalletTradeUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutNotificationsInput = {
+  id?: string
+  name?: string | null
+  emailVerified?: Date | string | null
+  username?: string | null
+  image?: string | null
+  password?: string | null
+  email?: string | null
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  backtests?: Prisma.BacktestCreateNestedManyWithoutUserInput
+  balances?: Prisma.BalanceCreateNestedManyWithoutUserInput
+  portfolioHistory?: Prisma.PortfolioHistoryCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotCreateNestedManyWithoutUserInput
+  strategies?: Prisma.StrategyCreateNestedManyWithoutUserInput
+  trades?: Prisma.TradeCreateNestedManyWithoutUserInput
+  coins?: Prisma.UserCoinCreateNestedManyWithoutUserInput
+  wallets?: Prisma.WalletCreateNestedManyWithoutUserInput
+  walletTrades?: Prisma.WalletTradeCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutNotificationsInput = {
+  id?: string
+  name?: string | null
+  emailVerified?: Date | string | null
+  username?: string | null
+  image?: string | null
+  password?: string | null
+  email?: string | null
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  backtests?: Prisma.BacktestUncheckedCreateNestedManyWithoutUserInput
+  balances?: Prisma.BalanceUncheckedCreateNestedManyWithoutUserInput
+  portfolioHistory?: Prisma.PortfolioHistoryUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  snapshots?: Prisma.SnapshotUncheckedCreateNestedManyWithoutUserInput
+  strategies?: Prisma.StrategyUncheckedCreateNestedManyWithoutUserInput
+  trades?: Prisma.TradeUncheckedCreateNestedManyWithoutUserInput
+  coins?: Prisma.UserCoinUncheckedCreateNestedManyWithoutUserInput
+  wallets?: Prisma.WalletUncheckedCreateNestedManyWithoutUserInput
+  walletTrades?: Prisma.WalletTradeUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutNotificationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+}
+
+export type UserUpsertWithoutNotificationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutNotificationsInput, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutNotificationsInput, Prisma.UserUncheckedCreateWithoutNotificationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutNotificationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutNotificationsInput, Prisma.UserUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type UserUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  backtests?: Prisma.BacktestUpdateManyWithoutUserNestedInput
+  balances?: Prisma.BalanceUpdateManyWithoutUserNestedInput
+  portfolioHistory?: Prisma.PortfolioHistoryUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUpdateManyWithoutUserNestedInput
+  strategies?: Prisma.StrategyUpdateManyWithoutUserNestedInput
+  trades?: Prisma.TradeUpdateManyWithoutUserNestedInput
+  coins?: Prisma.UserCoinUpdateManyWithoutUserNestedInput
+  wallets?: Prisma.WalletUpdateManyWithoutUserNestedInput
+  walletTrades?: Prisma.WalletTradeUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  backtests?: Prisma.BacktestUncheckedUpdateManyWithoutUserNestedInput
+  balances?: Prisma.BalanceUncheckedUpdateManyWithoutUserNestedInput
+  portfolioHistory?: Prisma.PortfolioHistoryUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  snapshots?: Prisma.SnapshotUncheckedUpdateManyWithoutUserNestedInput
+  strategies?: Prisma.StrategyUncheckedUpdateManyWithoutUserNestedInput
+  trades?: Prisma.TradeUncheckedUpdateManyWithoutUserNestedInput
+  coins?: Prisma.UserCoinUncheckedUpdateManyWithoutUserNestedInput
+  wallets?: Prisma.WalletUncheckedUpdateManyWithoutUserNestedInput
+  walletTrades?: Prisma.WalletTradeUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -1505,8 +1827,10 @@ export type UserCountOutputType = {
   accounts: number
   backtests: number
   balances: number
+  notifications: number
   portfolioHistory: number
   sessions: number
+  snapshots: number
   strategies: number
   trades: number
   coins: number
@@ -1518,8 +1842,10 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   accounts?: boolean | UserCountOutputTypeCountAccountsArgs
   backtests?: boolean | UserCountOutputTypeCountBacktestsArgs
   balances?: boolean | UserCountOutputTypeCountBalancesArgs
+  notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
   portfolioHistory?: boolean | UserCountOutputTypeCountPortfolioHistoryArgs
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
+  snapshots?: boolean | UserCountOutputTypeCountSnapshotsArgs
   strategies?: boolean | UserCountOutputTypeCountStrategiesArgs
   trades?: boolean | UserCountOutputTypeCountTradesArgs
   coins?: boolean | UserCountOutputTypeCountCoinsArgs
@@ -1561,6 +1887,13 @@ export type UserCountOutputTypeCountBalancesArgs<ExtArgs extends runtime.Types.E
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.NotificationWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountPortfolioHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PortfolioHistoryWhereInput
 }
@@ -1570,6 +1903,13 @@ export type UserCountOutputTypeCountPortfolioHistoryArgs<ExtArgs extends runtime
  */
 export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.SessionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountSnapshotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SnapshotWhereInput
 }
 
 /**
@@ -1611,16 +1951,18 @@ export type UserCountOutputTypeCountWalletTradesArgs<ExtArgs extends runtime.Typ
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  email?: boolean
   emailVerified?: boolean
   username?: boolean
   image?: boolean
   password?: boolean
+  email?: boolean
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   backtests?: boolean | Prisma.User$backtestsArgs<ExtArgs>
   balances?: boolean | Prisma.User$balancesArgs<ExtArgs>
+  notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   portfolioHistory?: boolean | Prisma.User$portfolioHistoryArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
+  snapshots?: boolean | Prisma.User$snapshotsArgs<ExtArgs>
   strategies?: boolean | Prisma.User$strategiesArgs<ExtArgs>
   trades?: boolean | Prisma.User$tradesArgs<ExtArgs>
   coins?: boolean | Prisma.User$coinsArgs<ExtArgs>
@@ -1632,40 +1974,42 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  email?: boolean
   emailVerified?: boolean
   username?: boolean
   image?: boolean
   password?: boolean
+  email?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
-  email?: boolean
   emailVerified?: boolean
   username?: boolean
   image?: boolean
   password?: boolean
+  email?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
   id?: boolean
   name?: boolean
-  email?: boolean
   emailVerified?: boolean
   username?: boolean
   image?: boolean
   password?: boolean
+  email?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "username" | "image" | "password", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "emailVerified" | "username" | "image" | "password" | "email", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   backtests?: boolean | Prisma.User$backtestsArgs<ExtArgs>
   balances?: boolean | Prisma.User$balancesArgs<ExtArgs>
+  notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>
   portfolioHistory?: boolean | Prisma.User$portfolioHistoryArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
+  snapshots?: boolean | Prisma.User$snapshotsArgs<ExtArgs>
   strategies?: boolean | Prisma.User$strategiesArgs<ExtArgs>
   trades?: boolean | Prisma.User$tradesArgs<ExtArgs>
   coins?: boolean | Prisma.User$coinsArgs<ExtArgs>
@@ -1682,8 +2026,10 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     accounts: Prisma.$AccountPayload<ExtArgs>[]
     backtests: Prisma.$BacktestPayload<ExtArgs>[]
     balances: Prisma.$BalancePayload<ExtArgs>[]
+    notifications: Prisma.$NotificationPayload<ExtArgs>[]
     portfolioHistory: Prisma.$PortfolioHistoryPayload<ExtArgs>[]
     sessions: Prisma.$SessionPayload<ExtArgs>[]
+    snapshots: Prisma.$SnapshotPayload<ExtArgs>[]
     strategies: Prisma.$StrategyPayload<ExtArgs>[]
     trades: Prisma.$TradePayload<ExtArgs>[]
     coins: Prisma.$UserCoinPayload<ExtArgs>[]
@@ -1693,11 +2039,11 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string | null
-    email: string
     emailVerified: Date | null
     username: string | null
     image: string | null
     password: string | null
+    email: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -2095,8 +2441,10 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   accounts<T extends Prisma.User$accountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   backtests<T extends Prisma.User$backtestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$backtestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BacktestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   balances<T extends Prisma.User$balancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$balancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BalancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   portfolioHistory<T extends Prisma.User$portfolioHistoryArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$portfolioHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PortfolioHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  snapshots<T extends Prisma.User$snapshotsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$snapshotsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   strategies<T extends Prisma.User$strategiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$strategiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StrategyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   trades<T extends Prisma.User$tradesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$tradesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TradePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   coins<T extends Prisma.User$coinsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$coinsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserCoinPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2133,11 +2481,11 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface UserFieldRefs {
   readonly id: Prisma.FieldRef<"User", 'String'>
   readonly name: Prisma.FieldRef<"User", 'String'>
-  readonly email: Prisma.FieldRef<"User", 'String'>
   readonly emailVerified: Prisma.FieldRef<"User", 'DateTime'>
   readonly username: Prisma.FieldRef<"User", 'String'>
   readonly image: Prisma.FieldRef<"User", 'String'>
   readonly password: Prisma.FieldRef<"User", 'String'>
+  readonly email: Prisma.FieldRef<"User", 'String'>
 }
     
 
@@ -2356,7 +2704,7 @@ export type UserCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
   /**
    * The data needed to create a User.
    */
-  data: Prisma.XOR<Prisma.UserCreateInput, Prisma.UserUncheckedCreateInput>
+  data?: Prisma.XOR<Prisma.UserCreateInput, Prisma.UserUncheckedCreateInput>
 }
 
 /**
@@ -2598,6 +2946,30 @@ export type User$balancesArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 }
 
 /**
+ * User.notifications
+ */
+export type User$notificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Notification
+   */
+  select?: Prisma.NotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Notification
+   */
+  omit?: Prisma.NotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.NotificationInclude<ExtArgs> | null
+  where?: Prisma.NotificationWhereInput
+  orderBy?: Prisma.NotificationOrderByWithRelationInput | Prisma.NotificationOrderByWithRelationInput[]
+  cursor?: Prisma.NotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.NotificationScalarFieldEnum | Prisma.NotificationScalarFieldEnum[]
+}
+
+/**
  * User.portfolioHistory
  */
 export type User$portfolioHistoryArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2643,6 +3015,30 @@ export type User$sessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.SessionScalarFieldEnum | Prisma.SessionScalarFieldEnum[]
+}
+
+/**
+ * User.snapshots
+ */
+export type User$snapshotsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Snapshot
+   */
+  select?: Prisma.SnapshotSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Snapshot
+   */
+  omit?: Prisma.SnapshotOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SnapshotInclude<ExtArgs> | null
+  where?: Prisma.SnapshotWhereInput
+  orderBy?: Prisma.SnapshotOrderByWithRelationInput | Prisma.SnapshotOrderByWithRelationInput[]
+  cursor?: Prisma.SnapshotWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SnapshotScalarFieldEnum | Prisma.SnapshotScalarFieldEnum[]
 }
 
 /**

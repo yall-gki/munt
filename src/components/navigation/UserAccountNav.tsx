@@ -6,8 +6,15 @@ import Link from "next/link";
 import { User } from "next-auth";
 import { UserAvatar } from "@/components/UserAvatar";
 import gsap from "gsap";
-import { X } from "lucide-react";
+import { LogOut, Settings, User as UserIcon, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/DropdownMenu";
 
 interface UserAccountMenuProps {
   user: Pick<User, "name" | "email" | "image">;
@@ -37,18 +44,19 @@ export default function UserAccountMenu({ user }: UserAccountMenuProps) {
 
   return (
     <div className="relative z-50">
-      {/* Hamburger Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-md text-white hover:text-blue-400 transition-all group"
-        aria-label="Toggle Menu"
-      >
-        {/* Two-bar hamburger (long sticks) */}
-        <div className="space-y-1 transition-all duration-300">
-          <div className="w-6 h-[2px] bg-white rounded" />
-          <div className="w-6 h-[2px] bg-white rounded" />
-        </div>
-      </button>
+      {/* Mobile hamburger */}
+      <div className="md:hidden">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="p-2 rounded-md text-white hover:text-blue-400 transition-all group"
+          aria-label="Toggle Menu"
+        >
+          <div className="space-y-1 transition-all duration-300">
+            <div className="w-6 h-[2px] bg-white rounded" />
+            <div className="w-6 h-[2px] bg-white rounded" />
+          </div>
+        </button>
+      </div>
 
       {/* Fullscreen Overlay */}
       <AnimatePresence>
@@ -59,7 +67,7 @@ export default function UserAccountMenu({ user }: UserAccountMenuProps) {
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -12, opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="fixed inset-0 md:inset-x-0 md:top-[8vh] md:bottom-auto md:h-[320px] bg-zinc-950/95 text-white flex flex-col items-center justify-between py-10 px-6 overflow-y-auto backdrop-blur-md border-b border-zinc-800"
+            className="fixed inset-0 bg-zinc-950/95 text-white flex flex-col items-center justify-between py-10 px-6 overflow-y-auto backdrop-blur-md border-b border-zinc-800 md:hidden"
           >
             <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row md:items-start md:justify-between gap-8">
               {/* Header */}
@@ -121,6 +129,50 @@ export default function UserAccountMenu({ user }: UserAccountMenuProps) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Desktop dropdown */}
+      <div className="hidden md:block">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/70 px-2 py-1.5 text-sm text-zinc-200 hover:text-white transition">
+              <UserAvatar
+                user={{ name: user.name || null, image: user.image || null }}
+                className="h-7 w-7"
+              />
+              <span className="max-w-[140px] truncate">
+                {user.name || "Account"}
+              </span>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            className="w-56 border-zinc-800 bg-zinc-950 text-white"
+          >
+            <div className="px-2 py-2">
+              <p className="text-sm font-semibold">{user.name || "User"}</p>
+              <p className="text-xs text-zinc-400 truncate">{user.email}</p>
+            </div>
+            <DropdownMenuSeparator className="bg-zinc-800" />
+            <DropdownMenuItem asChild>
+              <Link href="/account/settings#profile" className="flex items-center gap-2">
+                <UserIcon className="h-4 w-4" /> Profile
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/account/settings" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" /> Settings
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-zinc-800" />
+            <DropdownMenuItem
+              onSelect={() => signOut({ callbackUrl: `${window.location.origin}/login` })}
+              className="text-rose-400 focus:text-rose-300"
+            >
+              <LogOut className="h-4 w-4" /> Sign Out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   );
 }

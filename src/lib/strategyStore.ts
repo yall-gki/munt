@@ -5,8 +5,10 @@ export type StrategyItem = {
   name: string;
   type: string;
   coinId?: string | null;
+  coinIds?: string[] | null;
   timeframe?: string | null;
   isActive?: boolean;
+  parameters?: Record<string, any> | null;
 };
 
 interface StrategyStore {
